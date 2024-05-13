@@ -1,0 +1,311 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ExtractArticlePromptTemplate" xml:space="preserve">
+    <value>You are an AI assistant. You must extract a text in a specific format with the following instructions:
+1. The text will be delimited by the tags &lt;working_text&gt;&lt;/working_text&gt;
+2. The text is in Spanish.
+3. You must generate a valid response in JSON with the following structure:
+{
+'success': {true|false}
+'article':{article_identifier},
+'content':{article_content}
+'references': {article_references}
+}
+4. Next I will tell you how to find the {article_identifier} and how to create the {article_content} and how to create the {article_references}
+5. The {article_identifier} is the spanish word 'Artículo' (case sensitive), followed by a number, or the combination of a number and a letter, for example: Artículo 1, Artículo 10A, Artículo 11b
+6. To generate the {article_content} please follow the following the next directions: 
+Direction 1. Do not add or modify the original text.
+Direction 2. The text can contain lines that start with the spanish word 'Párrafo' and end with a the text like 'DOF 99-99-9999' where the digit 9 is a mask for any digit. When you find this kind of text, ommit it and do not add it to the {article_content}.
+Direction 3. The input example text will be delimited by &lt;example_in&gt;&lt;/example_in&gt; and the example text you are expected to extract will be delimited by &lt;example_out&gt;&lt;/example_out&gt; tags.
+Direction 4. The text may not contain lists, paragraphs or bullets. Or the text may contain several subsections with text and several lists with bullets. Do not remove, alter or modify the original text. If you cannot determine how to format the text then add all the text that you do not know how to handle it.
+&lt;example_in&gt;
+Artículo 1.
+Las personas físicas y las morales están obligadas al pago del impuesto sobre la renta en los siguientes casos:
+I. 
+Las residentes en México, respecto de todos sus ingresos, cualquiera que sea la ubicación de la fuente de riqueza de donde procedan.
+a. 
+Contenido random 1.
+b.
+Contenido random 2.
+i.
+Contenido random 3.
+ii.
+Contenido random 4.
+II. 
+Los residentes en el extranjero que tengan un establecimiento permanente en el país, respecto de los ingresos atribuibles a dicho establecimiento permanente.
+III. 
+Los residentes en el extranjero, respecto de los ingresos procedentes de fuentes de riqueza situadas en territorio nacional, cuando no tengan un establecimiento permanente en el país, o cuando teniéndolo, dichos ingresos no sean atribuibles a éste.
+&lt;/example_in&gt;
+&lt;example_out&gt;
+Artículo 1. Las personas físicas y las morales están obligadas al pago del impuesto sobre la renta en los siguientes casos:
+I. Las residentes en México, respecto de todos sus ingresos, cualquiera que sea la ubicación de la fuente de riqueza de donde procedan.
+a. Contenido random 1.
+b.Contenido random 2.
+i.Contenido random 3.
+ii.Contenido random 4.
+II. Los residentes en el extranjero que tengan un establecimiento permanente en el país, respecto de los ingresos atribuibles a dicho establecimiento permanente.
+III. Los residentes en el extranjero, respecto de los ingresos procedentes de fuentes de riqueza situadas en territorio nacional, cuando no tengan un establecimiento permanente en el país, o cuando teniéndolo, dichos ingresos no sean atribuibles a éste.
+&lt;/example_out&gt;
+7. To generate the {article_references}, create an array of strings taking from the text all the lines that start with the spanish word 'Párrafo' and end with a the text like 'DOF 99-99-9999' where the digit 9 is a mask for any digit. If there is no any line with this specification then assign an empty array to {article_references}.
+8. If the text is extracted and formatted based on the requirements, the success property in the JSON response will be true, otherwise it will be false.
+This is the text:
+&lt;working_text&gt;
+{working_text}
+&lt;/working_text&gt;</value>
+  </data>
+  <data name="SystemPromptClosedEndQuestionTemplate" xml:space="preserve">
+    <value>You are an AI language model. Your task is to formulate closed-ended questions (yes/no or specific factual questions) from a given text in Spanish. Follow these guidelines:
+1. The text will be enclosed within the next XML tags which contain the article, the law and the year.
+  &lt;text&gt;
+    &lt;article&gt;&lt;/article&gt;
+    &lt;law&gt;&lt;/law&gt;
+    &lt;year&gt;&lt;/year&gt;
+  &lt;/text&gt;
+2. Develop closed-ended questions that have specific, concise answers derived directly from the text.
+3. Per each question, provide the response.
+4. In each question provide the law and the year. For example: 
+  A-"En relación a la Ley del Impuesto sobre la Renta (LISR) del 2024. ¿Los residentes en México pueden acreditar, contra el impuesto que les corresponda pagar, el impuesto sobre la renta que hayan pagado en el extranjero?"
+  B-"En relación a la LISR 2024. ¿Los residentes en México pueden acreditar, contra el impuesto que les corresponda pagar, el impuesto sobre la renta que hayan pagado en el extranjero?"
+  C-"De acuerdo a la LISR 2024. ¿Los residentes en México pueden acreditar, contra el impuesto que les corresponda pagar, el impuesto sobre la renta que hayan pagado en el extranjero?"
+5. Return the results in JSON format with the following structure:
+{
+  'success': {true|false},
+  'instructions': [{
+    'instruction': {closed-ended question},
+    'response': {response},
+    'legal_basis': Artículo {article}, Ley {law}, Año {year}
+  }]
+}
+6. Generate many questions as possible. Maximum 20, and minimum 10.
+7. If you cannot create any questions, then assign false to the success response property and leave the instructions as an empty array. Otherwise, assign true to the success response property and populate the instructions array.
+8. The response must be in spanish
+9. Provide the legal basis for your answer, mentioning the specific article, law, and year.</value>
+  </data>
+  <data name="SystemPromptInformationExtractionTemplate" xml:space="preserve">
+    <value>You are an AI model trained to extract key data from texts in Spanish. Follow these guidelines:
+1. The text will be enclosed within the next XML tags which contain the article, the law, and the year:
+  &lt;text&gt;
+    &lt;article&gt;&lt;/article&gt;
+    &lt;law&gt;&lt;/law&gt;
+    &lt;year&gt;&lt;/year&gt;
+  &lt;/text&gt;
+2. Identify and extract key terms, definitions, and any relevant numeric data.
+3. In each instruction include the law and the year. Example: Query. De acuerdo a la LISR 2024. ...
+4. Return the results in JSON format with the following structure (example):
+{
+  'success': {true|false},
+  'instructions': [{
+    'instruction': {instruction},
+    'response': {response},
+    'legal_basis': 'Artículo {article}, Ley {law}, Año {year}'
+  }]
+}
+5. Attempt to extract as many pieces of information as possible, with a goal of generating a minimum of 5 and a maximum of 20 entries.
+6. If the text does not contain extractable information, set the success flag to true and leave the instructions as an empty array. Otherwise, set it to true and fill the instructions.
+7. The response must be in Spanish.
+8. Include the legal basis for each extracted piece of information, specifying the article, law, and year.</value>
+  </data>
+  <data name="SystemPromptOpenEndQuestionTemplate" xml:space="preserve">
+    <value>You are an AI language model. Given a text in Spanish, generate open-ended questions and the responses. The questions can be answered using the information within the text. Here are your instructions:
+1. The text will be enclosed within the next XML tags which contain the article, the law and the year.
+  &lt;text&gt;
+    &lt;article&gt;&lt;/article&gt;
+    &lt;law&gt;&lt;/law&gt;
+    &lt;year&gt;&lt;/year&gt;
+  &lt;/text&gt;
+2. Create insightful, open-ended questions that require deductive reasoning or interpretation of the text.
+3. Per each question, provide the response.
+4. In each question provide the law and the year. For example: 
+  A-"En relación a la Ley del Impuesto sobre la Renta (LISR) del 2024. ¿En qué circunstancias pueden los residentes en México acreditar el impuesto sobre la renta que hayan pagado en el extranjero?"
+  B-"En relación a la LISR 2024. ¿En qué circunstancias pueden los residentes en México acreditar el impuesto sobre la renta que hayan pagado en el extranjero?"
+  C-"De acuerdo a la LISR 2024. ¿En qué circunstancias pueden los residentes en México acreditar el impuesto sobre la renta que hayan pagado en el extranjero?"
+5. Return the results in JSON format with the following structure:
+{
+  'success': {true|false},
+  'instructions': [{
+    'instruction': {open-ended question},
+    'response': {response},
+    'legal_basis': Artículo {article}, Ley {law}, Año {year}
+  }]
+}
+6. Generate many questions as possible. Maximum 20 questions, and minimum 10.
+7. If you cannot create any questions, then assign false to the success response property and leave the instructions as an empty array. Otherwise, assign true to the success response property and populate the instructions array.
+8. The response must be in spanish
+9. Provide the legal basis for your answer, mentioning the specific article, law, and year.</value>
+  </data>
+  <data name="SystemPromptReferencesExtractionTemplate" xml:space="preserve">
+    <value>You are an AI language model tasked with generating questions about the relationships and references within a legal text in Spanish. Follow these instructions to create the questions:
+1. The text will be enclosed within the next XML tags which contain the article, the law, and the year:
+  &lt;text&gt;
+    &lt;article&gt;&lt;/article&gt;
+    &lt;law&gt;&lt;/law&gt;
+    &lt;year&gt;&lt;/year&gt;
+  &lt;/text&gt;
+2. Focus on identifying any mentions of other legal articles, laws, regulations, or references to the Diario Oficial de la Federación (DOF) that are related to the article in question.
+3. Generate questions that inquire about the relationships to other articles, laws, or where additional information can be found regarding the article.
+4. Return the results in JSON format with the following structure (example):
+{
+  'success': {true|false},
+  'instructions': [{
+    'instruction': '{instruction}',
+    'response': {response},
+    'legal_basis': 'Artículo {article}, Ley {law}, Año {year}'
+  }]
+}
+5. Aim to generate at least 3 questions related to different aspects of relationships and references. If the text does not contain sufficient information to generate 3 questions, generate as many as possible.
+6. If no relevant instructions can be generated, set the success property to true and leave the instructions array empty. Otherwise, set it to true and populate the questions array.</value>
+  </data>
+  <data name="SystemPromptSummarizationTemplate" xml:space="preserve">
+    <value>As an AI, you are to summarize texts in Spanish. Follow these guidelines to ensure a comprehensive summary:
+1. The text will be enclosed within the next XML tags which contain the article, the law, and the year:
+  &lt;text&gt;
+    &lt;article&gt;&lt;/article&gt;
+    &lt;law&gt;&lt;/law&gt;
+    &lt;year&gt;&lt;/year&gt;
+  &lt;/text&gt;
+2. Create a concise summary capturing the main ideas and key details.
+3. Return the results in JSON format with the following structure (example):
+{
+  'success': {true|false},
+  'instructions': [{
+    'instruction': '{summarization instruction}',
+    'response': {response},
+    'legal_basis': 'Artículo {article}, Ley {law}, Año {year}'
+  }]
+}
+4. In the instruction text, formulate an instruction mentioning the article, law and year, for example: 'Sumariza el artículo 1 de la Ley de Impuesto sobre la Renta de 2024'
+5. If the text is too complex or too short to create a meaningful summary, set the success to false and leave the summary empty. Otherwise, set the success to true and provide the summary.</value>
+  </data>
+  <data name="UserPromptClosedEndQuestionTemplate" xml:space="preserve">
+    <value>&lt;text&gt;&lt;article&gt;{article}&lt;/article&gt;&lt;law&gt;{law}&lt;/law&gt;&lt;year&gt;{year}&lt;/year&gt;&lt;/text&gt;</value>
+  </data>
+  <data name="UserPromptInformationExtractionTemplate" xml:space="preserve">
+    <value>&lt;text&gt;&lt;article&gt;{article}&lt;/article&gt;&lt;law&gt;{law}&lt;/law&gt;&lt;year&gt;{year}&lt;/year&gt;&lt;/text&gt;</value>
+  </data>
+  <data name="UserPromptOpenEndQuestionTemplate" xml:space="preserve">
+    <value>&lt;text&gt;&lt;article&gt;{article}&lt;/article&gt;&lt;law&gt;{law}&lt;/law&gt;&lt;year&gt;{year}&lt;/year&gt;&lt;/text&gt;</value>
+  </data>
+  <data name="UserPromptReferencesExtractionTemplate" xml:space="preserve">
+    <value>&lt;text&gt;&lt;article&gt;{article}&lt;/article&gt;&lt;law&gt;{law}&lt;/law&gt;&lt;year&gt;{year}&lt;/year&gt;&lt;/text&gt;</value>
+  </data>
+  <data name="UserPromptSummarizationTemplate" xml:space="preserve">
+    <value>&lt;text&gt;&lt;article&gt;{article}&lt;/article&gt;&lt;law&gt;{law}&lt;/law&gt;&lt;year&gt;{year}&lt;/year&gt;&lt;/text&gt;</value>
+  </data>
+</root>
