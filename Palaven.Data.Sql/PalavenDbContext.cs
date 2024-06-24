@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Palaven.Model.Datasets;
-using Palaven.Model.LllmPerformance;
+using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Data.Sql;
 
@@ -11,8 +11,14 @@ public class PalavenDbContext : DbContext, IPalavenDbContext
     {
     }
 
-    public DbSet<Instruction> Instructions { get; set; } = default!;
-    public DbSet<BertScoreEvaluationMetric> BertScoreEvaluationMetrics { get; set; } = default!;
+    public DbSet<InstructionEntity> Instructions { get; set; } = default!;
+    public DbSet<EvaluationSession> EvaluationSessions { get; set; } = default!;
+    public DbSet<FineTunedLlmResponse> FineTunedLlmResponses { get; set; } = default!;
+    public DbSet<FineTunedLlmWithRagResponse> FineTunedLlmWithRagResponses { get; set; } = default!;
+    public DbSet<LlmResponse> LlmResponses { get; set; } = default!;
+    public DbSet<LlmWithRagResponse> LlmWithRagResponses { get; set; } = default!;
+    public DbSet<BertScoreMetric> BertScoreMetrics { get; set; } = default!;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

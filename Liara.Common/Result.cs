@@ -7,4 +7,19 @@ public sealed class Result : IResult
     public bool AnyErrors => Errors.Any();
     public bool AnyValidationErrors => ValidationErrors.Any();
     public bool AnyErrorsOrValidationFailures { get; set; }
+
+    public static IResult Success()
+    {
+        return new Result();
+    }
+
+    public static IResult Fail(IEnumerable<ValidationError> validationErrors, IEnumerable<Exception> errors)
+    {
+        var result = new Result();
+
+        result.Errors.AddRange(errors ?? new List<Exception>());
+        result.ValidationErrors.AddRange(validationErrors ?? new List<ValidationError>());
+
+        return result;
+    }
 }

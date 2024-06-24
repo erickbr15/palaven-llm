@@ -7,20 +7,20 @@ namespace Palaven.Data.Sql.Services;
 public class InstructionDataService : IInstructionDataService
 {
     private readonly PalavenDbContext _dbContext;
-    private readonly IRepository<Instruction> _repository;
+    private readonly IRepository<InstructionEntity> _repository;
 
-    public InstructionDataService(PalavenDbContext dbContext, IRepository<Instruction> repository)
+    public InstructionDataService(PalavenDbContext dbContext, IRepository<InstructionEntity> repository)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    public Task<Instruction?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public Task<InstructionEntity?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         return _repository.GetByIdAsync(id, cancellationToken);
     }
 
-    public async Task<Instruction> CreateAsync(Instruction instruction, CancellationToken cancellationToken)
+    public async Task<InstructionEntity> CreateAsync(InstructionEntity instruction, CancellationToken cancellationToken)
     {            
         await _repository.AddAsync(instruction, cancellationToken);
         return instruction;
@@ -41,12 +41,12 @@ public class InstructionDataService : IInstructionDataService
         return _repository.ExistsAsync(id, cancellationToken);
     }
 
-    public IList<Instruction> GetAll()
+    public IList<InstructionEntity> GetAll()
     {
         return _repository.GetAll().ToList();
     }
 
-    public IQueryable<Instruction> GetQueryable()
+    public IQueryable<InstructionEntity> GetQueryable()
     {
         return _repository.GetAll();
     }
@@ -61,11 +61,11 @@ public class InstructionDataService : IInstructionDataService
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Instruction> UpdateAsync(int id, Instruction instruction, CancellationToken cancellationToken)
+    public async Task<InstructionEntity> UpdateAsync(int id, InstructionEntity instruction, CancellationToken cancellationToken)
     {
         var entity = await _repository.GetByIdAsync(id, cancellationToken) ?? throw new InvalidOperationException($"Unable to find the entity with id {id}.");        
 
-        entity.InstructionRequest = instruction.InstructionRequest;
+        entity.Instruction = instruction.Instruction;
         entity.Response = instruction.Response;
         entity.Category = instruction.Category;
         entity.GoldenArticleId = instruction.GoldenArticleId;

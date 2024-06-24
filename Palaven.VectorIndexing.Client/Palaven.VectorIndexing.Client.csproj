@@ -20,7 +20,7 @@
     <ProjectReference Include="..\Liara.Pinecone\Liara.Pinecone.csproj" />
     <ProjectReference Include="..\Palaven.Data.Sql\Palaven.Data.Sql.csproj" />
     <ProjectReference Include="..\Palaven.Data\Palaven.Data.csproj" />
-    <ProjectReference Include="..\Palaven.Instructions\Palaven.Instructions.csproj" />
+    <ProjectReference Include="..\Palaven.Instructions\Palaven.Core.csproj" />
     <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
     <ProjectReference Include="..\Palaven.VectorIndexing\Palaven.VectorIndexing.csproj" />
   </ItemGroup>

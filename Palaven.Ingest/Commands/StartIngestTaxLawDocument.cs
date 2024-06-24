@@ -14,9 +14,7 @@ public class StartIngestTaxLawDocument : ITraceableCommand<IngestLawDocumentMode
     private readonly IBlobStorageService _storageService;
     private readonly IDocumentRepository<TaxLawToIngestDocument> _repository;
 
-    public StartIngestTaxLawDocument(
-        IOptions<BlobStorageConnectionOptions> storageOptions, 
-        IDocumentRepository<TaxLawToIngestDocument> repository)
+    public StartIngestTaxLawDocument(IOptions<BlobStorageConnectionOptions> storageOptions, IDocumentRepository<TaxLawToIngestDocument> repository)
     {
         var options = storageOptions?.Value ?? throw new ArgumentNullException(nameof(storageOptions));
 

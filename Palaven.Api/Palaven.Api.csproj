@@ -7,23 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.12.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="7.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Liara.Common\Liara.Common.csproj" />
-    <ProjectReference Include="..\Liara.CosmosDb\Liara.CosmosDb.csproj" />
-    <ProjectReference Include="..\Liara.OpenAI\Liara.OpenAI.csproj" />
-    <ProjectReference Include="..\Liara.Pinecone\Liara.Pinecone.csproj" />
-    <ProjectReference Include="..\Palaven.Chat\Palaven.Chat.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
 </Project>

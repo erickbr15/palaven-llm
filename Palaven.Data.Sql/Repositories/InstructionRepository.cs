@@ -3,9 +3,10 @@ using Palaven.Model.Datasets;
 
 namespace Palaven.Data.Sql.Repositories;
 
-public class InstructionRepository : GenericRepository<Instruction>
+public class InstructionRepository : GenericRepository<InstructionEntity>
 {
-    public InstructionRepository(PalavenDbContext dbContext) : base(dbContext)
+    public InstructionRepository(PalavenDbContext dbContext) 
+        : base(dbContext)
     {
     }
 }

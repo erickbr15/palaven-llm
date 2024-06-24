@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Liara.Common.DataAccess;
 using Palaven.Model.Datasets;
 using Palaven.Data.Sql.Repositories;
-using Palaven.Model.LllmPerformance;
 using Palaven.Data.Sql.Services;
 using Palaven.Data.Sql.Services.Contracts;
+using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Data.Sql.Extensions;
 
@@ -17,15 +17,15 @@ public static class ApplicationRootExtensions
             options.UseSqlServer("name=ConnectionStrings:PalavenDb");
         });
 
-        services.AddTransient<IRepository<Instruction>, InstructionRepository>();
-        services.AddTransient<IRepository<BertScoreEvaluationMetric>, BertScoreEvaluationMetricsRepository>();
-        services.AddTransient<IRepository<RagBertScoreEvaluationMetric>, RagBertScoreEvaluationMetricsRepository>();
-        services.AddTransient<IRepository<FineTuningBertScoreEvaluationMetric>, FineTuningBertScoreEvaluationMetricsRepository>();
-        services.AddTransient<IRepository<RagFineTuningBertScoreEvaluationMetric>, RagFineTuningBertScoreEvaluationMetricsRepository>();
+        services.AddTransient<IRepository<BertScoreMetric>, BertScoreMetricRepository>();
+        services.AddTransient<IRepository<EvaluationSession>, EvaluationSessionRepository>();
+        services.AddTransient<IRepository<FineTunedLlmResponse>, FineTunedLlmResponseRepository>();
+        services.AddTransient<IRepository<FineTunedLlmWithRagResponse>, FineTunedLlmWithRagResponsesRepository>();
+        services.AddTransient<IRepository<InstructionEntity>, InstructionRepository>();
+        services.AddTransient<IRepository<LlmResponse>, LlmResponseRepository>();
+        services.AddTransient<IRepository<LlmWithRagResponse>, LlmWithRagResponseRepository>();
+
         services.AddTransient<IInstructionDataService, InstructionDataService>();
-        services.AddTransient<IBertScoreEvaluationMetricsDataService, BertScoreEvaluationMetricsDataService>();
-        services.AddTransient<IRagBertScoreMetricsDataService, RagBertScoreMetricsDataService>();
-        services.AddTransient<IFineTuningBertScoreMetricsDataService, FineTuningBertScoreMetricsDataService>();
-        services.AddTransient<IRagFineTuningBertScoreMetricsDataService, RagFineTuningBertScoreMetricsDataService>();
+        services.AddTransient<IPerformanceEvaluationDataService, PerformanceEvaluationDataService>();        
     }
 }
