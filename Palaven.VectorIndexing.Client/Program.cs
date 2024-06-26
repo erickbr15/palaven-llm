@@ -4,8 +4,8 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Hosting;
 using Palaven.Data.Extensions;
 using Palaven.Data.Sql.Extensions;
-using Palaven.Instructions.Extensions;
 using Palaven.VectorIndexing.Extensions;
+using Palaven.Core.Extensions;
 
 var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -30,7 +30,7 @@ var hostBuilder = new HostBuilder()
         services.AddDataServices();
         services.AddDataSqlServices();
         services.AddVectorIndexingServices();
-        services.AddInstructionsServices();
+        services.AddPalavenCoreServices();
     });
 
 var host = hostBuilder.Build();

@@ -28,6 +28,6 @@ public static class ApplicationRootExtensions
     public static void AddChatServices(this IServiceCollection services)
     {
         services.AddSingleton<IOpenAIChatService, OpenAIChatService>();
-        services.AddSingleton<IGemmaQueryAugmentationService, GemmaQueryAugmentationService>();
+        services.AddSingleton<IGemmaChatService, GemmaChatService>();
     }
 }

@@ -14,15 +14,18 @@ public class DatasetInstructionService : IDatasetInstructionService
     private readonly IDocumentRepository<DatasetGenerationTaskDocument> _datasetGenerationTasksRepository;
     private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleRepository;
     private readonly IInstructionDataService _instructionDataService;
+    private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
 
     public DatasetInstructionService(
         IDocumentRepository<DatasetGenerationTaskDocument> datasetGenerationTasksRepository,
         IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleRepository,
-        IInstructionDataService instructionDataService)
+        IInstructionDataService instructionDataService,
+        IPerformanceEvaluationDataService performanceEvaluationDataService)
     {
         _datasetGenerationTasksRepository = datasetGenerationTasksRepository ?? throw new ArgumentNullException(nameof(datasetGenerationTasksRepository));
         _goldenArticleRepository = goldenArticleRepository ?? throw new ArgumentNullException(nameof(goldenArticleRepository));
         _instructionDataService = instructionDataService ?? throw new ArgumentNullException(nameof(instructionDataService));
+        _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
     }
 
     public async Task CreateInstructionDatasetAsync(Guid traceId, CancellationToken cancellationToken)
@@ -88,9 +91,35 @@ public class DatasetInstructionService : IDatasetInstructionService
         }
     }
 
-    public Task<IResult<List<InstructionData>>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken)
+    public async Task<IResult<List<InstructionData>>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var evaluationSession = await _performanceEvaluationDataService.GetEvaluationSessionAsync(model.SessionId, cancellationToken);
+        if(evaluationSession == null)
+        {
+            return Result<List<InstructionData>>.Success(new List<InstructionData>());
+        }
+
+        var offset = (model.BatchNumber - 1) * evaluationSession.BatchSize;
+
+        var instructionDataset = _instructionDataService.GetQueryable()
+            .Where(x => x.DatasetId == evaluationSession.DatasetId)
+            .OrderBy(x => x.Id)
+            .Skip(offset)
+            .Take(evaluationSession.BatchSize)
+            .Select(i=> new InstructionData
+            {
+                InstructionId = i.Id,
+                DatasetId = i.DatasetId,
+                ChunckNumber = model.BatchNumber,
+                Instruction = i.Instruction,
+                Response = i.Response,
+                Category = i.Category,
+                GoldenArticleId = i.GoldenArticleId,
+                LawId = i.LawId,
+                ArticleId = i.ArticleId
+            }).ToList();
+
+        return Result<List<InstructionData>>.Success(instructionDataset);
     }
 
     private async Task<IList<Guid>> GetProcessedGoldenArticlesAsync(Guid traceId, CancellationToken cancellationToken)

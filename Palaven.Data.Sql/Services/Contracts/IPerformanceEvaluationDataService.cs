@@ -4,6 +4,7 @@ namespace Palaven.Data.Sql.Services.Contracts;
 
 public interface IPerformanceEvaluationDataService
 {
+    Task<EvaluationSession?> GetEvaluationSessionAsync(Guid sessionId, CancellationToken cancellationToken);
     Task<EvaluationSession> CreateEvaluationSessionAsync(EvaluationSession evaluationSession, CancellationToken cancellationToken);
     Task<EvaluationSession> UpdateEvaluationSessionAsync(EvaluationSession evaluationSession, CancellationToken cancellationToken);    
     Task UpsertChatCompletionResponseAsync(IEnumerable<FineTunedLlmResponse> chatCompletionResponses, CancellationToken cancellationToken);

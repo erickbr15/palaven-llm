@@ -61,6 +61,11 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         return evaluationSessionEntity;
     }
 
+    public async Task<EvaluationSession?> GetEvaluationSessionAsync(Guid sessionId, CancellationToken cancellationToken)
+    {
+        return await _evaluationSessionRepository.GetByIdAsync(sessionId, cancellationToken);
+    }
+
     public async Task UpsertChatCompletionPerformanceEvaluationAsync(BertScoreMetric chatCompletionPerformanceEvaluation, CancellationToken cancellationToken)
     {
         var existingEvaluation = _bertScoreMetricRepository.GetAll().SingleOrDefault(x => x.SessionId == chatCompletionPerformanceEvaluation.SessionId && x.BatchNumber == chatCompletionPerformanceEvaluation.BatchNumber);

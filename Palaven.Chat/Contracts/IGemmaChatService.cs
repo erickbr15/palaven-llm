@@ -2,7 +2,7 @@
 
 namespace Palaven.Chat.Contracts;
 
-public interface IGemmaQueryAugmentationService
+public interface IGemmaChatService
 {
     Task<ChatMessage> AugmentQueryAsync(ChatMessage message, CancellationToken cancellationToken);
 }

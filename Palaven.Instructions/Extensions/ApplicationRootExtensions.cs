@@ -1,13 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Liara.Common;
+using Microsoft.Extensions.DependencyInjection;
 using Palaven.Core.Datasets;
+using Palaven.Core.PerformanceEvaluation;
+using Palaven.Core.PerformanceEvaluation.Commands;
+using Palaven.Model.PerformanceEvaluation.Commands;
 
-namespace Palaven.Instructions.Extensions;
+namespace Palaven.Core.Extensions;
 
 public static class ApplicationRootExtensions
 {
-    public static IServiceCollection AddInstructionsServices(this IServiceCollection services)
+    public static IServiceCollection AddPalavenCoreServices(this IServiceCollection services)
     {
+        services.AddTransient<ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool>, UpsertChatCompletionResponseCommand>();
         services.AddTransient<IDatasetInstructionService, DatasetInstructionService>();
+        services.AddTransient<IPerformanceEvaluationService, PerformanceEvaluationService>();
+
         return services;
     }
 }

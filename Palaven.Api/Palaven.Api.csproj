@@ -7,7 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Liara.Azure\Liara.Azure.csproj" />
+    <ProjectReference Include="..\Liara.Common\Liara.Common.csproj" />
+    <ProjectReference Include="..\Liara.CosmosDb\Liara.CosmosDb.csproj" />
+    <ProjectReference Include="..\Liara.EntityFrameworkCore\Liara.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Liara.OpenAI\Liara.OpenAI.csproj" />
+    <ProjectReference Include="..\Liara.Pinecone\Liara.Pinecone.csproj" />
+    <ProjectReference Include="..\Palaven.Chat\Palaven.Chat.csproj" />
+    <ProjectReference Include="..\Palaven.Data.Sql\Palaven.Data.Sql.csproj" />
+    <ProjectReference Include="..\Palaven.Data\Palaven.Data.csproj" />
+    <ProjectReference Include="..\Palaven.Instructions\Palaven.Core.csproj" />
+    <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,13 +10,13 @@ using Palaven.Model.Ingest.Documents.Golden;
 
 namespace Palaven.Chat;
 
-public class GemmaQueryAugmentationService : IGemmaQueryAugmentationService
+public class GemmaChatService : IGemmaChatService
 {
     private readonly IPineconeServiceClient _pineconeServiceClient;
     private readonly IOpenAiServiceClient _openAiServiceClient;
     private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _articleRepository;
 
-    public GemmaQueryAugmentationService(
+    public GemmaChatService(
         IPineconeServiceClient pineconeServiceClient, 
         IOpenAiServiceClient openAiServiceClient,
         IDocumentRepository<TaxLawDocumentGoldenArticle> documentRepository)

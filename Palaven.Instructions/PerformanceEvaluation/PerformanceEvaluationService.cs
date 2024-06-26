@@ -8,10 +8,13 @@ namespace Palaven.Core.PerformanceEvaluation;
 public class PerformanceEvaluationService : IPerformanceEvaluationService
 {
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
+    private readonly ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool> _upsertChatCompletionResponseCommand;
 
-    public PerformanceEvaluationService(IPerformanceEvaluationDataService performanceEvaluationDataService)
+    public PerformanceEvaluationService(IPerformanceEvaluationDataService performanceEvaluationDataService,
+        ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool> upsertChatCompletionResponseCommand)
     {
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
+        _upsertChatCompletionResponseCommand = upsertChatCompletionResponseCommand ?? throw new ArgumentNullException(nameof(upsertChatCompletionResponseCommand));
     }
 
     public async Task<IResult<EvaluationSessionInfo>> CreateEvaluationSessionAsync(CreateEvaluationSessionModel model, CancellationToken cancellationToken)
@@ -25,7 +28,9 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             StartDate = DateTime.Now
         };
 
-        var newEvaluationSession = await _performanceEvaluationDataService.CreateEvaluationSessionAsync(evaluationSession, cancellationToken);
+        var newEvaluationSession = await _performanceEvaluationDataService.CreateEvaluationSessionAsync(evaluationSession, cancellationToken);        
+        await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
+
         
         return Result<EvaluationSessionInfo>.Success(new EvaluationSessionInfo
         {
@@ -36,6 +41,26 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             IsActive = newEvaluationSession.IsActive,
             StartDate = newEvaluationSession.StartDate
         });
+    }
+
+    public async Task<EvaluationSessionInfo?> GetEvaluationSessionAsync(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var evaluationSession = await _performanceEvaluationDataService.GetEvaluationSessionAsync(sessionId, cancellationToken);
+        
+        if(evaluationSession == null)
+        {
+            return null;
+        }
+
+        return new EvaluationSessionInfo
+        {
+            SessionId = evaluationSession.SessionId,
+            DatasetId = evaluationSession.DatasetId,
+            BatchSize = evaluationSession.BatchSize,
+            LargeLanguageModel = evaluationSession.LargeLanguageModel,
+            IsActive = evaluationSession.IsActive,
+            StartDate = evaluationSession.StartDate
+        };
     }
 
     public async Task<IResult> UpsertChatCompletionPerformanceEvaluationAsync(UpsertChatCompletionPerformanceEvaluationModel model, CancellationToken cancellationToken)
@@ -50,12 +75,17 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         };
         
         await _performanceEvaluationDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
+        await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
 
-    public Task<IResult> UpsertChatCompletionResponseAsync(IEnumerable<UpsertChatCompletionResponseModel> model, CancellationToken cancellationToken)
+    public async Task<IResult> UpsertChatCompletionResponseAsync(IEnumerable<UpsertChatCompletionResponseModel> model, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _upsertChatCompletionResponseCommand.ExecuteAsync(model, cancellationToken);        
+
+        return result.AnyErrorsOrValidationFailures ? 
+            Result.Fail(result.ValidationErrors, result.Errors) : 
+            Result.Success();
     }
 }
