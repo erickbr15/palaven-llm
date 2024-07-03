@@ -28,7 +28,10 @@ var hostBuilder = new HostBuilder()
     {
         services.AddAIServices();
         services.AddDataServices();
-        services.AddDataSqlServices();
+        
+        var sqlConnectionString = hostContext.Configuration.GetValue<string>("SqlDB:ConnectionString");
+        services.AddDataSqlServices(sqlConnectionString!);
+
         services.AddVectorIndexingServices();
         services.AddPalavenCoreServices();
     });
