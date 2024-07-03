@@ -25,10 +25,13 @@ namespace Palaven.Api
                     kv.SetCredential(new DefaultAzureCredential());
                 });
             });
-
+            
             builder.Services.AddAIServices();
             builder.Services.AddDataServices();
-            builder.Services.AddDataSqlServices();
+
+            var sqlConnectionString = builder.Configuration.GetValue<string>("SqlDB:ConnectionString");
+            builder.Services.AddDataSqlServices(sqlConnectionString!);
+
             builder.Services.AddChatServices();
             builder.Services.AddPalavenCoreServices();
 
@@ -39,10 +42,10 @@ namespace Palaven.Api
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            app.UseSwagger();
+            
             if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
+            {                
                 app.UseSwaggerUI();
             }
 

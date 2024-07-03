@@ -11,12 +11,12 @@ namespace Palaven.Data.Sql.Extensions;
 
 public static class ApplicationRootExtensions
 {    
-    public static void AddDataSqlServices(this IServiceCollection services)
-    {
-        services.AddDbContext<PalavenDbContext>(options => {
-            options.UseSqlServer("name=ConnectionStrings:PalavenDb");
+    public static void AddDataSqlServices(this IServiceCollection services, string connectionString)
+    {        
+        services.AddDbContext<PalavenDbContext>(options => {            
+            options.UseSqlServer(connectionString);
         });
-
+        
         services.AddTransient<IRepository<BertScoreMetric>, BertScoreMetricRepository>();
         services.AddTransient<IRepository<EvaluationSession>, EvaluationSessionRepository>();
         services.AddTransient<IRepository<FineTunedLlmResponse>, FineTunedLlmResponseRepository>();
