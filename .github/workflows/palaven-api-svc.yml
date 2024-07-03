@@ -20,7 +20,7 @@ env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: Palaven.Api
-  ConnectionStrings.AppConfiguration: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
+  AppConfigurationEndpoint: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
 jobs:
   build:
     runs-on: windows-latest

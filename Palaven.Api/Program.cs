@@ -12,15 +12,15 @@ namespace Palaven.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-            builder.Configuration.AddEnvironmentVariables();
-            
-            var appConfigurationConnectionString = builder.Configuration.GetConnectionString("AppConfiguration");
+                                    
+            var appConfigurationEndpoint = Environment.GetEnvironmentVariable("AppConfigurationEndpoint");
             
             builder.Configuration.AddAzureAppConfiguration(options =>
             {
-                options.Connect(appConfigurationConnectionString).Select(KeyFilter.Any);
+                var azureCredentialOptions = new DefaultAzureCredentialOptions();
+                var credentials = new DefaultAzureCredential(azureCredentialOptions);
+                
+                options.Connect(new Uri(appConfigurationEndpoint!), credentials).Select(KeyFilter.Any);
                 options.ConfigureKeyVault(kv =>
                 {
                     kv.SetCredential(new DefaultAzureCredential());
