@@ -3,7 +3,7 @@ on:
   push:
     branches:
     - main
-env:
+env: 
   AZURE_WEBAPP_NAME: palaven-api-svc
   AZURE_WEBAPP_PACKAGE_PATH: Palaven.Api\publish
   AZURE_APIM_RESOURCE_PATH: /
@@ -15,6 +15,7 @@ env:
   SWASHBUCKLE_DOTNET_CORE_VERSION: 3.1.x
   API_IMPORT_SPECIFICATION_PATH: Palaven.Api\publish\swagger.json
   API_IMPORT_DLL: Palaven.Api\bin\Release\net6.0\Palaven.Api.dll
+  API_APPSETTINGS_PATH: Palaven.Api\bin\Release\net6.0\appsettings.json
   API_IMPORT_VERSION: v1
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
@@ -43,6 +44,12 @@ jobs:
     - name: Install Swashbuckle CLI .NET Global Tool
       run: dotnet tool install --global Swashbuckle.AspNetCore.Cli --version ${{ env.SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION }}
       working-directory: ${{ env.WORKING_DIRECTORY }}
+    - name: App Settings Variable Substitution
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: '${{env.API_APPSETTINGS_PATH}}'
+      env:
+        ConnectionStrings.AppConfiguration: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
     - name: Generate Open API Specification Document
       run: swagger tofile --output "${{ env.API_IMPORT_SPECIFICATION_PATH }}" "${{ env.API_IMPORT_DLL }}" "${{ env.API_IMPORT_VERSION }}"
     - name: Publish Artifacts
