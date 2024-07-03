@@ -14,6 +14,7 @@ namespace Palaven.Api
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            builder.Configuration.AddEnvironmentVariables();
             
             var appConfigurationConnectionString = builder.Configuration.GetConnectionString("AppConfiguration");
             
