@@ -45,7 +45,7 @@ jobs:
       run: dotnet tool install --global Swashbuckle.AspNetCore.Cli --version ${{ env.SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION }}
       working-directory: ${{ env.WORKING_DIRECTORY }}
     - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
