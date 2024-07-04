@@ -20,6 +20,9 @@ env:
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: Palaven.Api
   AppConfigurationEndpoint: ${{ secrets.APPCONFIG_CONNECTIONSTRING }}
+permissions:
+  id-token: write
+  contents: read
 jobs:
   build:
     runs-on: windows-latest
