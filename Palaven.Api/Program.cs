@@ -41,6 +41,14 @@ namespace Palaven.Api
             builder.Services.AddEndpointsApiExplorer();
             
             builder.Services.AddSwaggerGen();
+            builder.Services.ConfigureSwaggerGen(setup =>
+            {
+                setup.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Palaven LLM - Training & Eval API",
+                    Version = "v1"
+                });
+            });
 
             var app = builder.Build();
 
