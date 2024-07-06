@@ -65,7 +65,10 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
         var goldenArticles = await _goldenArticleDocumentRepository.GetAsync(queryGoldenArticle, continuationToken: null, queryRequestOptions: null, cancellationToken: cancellationToken);
         var existingGoldenArticleIds = string.Join(",", goldenArticles.Select(ga => $"'{ga.ArticleId}'"));
 
-        var query = new QueryDefinition($"SELECT TOP {chunkSize} * FROM c WHERE c.TraceId = \"{traceId}\" and c.LawId = \"{lawId}\" and IS_NULL(c.Content) = false and c.id NOT IN ({existingGoldenArticleIds})");
+        var query = string.IsNullOrEmpty(existingGoldenArticleIds) ?
+            new QueryDefinition($"SELECT TOP {chunkSize} * FROM c WHERE c.TraceId = \"{traceId}\" and c.LawId = \"{lawId}\" and IS_NULL(c.Content) = false") :            
+            new QueryDefinition($"SELECT TOP {chunkSize} * FROM c WHERE c.TraceId = \"{traceId}\" and c.LawId = \"{lawId}\" and IS_NULL(c.Content) = false and c.id NOT IN ({existingGoldenArticleIds})");
+
         var articles = await _articleDocumentRepository.GetAsync(query, continuationToken: null, queryRequestOptions: null, cancellationToken: cancellationToken);
 
         articles = articles.Where(a=> !string.IsNullOrWhiteSpace(a.Content) && a.Content.Length > 100).ToList();
@@ -80,5 +83,16 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
                 System.Diagnostics.Debug.WriteLine($"Golden article created: {!result.AnyErrorsOrValidationFailures}.");
             }            
         }
-    }   
+    }
+
+    public async Task DeleteGoldenDocumentsAsync(Guid traceId, Guid lawId, CancellationToken cancellationToken)
+    {
+        var query = new QueryDefinition($"SELECT * FROM c WHERE c.TraceId = \"{traceId}\" and c.LawId = \"{lawId}\"");
+        var goldenArticles = await _goldenArticleDocumentRepository.GetAsync(query, continuationToken: null, queryRequestOptions: null, cancellationToken: cancellationToken);
+
+        foreach (var goldenArticle in goldenArticles)
+        {
+            await _goldenArticleDocumentRepository.DeleteAsync(goldenArticle.Id, new PartitionKey(goldenArticle.TenantId), itemRequestOptions: null, cancellationToken);
+        }
+    }
 }

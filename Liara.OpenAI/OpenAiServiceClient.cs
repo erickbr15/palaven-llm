@@ -26,9 +26,12 @@ public class OpenAiServiceClient : IOpenAiServiceClient
             { "Authorization", $"Bearer {_openAiOptions.ApiKey}" }
         };
 
+        inputModel.Model = _openAiOptions.ChatGptModel;
+
         var chatCompletionBody = new ChatCompletionBodyBuilder().NewWith(messages, inputModel).Build();
         
         string content = JsonConvert.SerializeObject(chatCompletionBody);
+
         var bodyContent = new StringContent(Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(content)), Encoding.UTF8, "application/json");        
 
         var response = await _httpProxy.PostAsync(new Uri(_openAiOptions.ChatEndpointUrl),
@@ -48,9 +51,10 @@ public class OpenAiServiceClient : IOpenAiServiceClient
             { "Authorization", $"Bearer {_openAiOptions.ApiKey}" }
         };
 
-        var requestBody = new CreateEmbeddingsBodyBuilder().NewWithDefaults(inputModel.User, inputModel.Input).Build();
+        var requestBody = new CreateEmbeddingsBodyBuilder().NewWithDefaults(_openAiOptions.EmbeddingsModel, inputModel.User, inputModel.Input).Build();
         
         string content = JsonConvert.SerializeObject(requestBody);
+
         var bodyContent = new StringContent(Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(content)), Encoding.UTF8, "application/json");
         
         var response = await _httpProxy.PostAsync(new Uri(_openAiOptions.EmbeddingsEndpointUrl),
@@ -59,6 +63,7 @@ public class OpenAiServiceClient : IOpenAiServiceClient
             cancellationToken);
 
         var embeddings = await response.Content.ReadFromJsonAsync<dynamic>(cancellationToken: cancellationToken);
+
         var embeddingsArrayText = embeddings?.GetProperty("data").ToString();
         
         var embeddingResponse = new CreateEmbeddingResponse

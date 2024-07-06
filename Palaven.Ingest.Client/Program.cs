@@ -1,26 +1,23 @@
 ﻿using Azure.Identity;
-using Liara.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Palaven.Data.Extensions;
-using Palaven.Ingest.Commands;
 using Palaven.Ingest.Extensions;
 using Palaven.Ingest.Services;
-using Palaven.Model.Ingest.Commands;
 
 var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration((hostingContext, configBuilder) =>
     {
-        configBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-        var config = configBuilder.Build();
-        var appConfigurationConnectionString = config.GetConnectionString("AppConfiguration");
+        var appConfigurationEndpoint = Environment.GetEnvironmentVariable("AppConfigurationEndpoint");
 
         configBuilder.AddAzureAppConfiguration(options =>
         {
-            options.Connect(appConfigurationConnectionString).Select(KeyFilter.Any);
+            var azureCredentialOptions = new DefaultAzureCredentialOptions();
+            var credentials = new DefaultAzureCredential(azureCredentialOptions);
+
+            options.Connect(new Uri(appConfigurationEndpoint!), credentials).Select(KeyFilter.Any);
             options.ConfigureKeyVault(kv =>
             {
                 kv.SetCredential(new DefaultAzureCredential());
@@ -84,6 +81,8 @@ var service = host.Services.GetRequiredService<IIngestTaxLawDocumentService>();
 var traceId = new Guid("690cd4bc-1572-4cb9-8deb-04c1a96433d6");
 var lawId = new Guid("de787ea0-6897-4b6c-84a8-753a8534f550");
 
-service.CreateGoldenDocumentsAsync(traceId, lawId, chunkSize: 220, CancellationToken.None).GetAwaiter().GetResult();
+service.DeleteGoldenDocumentsAsync(traceId, lawId, CancellationToken.None).GetAwaiter().GetResult();
+
+//service.CreateGoldenDocumentsAsync(traceId, lawId, chunkSize: 220, CancellationToken.None).GetAwaiter().GetResult();
 
 host.Run();
