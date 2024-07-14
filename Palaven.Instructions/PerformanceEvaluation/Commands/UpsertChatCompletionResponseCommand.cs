@@ -35,7 +35,7 @@ public class UpsertChatCompletionResponseCommand : ICommand<IEnumerable<UpsertCh
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
                 ResponseCompletion = r.ResponseCompletion,
-                SessionId = r.SessionId
+                SessionId = r.SessionId!.Value
             }).ToList();
         
 
@@ -51,7 +51,7 @@ public class UpsertChatCompletionResponseCommand : ICommand<IEnumerable<UpsertCh
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
                 ResponseCompletion = r.ResponseCompletion,
-                SessionId = r.SessionId
+                SessionId = r.SessionId!.Value
             }).ToList();
         
 
@@ -67,7 +67,7 @@ public class UpsertChatCompletionResponseCommand : ICommand<IEnumerable<UpsertCh
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
                 ResponseCompletion = r.ResponseCompletion,
-                SessionId = r.SessionId
+                SessionId = r.SessionId!.Value
             }).ToList();
         
 
@@ -83,7 +83,7 @@ public class UpsertChatCompletionResponseCommand : ICommand<IEnumerable<UpsertCh
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
                 ResponseCompletion = r.ResponseCompletion,
-                SessionId = r.SessionId
+                SessionId = r.SessionId!.Value
             }).ToList();
         
 

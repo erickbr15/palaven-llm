@@ -50,6 +50,15 @@ public class GemmaChatService : IGemmaChatService
         };
     }
 
+    public ChatMessage GenerateSimpleQueryPrompt(ChatMessage message)
+    {
+        return new ChatMessage
+        {
+            UserId = message.UserId,
+            Query = Resources.GemmaPromptTemplates.SimpleQuery.Replace("{instruction}", message.Query)
+        };
+    }
+
     private async Task<IEnumerable<TaxLawDocumentGoldenArticle>> TryGetRelevantArticlesAsync(ChatMessage message, CancellationToken cancellationToken)
     {
         var createQueryEmbeddingsRequest = new CreateEmbeddingsModel

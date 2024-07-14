@@ -79,7 +79,7 @@ namespace Palaven.Chat.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;start_of_turn&gt;user
-        ///Answer the following question in a concise and informative manner. The question is in spanish, then answer in spanish.
+        ///Answer the following question in a concise and informative manner. The question is written in Spanish language, then answer in Spanish language. Generate an answer in a valid JSON format with only the property &apos;response&apos;. Do not include anything else than the query response.
         ///{instruction}&lt;end_of_turn&gt;
         ///&lt;start_of_turn&gt;model.
         /// </summary>
