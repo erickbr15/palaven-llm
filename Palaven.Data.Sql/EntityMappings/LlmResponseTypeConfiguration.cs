@@ -8,7 +8,7 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
 {
     public void Configure(EntityTypeBuilder<LlmResponse> builder)
     {
-        builder.ToTable("LlmResponses", PalavenDbSchemas.Datasets);
+        builder.ToTable("LlmResponses", PalavenDbSchemas.LlmPerformanceEvaluation);
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).UseIdentityColumn();
