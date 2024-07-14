@@ -43,10 +43,7 @@ public class VectorIndexingService : IVectorIndexingService
         
         foreach (var goldenArticle in goldenArticles)
         {
-            var indexCreationResult = await _uploadGoldenArticleToVectorIndex.ExecuteAsync(
-                traceId, 
-                new UploadGoldenArticleToVectorIndexModel { GoldenArticleId = new Guid(goldenArticle.Id) }, 
-                cancellationToken);
+            var indexCreationResult = await _uploadGoldenArticleToVectorIndex.ExecuteAsync(traceId, new UploadGoldenArticleToVectorIndexModel { GoldenArticleId = new Guid(goldenArticle.Id) }, cancellationToken);
 
             if (!indexCreationResult.AnyErrorsOrValidationFailures)
             {

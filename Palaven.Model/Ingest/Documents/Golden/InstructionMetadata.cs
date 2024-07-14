@@ -2,7 +2,7 @@
 
 namespace Palaven.Model.Ingest.Documents.Golden;
 
-public class FineTuningInstructionMetadata
+public class InstructionMetadata
 {
     [JsonProperty("law_id")]
     public Guid LawId { get; set; }

@@ -28,7 +28,7 @@ public class DatasetInstructionService : IDatasetInstructionService
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
     }
 
-    public async Task CreateInstructionDatasetAsync(Guid traceId, CancellationToken cancellationToken)
+    public async Task CreateInstructionDatasetAsync(Guid traceId, Guid datasetId, CancellationToken cancellationToken)
     {
         var indexedGoldenArticleIds = await GetProcessedGoldenArticlesAsync(traceId, cancellationToken);
 
@@ -50,7 +50,7 @@ public class DatasetInstructionService : IDatasetInstructionService
         {
             try
             {
-                foreach (var instruction in goldenArticle.FineTuningInstructions)
+                foreach (var instruction in goldenArticle.FineTuningData)
                 {
                     var instructionEntity = new InstructionEntity
                     {
@@ -59,7 +59,8 @@ public class DatasetInstructionService : IDatasetInstructionService
                         Category = instruction.Category,
                         GoldenArticleId = new Guid(goldenArticle.Id),
                         LawId = goldenArticle.LawId,
-                        ArticleId = goldenArticle.ArticleId
+                        ArticleId = goldenArticle.ArticleId,
+                        DatasetId = datasetId
                     };
 
                     await _instructionDataService.CreateAsync(instructionEntity, cancellationToken);

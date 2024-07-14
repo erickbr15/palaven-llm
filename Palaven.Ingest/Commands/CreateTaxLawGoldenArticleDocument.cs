@@ -2,7 +2,6 @@
 using Liara.CosmosDb;
 using Liara.OpenAI;
 using Liara.OpenAI.Model.Chat;
-using Liara.OpenAI.Model.Embeddings;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Palaven.Model.Ingest.Commands;
@@ -29,7 +28,6 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
 
     public async Task<IResult<Guid>> ExecuteAsync(Guid traceId, CreateGoldenArticleDocumentModel inputModel, CancellationToken cancellationToken)
     {
-        var goldenArticleId = Guid.NewGuid();
         try
         {
             var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
@@ -55,7 +53,7 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
 
             var goldenArticle = new TaxLawDocumentGoldenArticle
             {
-                Id = goldenArticleId.ToString(),
+                Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId.ToString(),
                 TraceId = traceId,
                 LawId = article.LawId,
@@ -74,7 +72,7 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
             await PopulateExtractInformationInstructionsAsync(goldenArticle, cancellationToken);
             await PopulateExtractReferencesInstructionsAsync(goldenArticle, cancellationToken);
             await PopulateSummarizationInstructionAsync(goldenArticle, cancellationToken);
-            await PopulateAugmentationDataAsync(goldenArticle, cancellationToken);
+            PopulateRetrievalAugmentationData(goldenArticle);
 
 
             var result = await _goldenArticleDocumentRepository.CreateAsync(goldenArticle, new PartitionKey(tenantId.ToString()), itemRequestOptions: null, cancellationToken);
@@ -83,18 +81,19 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
             {
                 throw new InvalidOperationException($"Unable to create the account file document. Status code: {result.StatusCode}");
             }
+
+            return Result<Guid>.Success(new Guid(goldenArticle.Id));
         }
         catch (Exception ex)
         {
             return Result<Guid>.Fail(new List<ValidationError>(), new List<Exception> { ex });
-        }
-
-        return Result<Guid>.Success(goldenArticleId);
+        }        
     }
 
     private async Task PopulateOpenEndedQuestionInstructionsAsync(TaxLawDocumentGoldenArticle goldenArticle, CancellationToken cancellationToken)
     {
         var systemPrompt = Resources.ChatGptPromptTemplates.SystemPromptOpenEndQuestionTemplate;
+        
         var userPrompt = Resources.ChatGptPromptTemplates.UserPromptOpenEndQuestionTemplate
             .Replace("{article}", goldenArticle.Content)
             .Replace("{law}", goldenArticle.LawName)
@@ -192,38 +191,37 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
         PopulateGoldenArticleFineTuningInstructions(goldenArticle, instructions.Instructions, "summarization", new List<string> { "summarization" });
     }
 
-    private async Task PopulateAugmentationDataAsync(TaxLawDocumentGoldenArticle goldenArticle, CancellationToken cancellationToken)
+    private void PopulateRetrievalAugmentationData(TaxLawDocumentGoldenArticle goldenArticle)
     {
-        var noneSummarizationInstructions = goldenArticle.FineTuningInstructions
-            .Where(i => !string.Equals(i.Category, FineTuningInstructionTypes.Summarization, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        foreach (var instruction in noneSummarizationInstructions)
+        foreach (var instruction in goldenArticle.FineTuningData)
         {
-            var instructionEmbeddings = await ComputeEmbeddingsAsync(new List<string> { instruction.Instruction }, cancellationToken);
-
-            goldenArticle.AugmentationData.Questions.Add(new TaxLawArticleRagQuestion
+            goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
             {
-                Question = instruction.Instruction,
-                Metadata = instruction.Metadata,
-                Embeddings = instructionEmbeddings.FirstOrDefault()?.ConvertToListOfDouble() ?? new List<double>()
+                InstructionId = instruction.InstructionId,
+                Instruction = instruction.Instruction,
+                Metadata = instruction.Metadata
             });
         }
-        
-        var summarizationInstruction = goldenArticle.FineTuningInstructions
-            .FirstOrDefault(i => string.Equals(i.Category, FineTuningInstructionTypes.Summarization, StringComparison.OrdinalIgnoreCase));
 
-        if (summarizationInstruction != null)
+        var goldenArticleMetadata = goldenArticle.FineTuningData[0].Metadata;
+
+        goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
         {
-            var summarizationEmbeddings = await ComputeEmbeddingsAsync(new List<string> { summarizationInstruction.Response }, cancellationToken);
+            Instruction = $"Sumariza el {goldenArticleMetadata.Article} de la {goldenArticleMetadata.LawName} del año {goldenArticleMetadata.LawYear}",
+            Metadata = goldenArticleMetadata
+        });
 
-            goldenArticle.AugmentationData.Summary = new TaxLawArticleSummary
-            {
-                Summary = summarizationInstruction.Response,
-                Metadata = summarizationInstruction.Metadata,
-                Embeddings = summarizationEmbeddings.FirstOrDefault()?.ConvertToListOfDouble() ?? new List<double>()
-            };
-        }
+        goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
+        {
+            Instruction = $"Realiza un resumen del {goldenArticleMetadata.Article}  de la  {goldenArticleMetadata.LawName} del año {goldenArticleMetadata.LawYear}",
+            Metadata = goldenArticleMetadata
+        });
+
+        goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
+        {
+            Instruction = $"Resume el {goldenArticleMetadata.Article}  de la  {goldenArticleMetadata.LawName} del año {goldenArticleMetadata.LawYear}",
+            Metadata = goldenArticleMetadata
+        });
     }
 
     private async Task<ChatCompletionInstructionsResponse?> InvokeChatGptAsync(string systemPrompt, string userPrompt, decimal? temperature, CancellationToken cancellationToken)
@@ -232,7 +230,6 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
         
         var chatGptCallOptions = new ChatCompletionCreationModel
         {
-            Model = "gpt-3.5-turbo",
             Temperature = temperature,
             User = tenanId.ToString(),
             ResponseFormat = new ResponseFormat { Type = "json_object" }
@@ -264,12 +261,13 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
     {
         foreach (var instruction in instructions)
         {
-            goldenArticle.FineTuningInstructions.Add(new FineTuningInstruction
+            goldenArticle.FineTuningData.Add(new FineTuningInstruction
             {
+                InstructionId = Guid.NewGuid(),
                 Instruction = instruction.Instruction,
                 Category = category,
-                Response = $"{instruction.Response} Fundamento legal: {instruction.LegalBasis}",
-                Metadata = new FineTuningInstructionMetadata
+                Response = instruction.Response,
+                Metadata = new InstructionMetadata
                 {
                     LawId = goldenArticle.LawId,
                     LawName = goldenArticle.LawName,
@@ -281,20 +279,5 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
                 }
             });
         }
-    }   
-            
-    private async Task<IList<Embedding>> ComputeEmbeddingsAsync(IList<string> input, CancellationToken cancellationToken)
-    {
-        var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
-
-        var inputModel = new CreateEmbeddingsModel
-        {
-            User = tenantId.ToString(),
-            Input = input
-        };
-
-        var chatGptResponse = await _openAiChatService.CreateEmbeddingsAsync(inputModel, cancellationToken);
-        
-        return chatGptResponse?.Data?? new List<Embedding>();
     }
 }

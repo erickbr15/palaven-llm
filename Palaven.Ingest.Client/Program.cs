@@ -81,8 +81,6 @@ var service = host.Services.GetRequiredService<IIngestTaxLawDocumentService>();
 var traceId = new Guid("690cd4bc-1572-4cb9-8deb-04c1a96433d6");
 var lawId = new Guid("de787ea0-6897-4b6c-84a8-753a8534f550");
 
-service.DeleteGoldenDocumentsAsync(traceId, lawId, CancellationToken.None).GetAwaiter().GetResult();
-
-//service.CreateGoldenDocumentsAsync(traceId, lawId, chunkSize: 220, CancellationToken.None).GetAwaiter().GetResult();
+service.CreateGoldenDocumentsAsync(traceId, lawId, chunkSize: 220, CancellationToken.None).GetAwaiter().GetResult();
 
 host.Run();

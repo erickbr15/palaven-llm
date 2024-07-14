@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Palaven.VectorIndexing.Client": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AppConfigurationEndpoint": "https://palaven-config.azconfig.io"
+      }
+    }
+  }
+}

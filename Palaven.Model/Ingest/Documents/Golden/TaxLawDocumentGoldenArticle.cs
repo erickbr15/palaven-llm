@@ -17,8 +17,8 @@ public class TaxLawDocumentGoldenArticle
     public Guid ArticleId { get; set; }
     public string Article { get; set; } = default!;
     public string Content { get; set; } = default!;
-    public string LawDocumentVersion { get; set; } = default!;
-    public TaxLawAugmentationData AugmentationData { get; set; } = new TaxLawAugmentationData();
-    public IList<FineTuningInstruction> FineTuningInstructions { get; set; } = new List<FineTuningInstruction>();
+    public string LawDocumentVersion { get; set; } = default!;    
+    public IList<RagInstruction> RetrievalAugmentationData { get; set; } = new List<RagInstruction>();
+    public IList<FineTuningInstruction> FineTuningData { get; set; } = new List<FineTuningInstruction>();
     public string DocumentType { get; set; } = default!;
 }
