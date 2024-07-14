@@ -47,7 +47,7 @@ public class UpsertChatCompletionResponseCommand : ICommand<IEnumerable<UpsertCh
     {
         var llmRagResponses = responses
             .Where(r => string.Equals(r.ChatCompletionExcerciseType, ChatCompletionExcerciseType.LlmWithRag, StringComparison.OrdinalIgnoreCase))
-            .Select(r => new LlmResponse
+            .Select(r => new LlmWithRagResponse
             {
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
@@ -64,7 +64,7 @@ public class UpsertChatCompletionResponseCommand : ICommand<IEnumerable<UpsertCh
     {
         var llmFineTunedResponses = responses
             .Where(r => string.Equals(r.ChatCompletionExcerciseType, ChatCompletionExcerciseType.LlmFineTuned, StringComparison.OrdinalIgnoreCase))
-            .Select(r => new LlmResponse
+            .Select(r => new FineTunedLlmResponse
             {
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
@@ -81,7 +81,7 @@ public class UpsertChatCompletionResponseCommand : ICommand<IEnumerable<UpsertCh
     {
         var llmFineTunedAndRagResponses = responses
             .Where(r => string.Equals(r.ChatCompletionExcerciseType, ChatCompletionExcerciseType.LlmFineTunedAndRag, StringComparison.OrdinalIgnoreCase))
-            .Select(r => new LlmResponse
+            .Select(r => new FineTunedLlmWithRagResponse
             {
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
