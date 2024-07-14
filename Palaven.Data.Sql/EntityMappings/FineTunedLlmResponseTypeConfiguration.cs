@@ -20,6 +20,8 @@ public class FineTunedLlmResponseTypeConfiguration : IEntityTypeConfiguration<Fi
         builder.Property(x=> x.ResponseCompletion)
             .HasColumnName("LlmResponseCompletion")
             .HasColumnType("text");
+
+        builder.Property(x => x.ElapsedTime).HasColumnType("float").IsRequired();
         
         builder.Property(x=> x.CreationDate).IsRequired();
         builder.Property(x=> x.ModifiedDate);

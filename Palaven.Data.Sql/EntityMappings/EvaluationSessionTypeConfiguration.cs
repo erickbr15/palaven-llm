@@ -15,7 +15,8 @@ public class EvaluationSessionTypeConfiguration : IEntityTypeConfiguration<Evalu
         builder.Property(x=> x.SessionId).IsRequired();
         builder.Property(x => x.DatasetId).IsRequired();
         builder.Property(x => x.BatchSize).IsRequired();
-        builder.Property(builder => builder.LargeLanguageModel).HasMaxLength(2000).IsRequired();
+        builder.Property(x=> x.LargeLanguageModel).HasMaxLength(2000).IsRequired();
+        builder.Property(x => x.DeviceInfo).HasMaxLength(250).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
         builder.Property(x => x.StartDate).IsRequired();
         builder.Property(x => x.EndDate);

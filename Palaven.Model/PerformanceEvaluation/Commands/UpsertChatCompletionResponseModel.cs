@@ -13,4 +13,5 @@ public class UpsertChatCompletionResponseModel
     public int BatchNumber { get; set; }
     public int InstructionId { get; set; }
     public string? ResponseCompletion { get; set; }
+    public float? ElapsedTime { get; set; }
 }

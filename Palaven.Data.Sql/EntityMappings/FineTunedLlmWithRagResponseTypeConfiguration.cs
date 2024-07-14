@@ -21,6 +21,8 @@ public class FineTunedLlmWithRagResponseTypeConfiguration : IEntityTypeConfigura
             .HasColumnName("LlmResponseCompletion")            
             .HasColumnType("text");
 
+        builder.Property(x => x.ElapsedTime).HasColumnType("float").IsRequired();
+
         builder.Property(x => x.CreationDate).IsRequired();
         builder.Property(x => x.ModifiedDate);
 

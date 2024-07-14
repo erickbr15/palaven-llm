@@ -24,13 +24,13 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             DatasetId = model.DatasetId,
             BatchSize = model.BatchSize,
             LargeLanguageModel = model.LargeLanguageModel,
+            DeviceInfo = model.DeviceInfo.ToLower(),
             IsActive = true,
             StartDate = DateTime.Now
         };
 
         var newEvaluationSession = await _performanceEvaluationDataService.CreateEvaluationSessionAsync(evaluationSession, cancellationToken);        
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
-
         
         return Result<EvaluationSessionInfo>.Success(new EvaluationSessionInfo
         {
@@ -38,6 +38,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             DatasetId = newEvaluationSession.DatasetId,
             BatchSize = newEvaluationSession.BatchSize,
             LargeLanguageModel = newEvaluationSession.LargeLanguageModel,
+            DeviceInfo = newEvaluationSession.DeviceInfo,
             IsActive = newEvaluationSession.IsActive,
             StartDate = newEvaluationSession.StartDate
         });
