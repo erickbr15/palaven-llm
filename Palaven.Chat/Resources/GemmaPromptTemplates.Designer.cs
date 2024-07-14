@@ -64,12 +64,9 @@ namespace Palaven.Chat.Resources {
         ///   Looks up a localized string similar to &lt;start_of_turn&gt;user
         ///Answer the following question in a concise and informative manner following the next directions:
         ///1. The question is in spanish, then answer in spanish.
-        ///2. Use one of the next article text to answer the given question. 
-        ///3. The articles are delimited by the tags &lt;article&gt;&lt;/article&gt;. Each article is different. You can generate an answer using one or many of the articles but in the response you must mention what articles were used to generate the answer.
-        ///
-        ///{articles}
-        ///
-        ///Question: {instr [rest of string was truncated]&quot;;.
+        ///2. Use one of the next articles to answer the given question. 
+        ///3. The articles are delimited by the tags &lt;article&gt;&lt;/article&gt;. Each article is different. You can generate an answer using one or many of the articles but in the response you must mention what articles you used.
+        ///4. Generate an answer in a valid JSON format with only the p [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AugmentedQuery {
             get {

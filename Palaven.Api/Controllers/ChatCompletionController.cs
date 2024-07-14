@@ -27,5 +27,17 @@ namespace Palaven.Api.Controllers
 
             return Ok(chatMessage);
         }
+
+        [HttpPost("{largeLanguageModel}/prompt")]
+        public IActionResult Prompt([FromRoute] string largeLanguageModel, [FromBody] ChatMessage query)
+        {
+            if(!string.Equals(largeLanguageModel, "google-gemma-7b", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest($"The LLM {largeLanguageModel} is not supported for this operation.");
+            }
+
+            var chatMessage = _gemmaChatService.GenerateSimpleQueryPrompt(query);
+            return Ok(chatMessage);
+        }
     }
 }
