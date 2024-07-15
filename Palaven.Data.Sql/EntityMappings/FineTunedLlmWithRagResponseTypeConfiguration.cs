@@ -17,8 +17,11 @@ public class FineTunedLlmWithRagResponseTypeConfiguration : IEntityTypeConfigura
         builder.Property(x => x.BatchNumber).IsRequired();
 
         builder.Property(x => x.InstructionId).IsRequired();
-        builder.Property(builder => builder.ResponseCompletion)
+        builder.Property(x => x.ResponseCompletion)
             .HasColumnName("LlmResponseCompletion")            
+            .HasColumnType("text");
+
+        builder.Property(x => x.LlmResponseToEvaluate)
             .HasColumnType("text");
 
         builder.Property(x => x.ElapsedTime).HasColumnType("float").IsRequired();

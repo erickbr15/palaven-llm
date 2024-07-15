@@ -2,6 +2,8 @@
 using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.PerformanceEvaluation;
 using Palaven.Model.PerformanceEvaluation.Commands;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Palaven.Core.PerformanceEvaluation;
 
@@ -88,5 +90,53 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         return result.AnyErrorsOrValidationFailures ? 
             Result.Fail(result.ValidationErrors, result.Errors) : 
             Result.Success();
+    }
+
+    public async Task<IResult> CleanChatCompletionResponsesAsync(Guid sessionId, int batchNumber, string chatCompletionExcerciseType, CancellationToken cancellationToken)
+    {
+        if(string.IsNullOrWhiteSpace(chatCompletionExcerciseType))
+        {
+            throw new ArgumentNullException(nameof(chatCompletionExcerciseType));
+        }
+
+        var wordsToClean = new List<string> { "<eos>", "<eos>\"'", "**Answer:**", "**Respuesta:**" };
+        
+        var cleaningStrategy = new Func<string?, string>(x =>
+        {
+            var responseParts = x!.Split(new string[] { "<start_of_turn>model" }, StringSplitOptions.RemoveEmptyEntries);
+            var cleanedResponse = responseParts[1].Trim();
+
+            wordsToClean.ForEach(w =>
+            {
+                cleanedResponse = cleanedResponse.Replace(w, string.Empty);
+            });
+
+            return cleanedResponse;
+        });
+
+        if(string.Equals(ChatCompletionExcerciseType.LlmVanilla, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
+        {
+            var selectionCriteria = new Func<LlmResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
+            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
+        }
+        else if(string.Equals(ChatCompletionExcerciseType.LlmWithRag, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
+        {
+            var selectionCriteria = new Func<LlmWithRagResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
+            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
+        }
+        else if(string.Equals(ChatCompletionExcerciseType.LlmFineTuned, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
+        {
+            var selectionCriteria = new Func<FineTunedLlmResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
+            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
+        }
+        else if(string.Equals(ChatCompletionExcerciseType.LlmFineTunedAndRag, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
+        {
+            var selectionCriteria = new Func<FineTunedLlmWithRagResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
+            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
+        }        
+
+        await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 }

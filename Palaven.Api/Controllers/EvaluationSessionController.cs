@@ -3,6 +3,7 @@ using Palaven.Core.Datasets;
 using Palaven.Core.PerformanceEvaluation;
 using Palaven.Model.PerformanceEvaluation;
 using Palaven.Model.PerformanceEvaluation.Commands;
+using Palaven.Model.PerformanceEvaluation.Web;
 
 namespace Palaven.Api.Controllers
 {
@@ -57,18 +58,26 @@ namespace Palaven.Api.Controllers
         }
 
         [HttpPost("{id}/chatcompletion/vanilla/response")]
-        public async Task<IActionResult> UpsertVanillaChatCompletionResponse([FromRoute]Guid id, [FromBody] UpsertChatCompletionResponseModel inputModel)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpsertVanillaChatCompletionResponse([FromRoute]Guid id, [FromForm] ChatCompletionResponseModel inputModel)
         {                                    
             if(inputModel == null)
             {
                 return BadRequest("Input model is required");
             }
 
-            inputModel.SessionId = id;
-            inputModel.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmVanilla;
+            var upsertModel = new UpsertChatCompletionResponseModel
+            {
+                BatchNumber = inputModel.BatchNumber,
+                InstructionId = inputModel.InstructionId,
+                ResponseCompletion = inputModel.ResponseCompletion,
+                ElapsedTime = inputModel.ElapsedTime,
+                SessionId = id,
+                ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmVanilla
+            };            
             
             var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<UpsertChatCompletionResponseModel> { inputModel }, 
+                new List<UpsertChatCompletionResponseModel> { upsertModel }, 
                 CancellationToken.None);
 
             if(upsertResult.AnyErrorsOrValidationFailures)
@@ -105,18 +114,26 @@ namespace Palaven.Api.Controllers
         }
 
         [HttpPost("{id}/chatcompletion/rag/response")]
-        public async Task<IActionResult> UpsertRagChatCompletionResponse([FromRoute] Guid id, [FromBody] UpsertChatCompletionResponseModel inputModel)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpsertRagChatCompletionResponse([FromRoute] Guid id, [FromForm] ChatCompletionResponseModel inputModel)
         {
             if (inputModel == null)
             {
                 return BadRequest("Input model is required");
             }
 
-            inputModel.SessionId = id;
-            inputModel.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmWithRag;
+            var upsertModel = new UpsertChatCompletionResponseModel
+            {
+                BatchNumber = inputModel.BatchNumber,
+                InstructionId = inputModel.InstructionId,
+                ResponseCompletion = inputModel.ResponseCompletion,
+                ElapsedTime = inputModel.ElapsedTime,
+                SessionId = id,
+                ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmWithRag
+            };            
 
             var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<UpsertChatCompletionResponseModel> { inputModel },
+                new List<UpsertChatCompletionResponseModel> { upsertModel },
                 CancellationToken.None);
 
             if (upsertResult.AnyErrorsOrValidationFailures)

@@ -198,6 +198,66 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         }
     }
 
+    public void CleanChatCompletionResponses(Func<FineTunedLlmResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
+    {
+        var chatCompletionResponses = _fineTunedLlmResponseRepository.GetAll().Where(selectionCriteria).ToList();
+        
+        foreach (var item in chatCompletionResponses)
+        {
+            var llmResponse = _fineTunedLlmResponseRepository.GetById(item.Id);
+
+            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
+            llmResponse.ModifiedDate = DateTime.Now;
+
+            _fineTunedLlmResponseRepository.Update(llmResponse);
+        }        
+    }  
+
+    public void CleanChatCompletionResponses(Func<FineTunedLlmWithRagResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
+    {
+        var chatCompletionResponses = _fineTunedLlmWithRagResponseRepository.GetAll().Where(selectionCriteria).ToList();
+        
+        foreach (var item in chatCompletionResponses)
+        {
+            var llmResponse = _fineTunedLlmWithRagResponseRepository.GetById(item.Id);
+
+            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
+            llmResponse.ModifiedDate = DateTime.Now;
+
+            _fineTunedLlmWithRagResponseRepository.Update(llmResponse);
+        }        
+    }
+
+    public void CleanChatCompletionResponses(Func<LlmResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
+    {
+        var chatCompletionResponses = _llmResponseRepository.GetAll().Where(selectionCriteria).ToList();
+        
+        foreach (var item in chatCompletionResponses)
+        {
+            var llmResponse = _llmResponseRepository.GetById(item.Id);
+
+            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
+            llmResponse.ModifiedDate = DateTime.Now;
+
+            _llmResponseRepository.Update(llmResponse);
+        }        
+    }
+
+    public void CleanChatCompletionResponses(Func<LlmWithRagResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
+    {
+        var chatCompletionResponses = _llmWithRagResponseRepository.GetAll().Where(selectionCriteria).ToList();
+        
+        foreach (var item in chatCompletionResponses)
+        {
+            var llmResponse = _llmWithRagResponseRepository.GetById(item.Id);
+
+            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
+            llmResponse.ModifiedDate = DateTime.Now;
+
+            _llmWithRagResponseRepository.Update(llmResponse);
+        }        
+    }
+
     public int SaveChanges()
     {
         return _dbContext.SaveChanges();

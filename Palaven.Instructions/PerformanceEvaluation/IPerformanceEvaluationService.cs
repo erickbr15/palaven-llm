@@ -9,4 +9,5 @@ public interface IPerformanceEvaluationService
     Task<IResult<EvaluationSessionInfo>> CreateEvaluationSessionAsync(CreateEvaluationSessionModel model, CancellationToken cancellationToken);         
     Task<IResult> UpsertChatCompletionResponseAsync(IEnumerable<UpsertChatCompletionResponseModel> model, CancellationToken cancellationToken);
     Task<IResult> UpsertChatCompletionPerformanceEvaluationAsync(UpsertChatCompletionPerformanceEvaluationModel model, CancellationToken cancellationToken);
+    Task<IResult> CleanChatCompletionResponsesAsync(Guid sessionId, int batchNumber, string chatCompletionExcerciseType, CancellationToken cancellationToken);
 }

@@ -9,6 +9,7 @@ public class FineTunedLlmResponse
     public int BatchNumber { get; set; }
     public int InstructionId { get; set; }    
     public string? ResponseCompletion { get; set; }
+    public string? LlmResponseToEvaluate { get; set; }
     public float ElapsedTime { get; set; }
     public InstructionEntity Instruction { get; set; } = default!;
     public EvaluationSession EvaluationSession { get; set; } = default!;

@@ -20,6 +20,9 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
             .HasColumnName("LlmResponseCompletion")
             .HasColumnType("text");
 
+        builder.Property(x => x.LlmResponseToEvaluate)
+            .HasColumnType("text");
+
         builder.Property(x => x.ElapsedTime).HasColumnType("float").IsRequired();
 
         builder.Property(x=> x.CreationDate).IsRequired();
