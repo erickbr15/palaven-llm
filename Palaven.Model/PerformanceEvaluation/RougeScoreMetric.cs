@@ -1,0 +1,15 @@
+﻿namespace Palaven.Model.PerformanceEvaluation;
+
+public class RougeScoreMetric
+{
+    public int Id { get; set; }
+    public Guid SessionId { get; set; }
+    public int BatchNumber { get; set; }
+    public string RougeType { get; set; } = default!;
+    public float? RougePrecision { get; set; }
+    public float? RougeRecall { get; set; }
+    public float? RougeF1 { get; set; }
+    public DateTime CreationDate { get; set; }
+    public DateTime? ModifiedDate { get; set; }
+    public EvaluationSession EvaluationSession { get; set; } = default!;
+}

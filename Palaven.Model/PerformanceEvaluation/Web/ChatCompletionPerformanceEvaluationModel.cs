@@ -1,8 +1,7 @@
-﻿namespace Palaven.Model.PerformanceEvaluation.Commands;
+﻿namespace Palaven.Model.PerformanceEvaluation.Web;
 
-public class UpsertChatCompletionPerformanceEvaluationModel
+public class ChatCompletionPerformanceEvaluationModel
 {
-    public Guid SessionId { get; set; }
     public int BatchNumber { get; set; }
     public float? BertScorePrecision { get; set; }
     public float? BertScoreRecall { get; set; }

@@ -15,7 +15,10 @@ public interface IPerformanceEvaluationDataService
     void CleanChatCompletionResponses(Func<FineTunedLlmWithRagResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy);    
     void CleanChatCompletionResponses(Func<LlmResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy);    
     void CleanChatCompletionResponses(Func<LlmWithRagResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy);
-    Task UpsertChatCompletionPerformanceEvaluationAsync(BertScoreMetric chatCompletionPerformanceEvaluation, CancellationToken cancellationToken);
+    Task UpsertChatCompletionPerformanceEvaluationAsync(BertScoreMetric bertScoreMetrics, CancellationToken cancellationToken);
+    Task UpsertChatCompletionPerformanceEvaluationAsync(IEnumerable<RougeScoreMetric> rougeScoreMetrics, CancellationToken cancellationToken);
+    IList<LlmResponseView> FetchChatCompletionLlmResponses(Func<LlmResponseView, bool> selectionCriteria);
+    IList<LlmResponseView> FetchChatCompletionLlmWithRagResponses(Func<LlmResponseView, bool> selectionCriteria);
     int SaveChanges();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     

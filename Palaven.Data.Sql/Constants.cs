@@ -1,6 +1,6 @@
 ﻿namespace Palaven.Data.Sql;
 internal static class PalavenDbSchemas
 {
-    public static string Datasets = "datasets";
-    public static string LlmPerformanceEvaluation = "llm_performance_eval";
+    public const string Datasets = "datasets";
+    public const string LlmPerformanceEvaluation = "llm_performance_eval";
 }

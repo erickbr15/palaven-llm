@@ -8,6 +8,8 @@ using Palaven.VectorIndexing.Extensions;
 using Palaven.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Palaven.Core.Datasets;
+using Palaven.Core.PerformanceEvaluation;
+using Palaven.Model.PerformanceEvaluation;
 
 var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -39,10 +41,5 @@ var hostBuilder = new HostBuilder()
     });
 
 var host = hostBuilder.Build();
-
-var service = host.Services.GetRequiredService<IDatasetInstructionService>();
-
-var traceId = new Guid("690cd4bc-1572-4cb9-8deb-04c1a96433d6");
-service.CreateInstructionDatasetAsync(traceId, Guid.NewGuid(), CancellationToken.None).Wait();
 
 host.Run();

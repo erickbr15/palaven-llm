@@ -42,9 +42,9 @@ namespace Palaven.Api.Controllers
         }
 
         [HttpGet("{id}/dataset/instructions")]
-        public async Task<IActionResult> GetInstructionsDataset([FromRoute]Guid id, [FromQuery]int batchNumber)
+        public async Task<IActionResult> GetInstructionsDataset([FromRoute]Guid id, [FromQuery]int? batchNumber)
         {
-            var queryModel = new QueryInstructionsDatasetModel { SessionId = id, BatchNumber = batchNumber };
+            var queryModel = new QueryInstructionsDatasetModel { SessionId = id, BatchNumber = batchNumber ?? 1 };
             var queryResult = await _datasetInstructionService.FetchInstructionsDatasetAsync(queryModel, CancellationToken.None);
 
             if(queryResult.AnyErrorsOrValidationFailures)
@@ -57,8 +57,8 @@ namespace Palaven.Api.Controllers
             return Ok(instructions);
         }
 
-        [HttpPost("{id}/chatcompletion/vanilla/response")]
         [Consumes("multipart/form-data")]
+        [HttpPost("{id}/chatcompletion/vanilla")]        
         public async Task<IActionResult> UpsertVanillaChatCompletionResponse([FromRoute]Guid id, [FromForm] ChatCompletionResponseModel inputModel)
         {                                    
             if(inputModel == null)
@@ -88,7 +88,7 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/vanilla/response/bulk")]
+        [HttpPost("{id}/chatcompletion/vanilla/bulk")]
         public async Task<IActionResult> UpsertVanillaChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
         {
             if (inputModel == null || !inputModel.Any())
@@ -113,8 +113,15 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/rag/response")]
+        [HttpGet("{id}/chatcompletion/vanilla/responses")]
+        public IActionResult GetChatCompletionLlmResponses([FromRoute] Guid id, [FromQuery]int? batchNumber)
+        {
+            var responses = _performanceEvaluationService.FetchChatCompletionLlmResponses(id, batchNumber ?? 1, ChatCompletionExcerciseType.LlmVanilla);
+            return Ok(responses);
+        }
+
         [Consumes("multipart/form-data")]
+        [HttpPost("{id}/chatcompletion/rag")]        
         public async Task<IActionResult> UpsertRagChatCompletionResponse([FromRoute] Guid id, [FromForm] ChatCompletionResponseModel inputModel)
         {
             if (inputModel == null)
@@ -144,7 +151,7 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/rag/response/bulk")]
+        [HttpPost("{id}/chatcompletion/rag/bulk")]
         public async Task<IActionResult> UpsertRagChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
         {
             if (inputModel == null || !inputModel.Any())
@@ -169,7 +176,14 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/finetuned/response")]
+        [HttpGet("{id}/chatcompletion/rag/responses")]
+        public IActionResult GetChatCompletionLlmRagResponses([FromRoute] Guid id, [FromQuery] int? batchNumber)
+        {
+            var responses = _performanceEvaluationService.FetchChatCompletionLlmResponses(id, batchNumber ?? 1, ChatCompletionExcerciseType.LlmWithRag);
+            return Ok(responses);
+        }
+
+        [HttpPost("{id}/chatcompletion/finetuned")]
         public async Task<IActionResult> UpsertFinetunedChatCompletionResponse([FromRoute] Guid id, [FromBody] UpsertChatCompletionResponseModel inputModel)
         {
             if (inputModel == null)
@@ -192,7 +206,7 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/finetuned/response/bulk")]
+        [HttpPost("{id}/chatcompletion/finetuned/bulk")]
         public async Task<IActionResult> UpsertFinetunedChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
         {
             if (inputModel == null || !inputModel.Any())
@@ -217,7 +231,7 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/finetuned-rag/response")]
+        [HttpPost("{id}/chatcompletion/finetuned-rag")]
         public async Task<IActionResult> UpsertFinetunedRagChatCompletionResponse([FromRoute] Guid id, [FromBody] UpsertChatCompletionResponseModel inputModel)
         {
             if (inputModel == null)
@@ -240,7 +254,7 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/finetuned-rag/response/bulk")]
+        [HttpPost("{id}/chatcompletion/finetuned-rag/bulk")]
         public async Task<IActionResult> UpsertFinetunedRagChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
         {
             if (inputModel == null || !inputModel.Any())
@@ -263,18 +277,27 @@ namespace Palaven.Api.Controllers
             }
 
             return Ok(upsertResult);
-        }
+        }        
 
-        [HttpPost("{id}/chatcompletion/bertscore-metrics")]
-        public async Task<IActionResult> UpsertBertScoreMetrics([FromRoute] Guid id, [FromBody] UpsertChatCompletionPerformanceEvaluationModel inputModel)
+        [HttpPost("{id}/metrics")]
+        public async Task<IActionResult> UpsertBertScoreMetricsAsync([FromRoute] Guid id, [FromBody] ChatCompletionPerformanceEvaluationModel inputModel, CancellationToken cancellationToken)
         {
             if (inputModel == null)
             {
                 return BadRequest("Input model is required");
             }
 
-            inputModel.SessionId = id;
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionPerformanceEvaluationAsync(inputModel, CancellationToken.None);
+            var upsertModel = new UpsertChatCompletionPerformanceEvaluationModel
+            {
+                SessionId = id,
+                BatchNumber = inputModel.BatchNumber,                
+                BertScorePrecision = inputModel.BertScorePrecision,
+                BertScoreRecall = inputModel.BertScoreRecall,
+                BertScoreF1 = inputModel.BertScoreF1,
+                RougeScoreMetrics = inputModel.RougeScoreMetrics
+            };
+            
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionPerformanceEvaluationAsync(upsertModel, cancellationToken);
 
             if (upsertResult.AnyErrorsOrValidationFailures)
             {
@@ -283,6 +306,5 @@ namespace Palaven.Api.Controllers
 
             return Ok(upsertResult);
         }
-
     }
 }

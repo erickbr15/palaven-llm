@@ -16,14 +16,15 @@ public static class ApplicationRootExtensions
         services.AddDbContext<PalavenDbContext>(options => {            
             options.UseSqlServer(connectionString);
         });
-        
-        services.AddTransient<IRepository<BertScoreMetric>, BertScoreMetricRepository>();
+                
         services.AddTransient<IRepository<EvaluationSession>, EvaluationSessionRepository>();
         services.AddTransient<IRepository<FineTunedLlmResponse>, FineTunedLlmResponseRepository>();
         services.AddTransient<IRepository<FineTunedLlmWithRagResponse>, FineTunedLlmWithRagResponsesRepository>();
         services.AddTransient<IRepository<InstructionEntity>, InstructionRepository>();
         services.AddTransient<IRepository<LlmResponse>, LlmResponseRepository>();
         services.AddTransient<IRepository<LlmWithRagResponse>, LlmWithRagResponseRepository>();
+        services.AddTransient<IRepository<BertScoreMetric>, BertScoreMetricRepository>();
+        services.AddTransient<IRepository<RougeScoreMetric>, RougeScoreMetricRepository>();
 
         services.AddTransient<IInstructionDataService, InstructionDataService>();
         services.AddTransient<IPerformanceEvaluationDataService, PerformanceEvaluationDataService>();        

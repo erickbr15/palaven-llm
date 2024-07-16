@@ -13,5 +13,5 @@ public interface IPalavenDbContext
     DbSet<LlmResponse> LlmResponses { get; set; }
     DbSet<LlmWithRagResponse> LlmWithRagResponses { get; set; }
     DbSet<BertScoreMetric> BertScoreMetrics { get; set; }
-    
+    DbSet<RougeScoreMetric> RougeScoreMetrics { get; set; }    
 }

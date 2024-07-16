@@ -2,8 +2,6 @@
 using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.PerformanceEvaluation;
 using Palaven.Model.PerformanceEvaluation.Commands;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Palaven.Core.PerformanceEvaluation;
 
@@ -11,12 +9,18 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
 {
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
     private readonly ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool> _upsertChatCompletionResponseCommand;
+    private readonly ICommand<CleanChatCompletionResponsesModel, bool> _cleanChatCompletionResponsesCommand;
+    private readonly IQueryCommand<SearchLlmChatCompletionResponseCriteria, IList<LlmResponseView>> _queryChatCompletionResponsesCommand;
 
     public PerformanceEvaluationService(IPerformanceEvaluationDataService performanceEvaluationDataService,
-        ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool> upsertChatCompletionResponseCommand)
+        ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool> upsertChatCompletionResponseCommand,
+        ICommand<CleanChatCompletionResponsesModel, bool> cleanChatCompletionResponsesCommand,
+        IQueryCommand<SearchLlmChatCompletionResponseCriteria, IList<LlmResponseView>> queryChatCompletionResponsesCommand)
     {
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
         _upsertChatCompletionResponseCommand = upsertChatCompletionResponseCommand ?? throw new ArgumentNullException(nameof(upsertChatCompletionResponseCommand));
+        _cleanChatCompletionResponsesCommand = cleanChatCompletionResponsesCommand ?? throw new ArgumentNullException(nameof(cleanChatCompletionResponsesCommand));
+        _queryChatCompletionResponsesCommand = queryChatCompletionResponsesCommand ?? throw new ArgumentNullException(nameof(queryChatCompletionResponsesCommand));
     }
 
     public async Task<IResult<EvaluationSessionInfo>> CreateEvaluationSessionAsync(CreateEvaluationSessionModel model, CancellationToken cancellationToken)
@@ -76,8 +80,19 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             BertScoreRecall = model.BertScoreRecall,
             BertScoreF1 = model.BertScoreF1
         };
+
+        var rougeMetrics = model.RougeScoreMetrics.Select(x => new RougeScoreMetric
+        {
+            SessionId = model.SessionId,
+            BatchNumber = model.BatchNumber,
+            RougeType = x.RougeType,
+            RougePrecision = x.RougeScorePrecision,
+            RougeRecall = x.RougeScoreRecall,
+            RougeF1 = x.RougeScoreF1
+        });
         
         await _performanceEvaluationDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
+        await _performanceEvaluationDataService.UpsertChatCompletionPerformanceEvaluationAsync(rougeMetrics, cancellationToken);
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
@@ -92,51 +107,27 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             Result.Success();
     }
 
-    public async Task<IResult> CleanChatCompletionResponsesAsync(Guid sessionId, int batchNumber, string chatCompletionExcerciseType, CancellationToken cancellationToken)
+    public async Task<IResult> CleanChatCompletionResponsesAsync(CleanChatCompletionResponsesModel model, CancellationToken cancellationToken)
     {
-        if(string.IsNullOrWhiteSpace(chatCompletionExcerciseType))
-        {
-            throw new ArgumentNullException(nameof(chatCompletionExcerciseType));
-        }
+        var result = await _cleanChatCompletionResponsesCommand.ExecuteAsync(model, cancellationToken);
 
-        var wordsToClean = new List<string> { "<eos>", "<eos>\"'", "**Answer:**", "**Respuesta:**" };
-        
-        var cleaningStrategy = new Func<string?, string>(x =>
-        {
-            var responseParts = x!.Split(new string[] { "<start_of_turn>model" }, StringSplitOptions.RemoveEmptyEntries);
-            var cleanedResponse = responseParts[1].Trim();
+        return result.AnyErrorsOrValidationFailures ? 
+            Result.Fail(result.ValidationErrors, result.Errors) : 
+            Result.Success();
+    }
 
-            wordsToClean.ForEach(w =>
-            {
-                cleanedResponse = cleanedResponse.Replace(w, string.Empty);
-            });
-
-            return cleanedResponse;
-        });
-
-        if(string.Equals(ChatCompletionExcerciseType.LlmVanilla, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
+    public IList<LlmResponseView> FetchChatCompletionLlmResponses(Guid evaluationSessionId, int batchNumber, string chatCompletionExcerciseType)
+    {
+        var criteria = new SearchLlmChatCompletionResponseCriteria
         {
-            var selectionCriteria = new Func<LlmResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }
-        else if(string.Equals(ChatCompletionExcerciseType.LlmWithRag, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
-        {
-            var selectionCriteria = new Func<LlmWithRagResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }
-        else if(string.Equals(ChatCompletionExcerciseType.LlmFineTuned, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
-        {
-            var selectionCriteria = new Func<FineTunedLlmResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }
-        else if(string.Equals(ChatCompletionExcerciseType.LlmFineTunedAndRag, chatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
-        {
-            var selectionCriteria = new Func<FineTunedLlmWithRagResponse, bool>(x => x.SessionId == sessionId && x.BatchNumber == batchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }        
+            ChatCompletionExcerciseType = chatCompletionExcerciseType,
+            SelectionCriteria = x => x.EvaluationSessionId == evaluationSessionId && x.BatchNumber == batchNumber
+        };
 
-        await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
+        var result = _queryChatCompletionResponsesCommand.Search(criteria);
 
-        return Result.Success();
+        return result.AnyErrorsOrValidationFailures ? 
+            new List<LlmResponseView>() :
+            result.Value;
     }
 }

@@ -18,7 +18,7 @@ public abstract class GenericRepository<TEntity> : IRepository<TEntity> where TE
     /// <exception cref="ArgumentNullException">
     ///     It is thrown when the <paramref name="dbContext"/> is null
     /// </exception>
-    public GenericRepository(DbContext dbContext)
+    protected GenericRepository(DbContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _dbSet = _dbContext.Set<TEntity>();
