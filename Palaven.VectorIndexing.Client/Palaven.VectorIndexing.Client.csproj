@@ -18,9 +18,9 @@
     <ProjectReference Include="..\Liara.Common\Liara.Common.csproj" />
     <ProjectReference Include="..\Liara.CosmosDb\Liara.CosmosDb.csproj" />
     <ProjectReference Include="..\Liara.Pinecone\Liara.Pinecone.csproj" />
+    <ProjectReference Include="..\Palaven.Core\Palaven.Core.csproj" />
     <ProjectReference Include="..\Palaven.Data.Sql\Palaven.Data.Sql.csproj" />
     <ProjectReference Include="..\Palaven.Data\Palaven.Data.csproj" />
-    <ProjectReference Include="..\Palaven.Instructions\Palaven.Core.csproj" />
     <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
     <ProjectReference Include="..\Palaven.VectorIndexing\Palaven.VectorIndexing.csproj" />
   </ItemGroup>

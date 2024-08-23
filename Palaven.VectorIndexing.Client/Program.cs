@@ -6,10 +6,6 @@ using Palaven.Data.Extensions;
 using Palaven.Data.Sql.Extensions;
 using Palaven.VectorIndexing.Extensions;
 using Palaven.Core.Extensions;
-using Microsoft.Extensions.DependencyInjection;
-using Palaven.Core.Datasets;
-using Palaven.Core.PerformanceEvaluation;
-using Palaven.Model.PerformanceEvaluation;
 
 var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration((hostingContext, configBuilder) =>

@@ -123,12 +123,12 @@ public class ExtractTaxLawDocumentArticles : ITraceableCommand<ExtractLawDocumen
 
         var messages = new List<Message>
         {
-            new Message
+            new()
             {
                 Role = "system",
                 Content = "You are a very capable AI assistant that will extract and format the article content for me."
             },
-            new Message
+            new()
             {
                 Role = "user",
                 Content = Resources.ChatGptPromptTemplates.ExtractArticlePromptTemplate.Replace("{working_text}", articleContent)
