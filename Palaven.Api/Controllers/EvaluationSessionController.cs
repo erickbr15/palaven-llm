@@ -12,9 +12,9 @@ namespace Palaven.Api.Controllers
     public class EvaluationSessionController : ControllerBase
     {
         private readonly IPerformanceEvaluationService _performanceEvaluationService;
-        private readonly IDatasetInstructionService _datasetInstructionService;
+        private readonly IInstructionDatasetService _datasetInstructionService;
 
-        public EvaluationSessionController(IPerformanceEvaluationService performanceEvaluationService, IDatasetInstructionService datasetInstructionService)
+        public EvaluationSessionController(IPerformanceEvaluationService performanceEvaluationService, IInstructionDatasetService datasetInstructionService)
         {
             _performanceEvaluationService = performanceEvaluationService ?? throw new ArgumentNullException(nameof(performanceEvaluationService));
             _datasetInstructionService = datasetInstructionService ?? throw new ArgumentNullException(nameof(datasetInstructionService));

@@ -25,8 +25,8 @@ public static class ApplicationRootExtensions
         services.AddTransient<IRepository<LlmWithRagResponse>, LlmWithRagResponseRepository>();
         services.AddTransient<IRepository<BertScoreMetric>, BertScoreMetricRepository>();
         services.AddTransient<IRepository<RougeScoreMetric>, RougeScoreMetricRepository>();
-
-        services.AddTransient<IInstructionDataService, InstructionDataService>();
+        services.AddTransient<IRepository<FineTuningPromptEntity>, FineTuningPromptRepository>();
+        services.AddTransient<IDatasetsDataService, DatasetsDataService>();
         services.AddTransient<IPerformanceEvaluationDataService, PerformanceEvaluationDataService>();        
     }
 }

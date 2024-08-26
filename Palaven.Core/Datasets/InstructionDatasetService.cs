@@ -9,17 +9,17 @@ using Palaven.Model.PerformanceEvaluation.Commands;
 
 namespace Palaven.Core.Datasets;
 
-public class DatasetInstructionService : IDatasetInstructionService
+public class InstructionDatasetService : IInstructionDatasetService
 {
     private readonly IDocumentRepository<DatasetGenerationTaskDocument> _datasetGenerationTasksRepository;
     private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleRepository;
-    private readonly IInstructionDataService _instructionDataService;
+    private readonly IDatasetsDataService _instructionDataService;
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
 
-    public DatasetInstructionService(
+    public InstructionDatasetService(
         IDocumentRepository<DatasetGenerationTaskDocument> datasetGenerationTasksRepository,
         IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleRepository,
-        IInstructionDataService instructionDataService,
+        IDatasetsDataService instructionDataService,
         IPerformanceEvaluationDataService performanceEvaluationDataService)
     {
         _datasetGenerationTasksRepository = datasetGenerationTasksRepository ?? throw new ArgumentNullException(nameof(datasetGenerationTasksRepository));
@@ -102,7 +102,7 @@ public class DatasetInstructionService : IDatasetInstructionService
 
         var offset = (model.BatchNumber - 1) * evaluationSession.BatchSize;
 
-        var instructionDataset = _instructionDataService.GetQueryable()
+        var instructionDataset = _instructionDataService.GetInstructionQueryable()
             .Where(x => x.DatasetId == evaluationSession.DatasetId)
             .OrderBy(x => x.Id)
             .Skip(offset)

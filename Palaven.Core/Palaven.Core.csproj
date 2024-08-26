@@ -12,4 +12,19 @@
     <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\GemmaPromptTemplates.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GemmaPromptTemplates.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\GemmaPromptTemplates.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>GemmaPromptTemplates.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

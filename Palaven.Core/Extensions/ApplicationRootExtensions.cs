@@ -15,7 +15,8 @@ public static class ApplicationRootExtensions
         services.AddTransient<ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool>, UpsertChatCompletionResponseCommand>();
         services.AddTransient<ICommand<CleanChatCompletionResponsesModel, bool>, CleanChatCompletionResponsesCommand>();
         services.AddTransient<IQueryCommand<SearchLlmChatCompletionResponseCriteria, IList<LlmResponseView>>, QueryLlmChatCompletionResponses>();
-        services.AddTransient<IDatasetInstructionService, DatasetInstructionService>();
+        services.AddTransient<IInstructionDatasetService, InstructionDatasetService>();
+        services.AddTransient<IFineTuningDatasetService, FineTuningDatasetService>();
         services.AddTransient<IPerformanceEvaluationService, PerformanceEvaluationService>();
 
         return services;
