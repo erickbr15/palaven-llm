@@ -1,9 +1,9 @@
 ﻿using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Palaven.Model.Ingest.Documents;
-using Palaven.Model.Ingest.Documents.Golden;
-using Palaven.Model.VectorIndexing.Commands;
+using Palaven.Model.Documents;
+using Palaven.Model.Documents.Golden;
+using Palaven.Model.VectorIndexing;
 
 namespace Palaven.VectorIndexing;
 

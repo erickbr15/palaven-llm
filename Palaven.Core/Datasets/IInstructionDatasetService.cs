@@ -1,10 +1,11 @@
 ﻿using Liara.Common;
-using Palaven.Model.PerformanceEvaluation.Commands;
+using Palaven.Model.Datasets;
+using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Core.Datasets;
 
 public interface IInstructionDatasetService
 {
-    Task CreateInstructionDatasetAsync(Guid traceId, Guid datasetId, CancellationToken cancellationToken);
-    Task<IResult<List<InstructionData>?>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken);
+    Task CreateInstructionDatasetAsync(CreateInstructionDataset model, CancellationToken cancellationToken);
+    Task<IResult<List<InstructionData>?>> FetchInstructionsDatasetAsync(FetchInstructionsDataset model, CancellationToken cancellationToken);
 }

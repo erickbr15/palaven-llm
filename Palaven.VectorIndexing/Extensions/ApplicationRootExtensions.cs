@@ -6,7 +6,7 @@ using Liara.Common;
 using Liara.Common.Http;
 using Liara.CosmosDb;
 using Microsoft.Extensions.DependencyInjection;
-using Palaven.Model.VectorIndexing.Commands;
+using Palaven.Model.VectorIndexing;
 using Palaven.VectorIndexing.Commands;
 
 namespace Palaven.VectorIndexing.Extensions;

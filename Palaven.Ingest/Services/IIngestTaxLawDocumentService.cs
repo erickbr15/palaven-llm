@@ -1,11 +1,11 @@
 ﻿using Liara.Common;
-using Palaven.Model.Ingest.Commands;
+using Palaven.Model.Ingest;
 
 namespace Palaven.Ingest.Services;
 
 public interface IIngestTaxLawDocumentService
 {
-    Task<IResult<IngestLawDocumentTaskInfo>> IngestTaxLawDocumentAsync(IngestLawDocumentModel model, CancellationToken cancellationToken);
-    Task CreateGoldenDocumentsAsync(Guid traceId, Guid lawId, int chunkSize, CancellationToken cancellationToken);
+    Task<IResult<TaxLawDocumentIngestTask>> IngestTaxLawDocumentAsync(IngestTaxLawDocumentCommand command, CancellationToken cancellationToken);
+    Task CreateGoldenDocumentBatchAsync(Guid traceId, Guid lawId, int batchSize, CancellationToken cancellationToken);
     Task DeleteGoldenDocumentsAsync(Guid traceId, Guid lawId, CancellationToken cancellationToken);
 }

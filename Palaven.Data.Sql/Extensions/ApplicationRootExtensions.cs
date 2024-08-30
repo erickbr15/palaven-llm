@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Liara.Common.DataAccess;
-using Palaven.Model.Datasets;
 using Palaven.Data.Sql.Repositories;
 using Palaven.Data.Sql.Services;
 using Palaven.Data.Sql.Services.Contracts;
-using Palaven.Model.PerformanceEvaluation;
+using Palaven.Model.Entities;
 
 namespace Palaven.Data.Sql.Extensions;
 

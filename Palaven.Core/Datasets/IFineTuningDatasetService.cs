@@ -1,5 +1,5 @@
 ﻿using Liara.Common;
-using Palaven.Model.PerformanceEvaluation.Commands;
+using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Core.Datasets;
 

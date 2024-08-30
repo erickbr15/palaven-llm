@@ -1,19 +1,19 @@
 ﻿using Liara.Common;
 using Palaven.Data.Sql.Services.Contracts;
+using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
-using Palaven.Model.PerformanceEvaluation.Commands;
 
 namespace Palaven.Core.PerformanceEvaluation;
 
 public class PerformanceEvaluationService : IPerformanceEvaluationService
 {
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
-    private readonly ICommandHandler<IEnumerable<ChatCompletionResponse>> _upsertChatCompletionResponseCommand;
+    private readonly ICommandHandler<UpsertChatCompletionResponseCommand> _upsertChatCompletionResponseCommand;
     private readonly ICommandHandler<CleanChatCompletionResponseCommand> _cleanChatCompletionResponsesCommand;
     private readonly IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> _queryChatCompletionResponsesCommand;
 
     public PerformanceEvaluationService(IPerformanceEvaluationDataService performanceEvaluationDataService,
-        ICommandHandler<IEnumerable<ChatCompletionResponse>> upsertChatCompletionResponseCommand,
+        ICommandHandler<UpsertChatCompletionResponseCommand> upsertChatCompletionResponseCommand,
         ICommandHandler<CleanChatCompletionResponseCommand> cleanChatCompletionResponsesCommand,
         IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> queryChatCompletionResponsesCommand)
     {
@@ -35,7 +35,8 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             StartDate = DateTime.Now
         };
 
-        var newEvaluationSession = await _performanceEvaluationDataService.CreateEvaluationSessionAsync(evaluationSession, cancellationToken);        
+        var newEvaluationSession = await _performanceEvaluationDataService.CreateEvaluationSessionAsync(evaluationSession, cancellationToken);
+
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
         
         return Result<EvaluationSessionInfo?>.Success(new EvaluationSessionInfo
@@ -70,7 +71,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         };
     }
 
-    public async Task<IResult> UpsertChatCompletionPerformanceEvaluationAsync(UpsertChatCompletionPerformanceEvaluationModel model, CancellationToken cancellationToken)
+    public async Task<IResult> UpsertChatCompletionPerformanceEvaluationAsync(UpsertChatCompletionPerformanceEvaluation model, CancellationToken cancellationToken)
     {
         var bertScoreMetrics = new BertScoreMetric
         {
@@ -98,17 +99,15 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         return Result.Success();
     }
 
-    public async Task<IResult> UpsertChatCompletionResponseAsync(IEnumerable<ChatCompletionResponse> model, CancellationToken cancellationToken)
+    public async Task<IResult> UpsertChatCompletionResponseAsync(UpsertChatCompletionResponseCommand command, CancellationToken cancellationToken)
     {
-        var result = await _upsertChatCompletionResponseCommand.ExecuteAsync(model, cancellationToken);
-
+        var result = await _upsertChatCompletionResponseCommand.ExecuteAsync(command, cancellationToken);
         return result.IsSuccess ? Result.Success() : Result.Fail(result.ValidationErrors, result.Exceptions);
     }
 
-    public async Task<IResult> CleanChatCompletionResponsesAsync(CleanChatCompletionResponseCommand model, CancellationToken cancellationToken)
+    public async Task<IResult> CleanChatCompletionResponseAsync(CleanChatCompletionResponseCommand command, CancellationToken cancellationToken)
     {
-        var result = await _cleanChatCompletionResponsesCommand.ExecuteAsync(model, cancellationToken);
-
+        var result = await _cleanChatCompletionResponsesCommand.ExecuteAsync(command, cancellationToken);
         return result.IsSuccess ? Result.Success() : Result.Fail(result.ValidationErrors, result.Exceptions);        
     }
 

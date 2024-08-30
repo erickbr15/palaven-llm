@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Palaven.Core.Datasets;
 using Palaven.Core.PerformanceEvaluation;
 using Palaven.Core.PerformanceEvaluation.Commands;
+using Palaven.Core.PerformanceEvaluation.Queries;
 using Palaven.Model.PerformanceEvaluation;
-using Palaven.Model.PerformanceEvaluation.Commands;
 
 namespace Palaven.Core.Extensions;
 

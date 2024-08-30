@@ -1,7 +1,7 @@
 ﻿using Liara.Common;
 using Palaven.Data.Sql.Services.Contracts;
+using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
-using Palaven.Model.PerformanceEvaluation.Commands;
 
 namespace Palaven.Core.PerformanceEvaluation.Commands;
 
@@ -19,12 +19,14 @@ public class CleanChatCompletionResponseCommandHandler : ICommandHandler<CleanCh
     {
         if (command == null)
         {
-            throw new ArgumentNullException(nameof(command));
+            var result = Result.Fail(new List<ValidationError>(), new List<Exception> { new ArgumentNullException(nameof(command)) });
+            return result;
         }
 
         if (string.IsNullOrWhiteSpace(command.ChatCompletionExcerciseType))
         {
-            throw new ArgumentException("The ChatCompletionExcerciseType is required");
+            var result = Result.Fail(new List<ValidationError>(), new List<Exception> { new ArgumentException("The ChatCompletionExcerciseType is required") });
+            return result;
         }
 
         var wordsToClean = new List<string> { "<eos>", "<eos>\"'", "**Answer:**", "**Respuesta:**" };

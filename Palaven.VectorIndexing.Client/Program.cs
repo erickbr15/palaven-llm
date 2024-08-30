@@ -42,7 +42,7 @@ var host = hostBuilder.Build();
 
 var datasetService = host.Services.GetRequiredService<IFineTuningDatasetService>();
 
-await datasetService.CreateFineTuningPromptDatasetAsync(new Palaven.Model.PerformanceEvaluation.Commands.CreateFineTuningDataset
+await datasetService.CreateFineTuningPromptDatasetAsync(new Palaven.Model.PerformanceEvaluation.CreateFineTuningDataset
 {
     DatasetId = new Guid("F0444B12-5485-4299-B03B-3BDB6D4A2578"),
     LargeLanguageModel = "google-gemma-7b",

@@ -6,7 +6,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;
-using Palaven.Model.Ingest.Documents.Golden;
+using Palaven.Model.Documents.Golden;
 
 namespace Palaven.Chat;
 
@@ -26,7 +26,7 @@ public class GemmaChatService : IGemmaChatService
         _articleRepository = documentRepository ?? throw new ArgumentNullException(nameof(documentRepository));
     }
 
-    public async Task<ChatMessage> AugmentQueryAsync(ChatMessage message, CancellationToken cancellationToken)
+    public async Task<ChatMessage> CreateAugmentedQueryPromptAsync(ChatMessage message, CancellationToken cancellationToken)
     {
         var relatedArticles = await TryGetRelevantArticlesAsync(message, cancellationToken);
         
@@ -35,27 +35,27 @@ public class GemmaChatService : IGemmaChatService
             return new ChatMessage
             {
                 UserId = message.UserId,
-                Query = Resources.GemmaPromptTemplates.SimpleQuery.Replace("{instruction}", message.Query)
+                Prompt = Resources.GemmaPromptTemplates.SimpleQuery.Replace("{instruction}", message.Prompt)
             };
         }
 
         var augmentedQuery = Resources.GemmaPromptTemplates.AugmentedQuery
             .Replace("{articles}", string.Join("", relatedArticles.Select(a => $"<article>{a.Content}</article>")))
-            .Replace("{instruction}", message.Query);
+            .Replace("{instruction}", message.Prompt);
 
         return new ChatMessage
         {
             UserId = message.UserId,
-            Query = augmentedQuery
+            Prompt = augmentedQuery
         };
     }
 
-    public ChatMessage GenerateSimpleQueryPrompt(ChatMessage message)
+    public ChatMessage CreateSimpleQueryPrompt(ChatMessage message)
     {
         return new ChatMessage
         {
             UserId = message.UserId,
-            Query = Resources.GemmaPromptTemplates.SimpleQuery.Replace("{instruction}", message.Query)
+            Prompt = Resources.GemmaPromptTemplates.SimpleQuery.Replace("{instruction}", message.Prompt)
         };
     }
 
@@ -64,7 +64,7 @@ public class GemmaChatService : IGemmaChatService
         var createQueryEmbeddingsRequest = new CreateEmbeddingsModel
         {
             User = message.UserId,
-            Input = new List<string> { message.Query }
+            Input = new List<string> { message.Prompt }
         };
 
         var queryEmbeddings = await _openAiServiceClient.CreateEmbeddingsAsync(createQueryEmbeddingsRequest, cancellationToken);

@@ -1,8 +1,9 @@
 ﻿using Liara.Common;
 using Palaven.Data.Sql.Services.Contracts;
-using Palaven.Model.PerformanceEvaluation.Commands;
 using Palaven.Model.Datasets;
 using System.Data;
+using Palaven.Model.Entities;
+using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Core.Datasets;
 

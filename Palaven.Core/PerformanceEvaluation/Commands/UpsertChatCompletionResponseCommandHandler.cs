@@ -1,7 +1,7 @@
 ﻿using Liara.Common;
 using Palaven.Data.Sql.Services.Contracts;
+using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
-using Palaven.Model.PerformanceEvaluation.Commands;
 
 namespace Palaven.Core.PerformanceEvaluation.Commands;
 
@@ -17,6 +17,12 @@ public class UpsertChatCompletionResponseCommandHandler : ICommandHandler<Upsert
 
     public async Task<IResult> ExecuteAsync(UpsertChatCompletionResponseCommand command, CancellationToken cancellationToken)
     {
+        if (command == null)
+        {
+            var result = Result.Fail(new List<ValidationError>(), new List<Exception> { new ArgumentNullException(nameof(command)) });
+            return result;
+        }
+        
         await UpsertVanillaResponsesAsync(command.ChatCompletionResponses, cancellationToken);
         await UpsertRagResponsesAsync(command.ChatCompletionResponses, cancellationToken);
         await UpsertFineTunedResponsesAsync(command.ChatCompletionResponses, cancellationToken);

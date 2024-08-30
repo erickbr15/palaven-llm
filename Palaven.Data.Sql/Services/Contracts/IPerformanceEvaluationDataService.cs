@@ -1,4 +1,5 @@
-﻿using Palaven.Model.PerformanceEvaluation;
+﻿using Palaven.Model.Entities;
+using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Data.Sql.Services.Contracts;
 

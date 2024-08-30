@@ -2,13 +2,13 @@
 using Liara.CosmosDb;
 using Microsoft.Extensions.DependencyInjection;
 using Liara.Azure.BlobStorage;
-using Palaven.Model.Ingest.Commands;
 using Palaven.Ingest.Commands;
 using Palaven.Ingest.Services;
 using Liara.Common.Http;
 using Liara.Clients.OpenAI;
 using Liara.Clients.Pinecone;
 using Liara.Common;
+using Palaven.Model.Ingest;
 
 namespace Palaven.Ingest.Extensions;
 
@@ -30,10 +30,10 @@ public static class ApplicationRootExtensions
 
     public static void AddIngestServices(this IServiceCollection services)
     {       
-        services.AddSingleton<ICommandHandler<IngestLawDocumentModel, IngestLawDocumentTaskInfo>, StartIngestTaxLawDocument>();
-        services.AddSingleton<ICommandHandler<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo>, ExtractTaxLawDocumentPages>();
-        services.AddSingleton<ICommandHandler<ExtractLawDocumentArticlesModel, IngestLawDocumentTaskInfo>, ExtractTaxLawDocumentArticles>();
-        services.AddSingleton<ICommandHandler<CreateGoldenArticleDocumentModel, Guid>, CreateTaxLawGoldenArticleDocument>();        
+        services.AddSingleton<ICommandHandler<IngestTaxLawDocumentCommand, TaxLawDocumentIngestTask>, StartTaxLawIngestCommandHandler>();
+        services.AddSingleton<ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask>, CreateBronzeDocumentCommandHandler>();
+        services.AddSingleton<ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask>, CreateSilverDocumentCommandHandler>();
+        services.AddSingleton<ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask>, CreateGoldenDocumentCommandHandler>();        
 
         services.AddSingleton<IIngestTaxLawDocumentService, IngestTaxLawDocumentService>();
     }

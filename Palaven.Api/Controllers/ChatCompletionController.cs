@@ -23,7 +23,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"The LLM {largeLanguageModel} is not supported for this operation.");
             }
 
-            var chatMessage = await _gemmaChatService.AugmentQueryAsync(query, CancellationToken.None);
+            var chatMessage = await _gemmaChatService.CreateAugmentedQueryPromptAsync(query, CancellationToken.None);
 
             return Ok(chatMessage);
         }
@@ -36,7 +36,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"The LLM {largeLanguageModel} is not supported for this operation.");
             }
 
-            var chatMessage = _gemmaChatService.GenerateSimpleQueryPrompt(query);
+            var chatMessage = _gemmaChatService.CreateSimpleQueryPrompt(query);
             return Ok(chatMessage);
         }
     }

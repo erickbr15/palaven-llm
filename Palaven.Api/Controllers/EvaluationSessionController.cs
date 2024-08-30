@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Palaven.Core.Datasets;
 using Palaven.Core.PerformanceEvaluation;
+using Palaven.Model.Datasets;
 using Palaven.Model.PerformanceEvaluation;
-using Palaven.Model.PerformanceEvaluation.Commands;
 using Palaven.Model.PerformanceEvaluation.Web;
 
 namespace Palaven.Api.Controllers
@@ -44,7 +44,7 @@ namespace Palaven.Api.Controllers
         [HttpGet("{id}/dataset/instructions")]
         public async Task<IActionResult> GetInstructionsDataset([FromRoute]Guid id, [FromQuery]int? batchNumber)
         {
-            var queryModel = new QueryInstructionsDatasetModel { SessionId = id, BatchNumber = batchNumber ?? 1 };
+            var queryModel = new FetchInstructionsDataset { SessionId = id, BatchNumber = batchNumber ?? 1 };
             var queryResult = await _datasetInstructionService.FetchInstructionsDatasetAsync(queryModel, CancellationToken.None);
 
             if(!queryResult.IsSuccess)
@@ -66,7 +66,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest("Input model is required");
             }
 
-            var upsertModel = new ChatCompletionResponse
+            var response = new ChatCompletionResponse
             {
                 BatchNumber = inputModel.BatchNumber,
                 InstructionId = inputModel.InstructionId,
@@ -74,11 +74,11 @@ namespace Palaven.Api.Controllers
                 ElapsedTime = inputModel.ElapsedTime,
                 SessionId = id,
                 ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmVanilla
-            };            
-            
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<ChatCompletionResponse> { upsertModel }, 
-                CancellationToken.None);
+            };
+
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { response } };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if(!upsertResult.IsSuccess)
             {
@@ -101,9 +101,11 @@ namespace Palaven.Api.Controllers
             responses.ForEach(r => {
                 r.SessionId = id;
                 r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmVanilla;
-            });             
+            });
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses,CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = responses };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if (!upsertResult.IsSuccess)
             {
@@ -129,7 +131,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest("Input model is required");
             }
 
-            var upsertModel = new ChatCompletionResponse
+            var response = new ChatCompletionResponse
             {
                 BatchNumber = inputModel.BatchNumber,
                 InstructionId = inputModel.InstructionId,
@@ -137,11 +139,11 @@ namespace Palaven.Api.Controllers
                 ElapsedTime = inputModel.ElapsedTime,
                 SessionId = id,
                 ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmWithRag
-            };            
+            };
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<ChatCompletionResponse> { upsertModel },
-                CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { response } };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if (!upsertResult.IsSuccess)
             {
@@ -166,7 +168,9 @@ namespace Palaven.Api.Controllers
                 r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmWithRag;
             });
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses, CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = responses };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if (!upsertResult.IsSuccess)
             {
@@ -194,9 +198,9 @@ namespace Palaven.Api.Controllers
             inputModel.SessionId = id;
             inputModel.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTuned;
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<ChatCompletionResponse> { inputModel },
-                CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { inputModel } };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if (!upsertResult.IsSuccess)
             {
@@ -221,7 +225,9 @@ namespace Palaven.Api.Controllers
                 r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTuned;
             });
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses, CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = responses };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if (!upsertResult.IsSuccess)
             {
@@ -242,9 +248,9 @@ namespace Palaven.Api.Controllers
             inputModel.SessionId = id;
             inputModel.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTunedAndRag;
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<ChatCompletionResponse> { inputModel },
-                CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { inputModel } };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if (!upsertResult.IsSuccess)
             {
@@ -269,7 +275,8 @@ namespace Palaven.Api.Controllers
                 r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTunedAndRag;
             });
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses, CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = responses };
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
             if (!upsertResult.IsSuccess)
             {
@@ -287,7 +294,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest("Input model is required");
             }
 
-            var upsertModel = new UpsertChatCompletionPerformanceEvaluationModel
+            var upsertModel = new UpsertChatCompletionPerformanceEvaluation
             {
                 SessionId = id,
                 BatchNumber = inputModel.BatchNumber,                

@@ -1,6 +1,6 @@
 ﻿using Liara.CosmosDb;
 using Microsoft.Extensions.Options;
-using Palaven.Model.Ingest.Documents;
+using Palaven.Model.Documents;
 
 namespace Palaven.Data;
 

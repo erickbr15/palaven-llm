@@ -7,7 +7,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;
-using Palaven.Model.Ingest.Documents.Golden;
+using Palaven.Model.Documents.Golden;
 
 namespace Palaven.Chat;
 
@@ -28,7 +28,7 @@ public class OpenAIChatService : IOpenAIChatService
     {            
         var relatedArticles = await TryGetRelevantArticlesAsync(chatMessage, cancellationToken);
 
-        var messages = BuildChatMessages(chatMessage.Query, relatedArticles);
+        var messages = BuildChatMessages(chatMessage.Prompt, relatedArticles);
 
         var completionModel = new ChatCompletionCreationModel
         {
@@ -77,7 +77,7 @@ public class OpenAIChatService : IOpenAIChatService
         var createQueryEmbeddingsRequest = new CreateEmbeddingsModel
         {
             User = message.UserId,
-            Input = new List<string> { message.Query }
+            Input = new List<string> { message.Prompt }
         };
 
         var queryEmbeddings = await _openAiServiceClient.CreateEmbeddingsAsync(createQueryEmbeddingsRequest, cancellationToken);

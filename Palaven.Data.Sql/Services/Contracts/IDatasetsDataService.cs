@@ -1,4 +1,4 @@
-﻿using Palaven.Model.Datasets;
+﻿using Palaven.Model.Entities;
 
 namespace Palaven.Data.Sql.Services.Contracts;
 

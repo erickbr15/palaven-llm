@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Palaven.Model.Datasets;
-using Palaven.Model.PerformanceEvaluation;
+using Palaven.Model.Entities;
 
 namespace Palaven.Data.Sql;
 
