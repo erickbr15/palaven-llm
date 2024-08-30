@@ -1,9 +1,9 @@
-﻿using Liara.CosmosDb;
-using Liara.OpenAI;
-using Liara.OpenAI.Model.Chat;
-using Liara.OpenAI.Model.Embeddings;
-using Liara.Pinecone;
-using Liara.Pinecone.Model;
+﻿using Liara.Clients.OpenAI;
+using Liara.Clients.OpenAI.Model.Chat;
+using Liara.Clients.OpenAI.Model.Embeddings;
+using Liara.Clients.Pinecone;
+using Liara.Clients.Pinecone.Model;
+using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;
@@ -57,12 +57,12 @@ public class OpenAIChatService : IOpenAIChatService
 
         var messages = new List<Message>
         {
-            new Message
+            new()
             {
                 Role = "system",
                 Content = Resources.ChatGptPromptTemplates.AnswerMexicanTaxLawQuestionSystemRole
             },
-            new Message
+            new()
             {
                 Role = "user",
                 Content = userMessageContent

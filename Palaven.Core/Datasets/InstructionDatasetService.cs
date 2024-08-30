@@ -92,7 +92,7 @@ public class InstructionDatasetService : IInstructionDatasetService
         }
     }
 
-    public async Task<IResult<List<InstructionData>>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken)
+    public async Task<IResult<List<InstructionData>?>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken)
     {
         var evaluationSession = await _performanceEvaluationDataService.GetEvaluationSessionAsync(model.SessionId, cancellationToken);
         if(evaluationSession == null)

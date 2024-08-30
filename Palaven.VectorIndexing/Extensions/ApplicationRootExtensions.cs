@@ -1,10 +1,10 @@
 ﻿using Liara.Azure.AI;
 using Liara.Azure.BlobStorage;
+using Liara.Clients.OpenAI;
+using Liara.Clients.Pinecone;
 using Liara.Common;
 using Liara.Common.Http;
 using Liara.CosmosDb;
-using Liara.OpenAI;
-using Liara.Pinecone;
 using Microsoft.Extensions.DependencyInjection;
 using Palaven.Model.VectorIndexing.Commands;
 using Palaven.VectorIndexing.Commands;
@@ -17,7 +17,7 @@ public static class ApplicationRootExtensions
     {
         services.AddOptions<BlobStorageConnectionOptions>().BindConfiguration("BlobStorage");
         services.AddOptions<CosmosDbConnectionOptions>().BindConfiguration("CosmosDB");
-        services.AddOptions<AiMultiServiceOptions>().BindConfiguration("AiServices");
+        services.AddOptions<MultiServiceAiOptions>().BindConfiguration("AiServices");
         services.AddOptions<OpenAiOptions>().BindConfiguration("OpenAi");
         services.AddOptions<PineconeOptions>().BindConfiguration("Pinecone");
 
@@ -29,7 +29,7 @@ public static class ApplicationRootExtensions
 
     public static void AddVectorIndexingServices(this IServiceCollection services)
     {
-        services.AddSingleton<ITraceableCommand<UploadGoldenArticleToVectorIndexModel, Guid>, UploadGoldenArticleToVectorIndex>();
+        services.AddSingleton<ICommandHandler<UploadGoldenArticleToVectorIndexCommand, Guid>, UploadGoldenArticleToVectorIndexCommandHandler>();
         services.AddSingleton<IVectorIndexingService, VectorIndexingService>();
     }            
 }

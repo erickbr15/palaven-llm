@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Palaven.Model.PerformanceEvaluation.Commands;
+namespace Palaven.Model.PerformanceEvaluation;
 
-public class UpsertChatCompletionResponseModel
+public class ChatCompletionResponse
 {
     [JsonIgnore]
     public string? ChatCompletionExcerciseType { get; set; } = default!;

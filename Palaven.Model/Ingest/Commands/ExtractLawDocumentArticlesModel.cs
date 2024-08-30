@@ -2,5 +2,6 @@
 
 public class ExtractLawDocumentArticlesModel
 {
+    public Guid TraceId { get; set; }
     public Guid OperationId { get; set; }
 }

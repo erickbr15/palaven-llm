@@ -6,5 +6,5 @@ namespace Palaven.Core.Datasets;
 public interface IInstructionDatasetService
 {
     Task CreateInstructionDatasetAsync(Guid traceId, Guid datasetId, CancellationToken cancellationToken);
-    Task<IResult<List<InstructionData>>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken);
+    Task<IResult<List<InstructionData>?>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken);
 }

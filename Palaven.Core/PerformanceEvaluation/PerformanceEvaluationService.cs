@@ -8,14 +8,14 @@ namespace Palaven.Core.PerformanceEvaluation;
 public class PerformanceEvaluationService : IPerformanceEvaluationService
 {
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
-    private readonly ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool> _upsertChatCompletionResponseCommand;
-    private readonly ICommand<CleanChatCompletionResponsesModel, bool> _cleanChatCompletionResponsesCommand;
-    private readonly IQueryCommand<SearchLlmChatCompletionResponseCriteria, IList<LlmResponseView>> _queryChatCompletionResponsesCommand;
+    private readonly ICommandHandler<IEnumerable<ChatCompletionResponse>> _upsertChatCompletionResponseCommand;
+    private readonly ICommandHandler<CleanChatCompletionResponseCommand> _cleanChatCompletionResponsesCommand;
+    private readonly IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> _queryChatCompletionResponsesCommand;
 
     public PerformanceEvaluationService(IPerformanceEvaluationDataService performanceEvaluationDataService,
-        ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool> upsertChatCompletionResponseCommand,
-        ICommand<CleanChatCompletionResponsesModel, bool> cleanChatCompletionResponsesCommand,
-        IQueryCommand<SearchLlmChatCompletionResponseCriteria, IList<LlmResponseView>> queryChatCompletionResponsesCommand)
+        ICommandHandler<IEnumerable<ChatCompletionResponse>> upsertChatCompletionResponseCommand,
+        ICommandHandler<CleanChatCompletionResponseCommand> cleanChatCompletionResponsesCommand,
+        IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> queryChatCompletionResponsesCommand)
     {
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
         _upsertChatCompletionResponseCommand = upsertChatCompletionResponseCommand ?? throw new ArgumentNullException(nameof(upsertChatCompletionResponseCommand));
@@ -23,7 +23,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         _queryChatCompletionResponsesCommand = queryChatCompletionResponsesCommand ?? throw new ArgumentNullException(nameof(queryChatCompletionResponsesCommand));
     }
 
-    public async Task<IResult<EvaluationSessionInfo>> CreateEvaluationSessionAsync(CreateEvaluationSessionModel model, CancellationToken cancellationToken)
+    public async Task<IResult<EvaluationSessionInfo?>> CreateEvaluationSessionAsync(CreateEvaluationSessionModel model, CancellationToken cancellationToken)
     {
         var evaluationSession = new EvaluationSession
         {
@@ -38,7 +38,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         var newEvaluationSession = await _performanceEvaluationDataService.CreateEvaluationSessionAsync(evaluationSession, cancellationToken);        
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
         
-        return Result<EvaluationSessionInfo>.Success(new EvaluationSessionInfo
+        return Result<EvaluationSessionInfo?>.Success(new EvaluationSessionInfo
         {
             SessionId = newEvaluationSession.SessionId,
             DatasetId = newEvaluationSession.DatasetId,
@@ -98,36 +98,32 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         return Result.Success();
     }
 
-    public async Task<IResult> UpsertChatCompletionResponseAsync(IEnumerable<UpsertChatCompletionResponseModel> model, CancellationToken cancellationToken)
+    public async Task<IResult> UpsertChatCompletionResponseAsync(IEnumerable<ChatCompletionResponse> model, CancellationToken cancellationToken)
     {
-        var result = await _upsertChatCompletionResponseCommand.ExecuteAsync(model, cancellationToken);        
+        var result = await _upsertChatCompletionResponseCommand.ExecuteAsync(model, cancellationToken);
 
-        return result.AnyErrorsOrValidationFailures ? 
-            Result.Fail(result.ValidationErrors, result.Errors) : 
-            Result.Success();
+        return result.IsSuccess ? Result.Success() : Result.Fail(result.ValidationErrors, result.Exceptions);
     }
 
-    public async Task<IResult> CleanChatCompletionResponsesAsync(CleanChatCompletionResponsesModel model, CancellationToken cancellationToken)
+    public async Task<IResult> CleanChatCompletionResponsesAsync(CleanChatCompletionResponseCommand model, CancellationToken cancellationToken)
     {
         var result = await _cleanChatCompletionResponsesCommand.ExecuteAsync(model, cancellationToken);
 
-        return result.AnyErrorsOrValidationFailures ? 
-            Result.Fail(result.ValidationErrors, result.Errors) : 
-            Result.Success();
+        return result.IsSuccess ? Result.Success() : Result.Fail(result.ValidationErrors, result.Exceptions);        
     }
 
     public IList<LlmResponseView> FetchChatCompletionLlmResponses(Guid evaluationSessionId, int batchNumber, string chatCompletionExcerciseType)
     {
-        var criteria = new SearchLlmChatCompletionResponseCriteria
+        var criteria = new LlmChatCompletionResponseQuery
         {
             ChatCompletionExcerciseType = chatCompletionExcerciseType,
             SelectionCriteria = x => x.EvaluationSessionId == evaluationSessionId && x.BatchNumber == batchNumber
         };
 
-        var result = _queryChatCompletionResponsesCommand.Search(criteria);
+        var result = _queryChatCompletionResponsesCommand.ExecuteAsync(criteria, CancellationToken.None)
+            .GetAwaiter()
+            .GetResult();
 
-        return result.AnyErrorsOrValidationFailures ? 
-            new List<LlmResponseView>() :
-            result.Value;
+        return result.IsSuccess ? result.Value! : new List<LlmResponseView>();
     }
 }

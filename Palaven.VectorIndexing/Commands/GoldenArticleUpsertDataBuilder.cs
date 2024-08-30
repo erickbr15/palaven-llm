@@ -1,4 +1,4 @@
-﻿using Liara.Pinecone.Model;
+﻿using Liara.Clients.Pinecone.Model;
 using Newtonsoft.Json.Linq;
 using Palaven.Model.Ingest.Documents.Golden;
 

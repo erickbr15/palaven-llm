@@ -1,8 +1,8 @@
-﻿using Liara.CosmosDb;
-using Liara.OpenAI;
-using Liara.OpenAI.Model.Embeddings;
-using Liara.Pinecone;
-using Liara.Pinecone.Model;
+﻿using Liara.Clients.OpenAI;
+using Liara.Clients.OpenAI.Model.Embeddings;
+using Liara.Clients.Pinecone;
+using Liara.Clients.Pinecone.Model;
+using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;

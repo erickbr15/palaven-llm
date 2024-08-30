@@ -1,7 +1,7 @@
-﻿using Liara.Common;
+﻿using Liara.Clients.OpenAI;
+using Liara.Clients.OpenAI.Model.Chat;
+using Liara.Common;
 using Liara.CosmosDb;
-using Liara.OpenAI;
-using Liara.OpenAI.Model.Chat;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Palaven.Model.Ingest.Commands;
@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace Palaven.Ingest.Commands;
 
-public class ExtractTaxLawDocumentArticles : ITraceableCommand<ExtractLawDocumentArticlesModel, IngestLawDocumentTaskInfo>
+public class ExtractTaxLawDocumentArticles : ICommandHandler<ExtractLawDocumentArticlesModel, IngestLawDocumentTaskInfo>
 {
     private readonly IOpenAiServiceClient _openAiChatService;
     private readonly IDocumentRepository<TaxLawDocumentPage> _lawPageDocumentRepository;
@@ -26,11 +26,11 @@ public class ExtractTaxLawDocumentArticles : ITraceableCommand<ExtractLawDocumen
         _articleDocumentRepository = articleDocumentRepository ?? throw new ArgumentNullException(nameof(articleDocumentRepository));
     }
 
-    public async Task<IResult<IngestLawDocumentTaskInfo>> ExecuteAsync(Guid traceId, ExtractLawDocumentArticlesModel inputModel, CancellationToken cancellationToken)
+    public async Task<IResult<IngestLawDocumentTaskInfo?>> ExecuteAsync(ExtractLawDocumentArticlesModel inputModel, CancellationToken cancellationToken)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
 
-        var query = new QueryDefinition($"SELECT * FROM c WHERE c.TraceId = \"{traceId}\"");
+        var query = new QueryDefinition($"SELECT * FROM c WHERE c.TraceId = \"{inputModel.TraceId}\"");
 
         var queryResults = await _lawPageDocumentRepository.GetAsync(query, continuationToken: null,
             new QueryRequestOptions { PartitionKey = new PartitionKey(tenantId.ToString()) },
@@ -43,7 +43,7 @@ public class ExtractTaxLawDocumentArticles : ITraceableCommand<ExtractLawDocumen
         {                                            
             article.Id = Guid.NewGuid().ToString();
             article.TenantId = tenantId.ToString();
-            article.TraceId = traceId;
+            article.TraceId = inputModel.TraceId;
             article.DocumentType = nameof(TaxLawDocumentArticle);
             article.LawDocumentVersion = documentPages.FirstOrDefault()?.LawDocumentVersion ?? string.Empty;
             article.LawId = documentPages.FirstOrDefault()?.LawId ?? Guid.Empty;
@@ -56,7 +56,7 @@ public class ExtractTaxLawDocumentArticles : ITraceableCommand<ExtractLawDocumen
             }
         }
 
-        return Result<IngestLawDocumentTaskInfo>.Success(new IngestLawDocumentTaskInfo { TraceId = traceId });
+        return Result<IngestLawDocumentTaskInfo>.Success(new IngestLawDocumentTaskInfo { TraceId = inputModel.TraceId });
     }
 
     private async Task<IList<TaxLawDocumentArticle>> ExtractArticlesAsync(IList<TaxLawDocumentPage> pages, CancellationToken cancellationToken)

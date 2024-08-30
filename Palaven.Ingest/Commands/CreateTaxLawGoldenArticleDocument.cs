@@ -1,7 +1,7 @@
-﻿using Liara.Common;
+﻿using Liara.Clients.OpenAI;
+using Liara.Clients.OpenAI.Model.Chat;
+using Liara.Common;
 using Liara.CosmosDb;
-using Liara.OpenAI;
-using Liara.OpenAI.Model.Chat;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Palaven.Model.Ingest.Commands;
@@ -11,7 +11,7 @@ using System.Net;
 
 namespace Palaven.Ingest.Commands;
 
-public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenArticleDocumentModel, Guid>
+public class CreateTaxLawGoldenArticleDocument : ICommandHandler<CreateGoldenArticleDocumentModel, Guid>
 {
     private readonly IOpenAiServiceClient _openAiChatService;
     private readonly IDocumentRepository<TaxLawDocumentArticle> _articleDocumentRepository;
@@ -26,7 +26,7 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
         _goldenArticleDocumentRepository = goldenArticleDocumentRepository ?? throw new ArgumentNullException(nameof(goldenArticleDocumentRepository));
     }
 
-    public async Task<IResult<Guid>> ExecuteAsync(Guid traceId, CreateGoldenArticleDocumentModel inputModel, CancellationToken cancellationToken)
+    public async Task<IResult<Guid>> ExecuteAsync(CreateGoldenArticleDocumentModel inputModel, CancellationToken cancellationToken)
     {
         try
         {
@@ -55,7 +55,7 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
             {
                 Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId.ToString(),
-                TraceId = traceId,
+                TraceId = inputModel.TraceId,
                 LawId = article.LawId,
                 LawName = "Ley del Impuesto Sobre la Renta",
                 LawAcronym = "LISR",
@@ -237,12 +237,12 @@ public class CreateTaxLawGoldenArticleDocument : ITraceableCommand<CreateGoldenA
 
         var messages = new List<Message>
         {
-            new Message
+            new()
             {
                 Role = "system",
                 Content = systemPrompt
             },
-            new Message
+            new()
             {
                 Role = "user",
                 Content = userPrompt

@@ -2,6 +2,7 @@
 
 public class IngestLawDocumentModel
 {
+    public Guid TraceId { get; set; }
     public string Acronym { get; set; } = default!;
     public string Name { get; set; } = default!;
     public int Year { get; set; }

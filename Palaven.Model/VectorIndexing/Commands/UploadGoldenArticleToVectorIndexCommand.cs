@@ -1,6 +1,7 @@
 ﻿namespace Palaven.Model.VectorIndexing.Commands;
 
-public class UploadGoldenArticleToVectorIndexModel
+public class UploadGoldenArticleToVectorIndexCommand
 {
+    public Guid TraceId { get; set; }
     public Guid GoldenArticleId { get; set; }
 }

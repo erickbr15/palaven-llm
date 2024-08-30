@@ -2,5 +2,6 @@
 
 public class CreateGoldenArticleDocumentModel
 {
+    public Guid TraceId { get; set; }
     public Guid ArticleId { get; set; }
 }

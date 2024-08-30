@@ -11,7 +11,7 @@ using System.Net;
 
 namespace Palaven.Ingest.Commands;
 
-public class ExtractTaxLawDocumentPages : ITraceableCommand<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo>
+public class ExtractTaxLawDocumentPages : ICommandHandler<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo>
 {
     private readonly IBlobStorageService _blobStorageService;
     private readonly IDocumentRepository<TaxLawToIngestDocument> _lawDocumentToIngestRepository;
@@ -35,11 +35,11 @@ public class ExtractTaxLawDocumentPages : ITraceableCommand<ExtractLawDocumentPa
         _documentAnalyzer = documentAnalyzer ?? throw new ArgumentNullException(nameof(documentAnalyzer));
     }
 
-    public async Task<IResult<IngestLawDocumentTaskInfo>> ExecuteAsync(Guid traceId, ExtractLawDocumentPagesModel inputModel, CancellationToken cancellationToken)
+    public async Task<IResult<IngestLawDocumentTaskInfo>> ExecuteAsync(ExtractLawDocumentPagesModel inputModel, CancellationToken cancellationToken)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
 
-        var query = new QueryDefinition($"SELECT * FROM c WHERE c.TraceId = \"{traceId}\"");
+        var query = new QueryDefinition($"SELECT * FROM c WHERE c.TraceId = \"{inputModel.TraceId}\"");
 
         var queryResults = await _lawDocumentToIngestRepository.GetAsync(
             query, 
@@ -47,13 +47,13 @@ public class ExtractTaxLawDocumentPages : ITraceableCommand<ExtractLawDocumentPa
             new QueryRequestOptions { PartitionKey = new PartitionKey(tenantId.ToString()) },            
             cancellationToken);
         
-        var taxLawToIngestDocument = queryResults.SingleOrDefault() ?? throw new InvalidOperationException($"Unable to find the tax law document to ingest with trace id {traceId}");
+        var taxLawToIngestDocument = queryResults.SingleOrDefault() ?? throw new InvalidOperationException($"Unable to find the tax law document to ingest with trace id {inputModel.TraceId}");
 
-        var latestPage = await GetLastestExtractedPageAsync(traceId, cancellationToken);
+        var latestPage = await GetLastestExtractedPageAsync(inputModel.TraceId, cancellationToken);
 
-        await ExtractDocumentPagesAsync(traceId, taxLawToIngestDocument, latestPage?.PageNumber, cancellationToken);
+        await ExtractDocumentPagesAsync(inputModel.TraceId, taxLawToIngestDocument, latestPage?.PageNumber, cancellationToken);
                                            
-        return new Result<IngestLawDocumentTaskInfo> { Value = new IngestLawDocumentTaskInfo { TraceId = traceId } };
+        return new Result<IngestLawDocumentTaskInfo> { Value = new IngestLawDocumentTaskInfo { TraceId = inputModel.TraceId } };
     }
 
     private async Task<TaxLawDocumentPage?> GetLastestExtractedPageAsync(Guid traceId, CancellationToken cancellationToken)
@@ -115,16 +115,17 @@ public class ExtractTaxLawDocumentPages : ITraceableCommand<ExtractLawDocumentPa
     private TaxLawDocumentPage BuildTaxLawDocumentPage(Guid traceId, TaxLawToIngestDocument taxLawToIngestDocument, DocumentPage page)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
-        
-        var taxLawPage = new TaxLawDocumentPage();
 
-        taxLawPage.Id = Guid.NewGuid().ToString();
-        taxLawPage.TenantId = tenantId.ToString();
-        taxLawPage.TraceId = traceId;
-        taxLawPage.DocumentType = nameof(TaxLawDocumentPage);
-        taxLawPage.LawDocumentVersion = taxLawToIngestDocument.LawDocumentVersion;
-        taxLawPage.LawId = taxLawToIngestDocument.LawId;
-        taxLawPage.PageNumber = page.PageNumber;
+        var taxLawPage = new TaxLawDocumentPage
+        {
+            Id = Guid.NewGuid().ToString(),
+            TenantId = tenantId.ToString(),
+            TraceId = traceId,
+            DocumentType = nameof(TaxLawDocumentPage),
+            LawDocumentVersion = taxLawToIngestDocument.LawDocumentVersion,
+            LawId = taxLawToIngestDocument.LawId,
+            PageNumber = page.PageNumber
+        };
 
         var lineCounter = 0;
         taxLawPage.Lines = page.Lines.Select(l =>

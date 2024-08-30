@@ -9,7 +9,7 @@ using System.Net;
 
 namespace Palaven.Ingest.Commands;
 
-public class StartIngestTaxLawDocument : ITraceableCommand<IngestLawDocumentModel, IngestLawDocumentTaskInfo>
+public class StartIngestTaxLawDocument : ICommandHandler<IngestLawDocumentModel, IngestLawDocumentTaskInfo>
 {
     private readonly IBlobStorageService _storageService;
     private readonly IDocumentRepository<TaxLawToIngestDocument> _repository;
@@ -26,7 +26,7 @@ public class StartIngestTaxLawDocument : ITraceableCommand<IngestLawDocumentMode
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    public async Task<IResult<IngestLawDocumentTaskInfo>> ExecuteAsync(Guid traceId, IngestLawDocumentModel inputModel, CancellationToken cancellationToken)
+    public async Task<IResult<IngestLawDocumentTaskInfo>> ExecuteAsync(IngestLawDocumentModel inputModel, CancellationToken cancellationToken)
     {        
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
         var documentId = Guid.NewGuid();
@@ -45,7 +45,7 @@ public class StartIngestTaxLawDocument : ITraceableCommand<IngestLawDocumentMode
         {
             Id = documentId.ToString(),
             TenantId = tenantId.ToString(),
-            TraceId = traceId,
+            TraceId = inputModel.TraceId,
             FileName = persistedFileName,
             OriginalFileName = inputModel.FileName,
             LawId = Guid.NewGuid(),
@@ -66,6 +66,6 @@ public class StartIngestTaxLawDocument : ITraceableCommand<IngestLawDocumentMode
             throw new InvalidOperationException($"Unable to create the TaxLawToIngest document. Status code: {result.StatusCode}");
         }
 
-        return new Result<IngestLawDocumentTaskInfo> { Value = new IngestLawDocumentTaskInfo { TraceId = traceId } };
+        return new Result<IngestLawDocumentTaskInfo> { Value = new IngestLawDocumentTaskInfo { TraceId = inputModel.TraceId } };
     }    
 }

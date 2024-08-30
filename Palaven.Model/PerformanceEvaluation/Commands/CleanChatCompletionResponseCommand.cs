@@ -1,6 +1,6 @@
 ﻿namespace Palaven.Model.PerformanceEvaluation.Commands;
 
-public class CleanChatCompletionResponsesModel
+public sealed class CleanChatCompletionResponseCommand
 {
     public Guid SessionId { get; set;}
     public int BatchNumber { get; set; }

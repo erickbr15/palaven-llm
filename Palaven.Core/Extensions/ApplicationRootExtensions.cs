@@ -12,9 +12,9 @@ public static class ApplicationRootExtensions
 {
     public static IServiceCollection AddPalavenCoreServices(this IServiceCollection services)
     {
-        services.AddTransient<ICommand<IEnumerable<UpsertChatCompletionResponseModel>, bool>, UpsertChatCompletionResponseCommand>();
-        services.AddTransient<ICommand<CleanChatCompletionResponsesModel, bool>, CleanChatCompletionResponsesCommand>();
-        services.AddTransient<IQueryCommand<SearchLlmChatCompletionResponseCriteria, IList<LlmResponseView>>, QueryLlmChatCompletionResponses>();
+        services.AddTransient<ICommandHandler<UpsertChatCompletionResponseCommand>, UpsertChatCompletionResponseCommandHandler>();
+        services.AddTransient<ICommandHandler<CleanChatCompletionResponseCommand>, CleanChatCompletionResponseCommandHandler>();
+        services.AddTransient<IQueryHandler<LlmChatCompletionResponseQuery, IEnumerable<LlmResponseView>>, LlmChatCompletionResponseQueryHandler>();
         services.AddTransient<IInstructionDatasetService, InstructionDatasetService>();
         services.AddTransient<IFineTuningDatasetService, FineTuningDatasetService>();
         services.AddTransient<IPerformanceEvaluationService, PerformanceEvaluationService>();

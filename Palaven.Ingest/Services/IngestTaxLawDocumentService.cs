@@ -11,16 +11,16 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
 {
     private readonly IDocumentRepository<TaxLawDocumentArticle> _articleDocumentRepository;
     private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleDocumentRepository;
-    private readonly ITraceableCommand<IngestLawDocumentModel, IngestLawDocumentTaskInfo> _startTaxLawIngestCommand;
-    private readonly ITraceableCommand<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo> _extractTaxLawDocumentPagesCommand;
-    private readonly ITraceableCommand<CreateGoldenArticleDocumentModel, Guid> _createGoldenArticleDocumentCommand;    
+    private readonly ICommandHandler<IngestLawDocumentModel, IngestLawDocumentTaskInfo> _startTaxLawIngestCommand;
+    private readonly ICommandHandler<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo> _extractTaxLawDocumentPagesCommand;
+    private readonly ICommandHandler<CreateGoldenArticleDocumentModel, Guid> _createGoldenArticleDocumentCommand;    
 
     public IngestTaxLawDocumentService(
         IDocumentRepository<TaxLawDocumentArticle> articleDocumentRepository,
         IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleDocumentRepository,
-        ITraceableCommand<IngestLawDocumentModel, IngestLawDocumentTaskInfo> startTaxLawIngestCommand,
-        ITraceableCommand<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo> extractTaxLawDocumentPagesCommand,
-        ITraceableCommand<CreateGoldenArticleDocumentModel, Guid> createGoldenArticleDocumentCommand)
+        ICommandHandler<IngestLawDocumentModel, IngestLawDocumentTaskInfo> startTaxLawIngestCommand,
+        ICommandHandler<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo> extractTaxLawDocumentPagesCommand,
+        ICommandHandler<CreateGoldenArticleDocumentModel, Guid> createGoldenArticleDocumentCommand)
     {
         _articleDocumentRepository = articleDocumentRepository ?? throw new ArgumentNullException(nameof(articleDocumentRepository));
         _goldenArticleDocumentRepository = goldenArticleDocumentRepository ?? throw new ArgumentNullException(nameof(goldenArticleDocumentRepository));
@@ -38,16 +38,22 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
         return extractPagesResult;
     }
 
-    private Task<IResult<IngestLawDocumentTaskInfo>> StartTaxLawDocumentIngestAsync(Guid operationId, IngestLawDocumentModel model, CancellationToken cancellationToken)
+    private Task<IResult<IngestLawDocumentTaskInfo?>> StartTaxLawDocumentIngestAsync(Guid operationId, IngestLawDocumentModel model, CancellationToken cancellationToken)
     {
-        return _startTaxLawIngestCommand.ExecuteAsync(operationId, model, cancellationToken);
+        model.TraceId = operationId;
+        return _startTaxLawIngestCommand.ExecuteAsync(model, cancellationToken);
     }
 
-    private async Task<IResult<IngestLawDocumentTaskInfo>> ExtractTaxLawDocumentPagesAsync(IResult<IngestLawDocumentTaskInfo> startLawDocumentResult, CancellationToken cancellationToken)
+    private async Task<IResult<IngestLawDocumentTaskInfo?>> ExtractTaxLawDocumentPagesAsync(IResult<IngestLawDocumentTaskInfo> startLawDocumentResult, CancellationToken cancellationToken)
     {
-        if(startLawDocumentResult.AnyErrorsOrValidationFailures)
+        if(startLawDocumentResult == null)
         {
-            return await Task.FromResult(Result<IngestLawDocumentTaskInfo>.Fail(startLawDocumentResult.ValidationErrors, startLawDocumentResult.Errors));
+            return await Task.FromResult(Result<IngestLawDocumentTaskInfo>.Fail());
+        }        
+        
+        if(!startLawDocumentResult.IsSuccess)
+        {
+            return await Task.FromResult(Result<IngestLawDocumentTaskInfo>.Fail(startLawDocumentResult.ValidationErrors, startLawDocumentResult.Exceptions));
         }
                 
         var model = new ExtractLawDocumentPagesModel
@@ -55,7 +61,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
             OperationId = startLawDocumentResult.Value.TraceId
         };
 
-        var extractPagesResult = await _extractTaxLawDocumentPagesCommand.ExecuteAsync(model.OperationId, model, cancellationToken);
+        var extractPagesResult = await _extractTaxLawDocumentPagesCommand.ExecuteAsync(model, cancellationToken);
         return extractPagesResult;
     }
 
@@ -76,11 +82,11 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
         foreach (var article in articles)
         {
             var articleId = new Guid(article.Id);
-            var result = await _createGoldenArticleDocumentCommand.ExecuteAsync(traceId, new CreateGoldenArticleDocumentModel { ArticleId = articleId }, cancellationToken);
+            var result = await _createGoldenArticleDocumentCommand.ExecuteAsync(new CreateGoldenArticleDocumentModel { TraceId = traceId, ArticleId = articleId }, cancellationToken);
 
-            if (result.AnyErrorsOrValidationFailures)
+            if (result.IsSuccess)
             {
-                System.Diagnostics.Debug.WriteLine($"Golden article created: {!result.AnyErrorsOrValidationFailures}.");
+                System.Diagnostics.Debug.WriteLine("Golden article created");
             }            
         }
     }
