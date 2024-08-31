@@ -8,16 +8,15 @@ namespace Palaven.Data.Sql.Services;
 public class PerformanceEvaluationDataService : IPerformanceEvaluationDataService
 {
     private readonly PalavenDbContext _dbContext;
-    private readonly IRepository<EvaluationSession> _evaluationSessionRepository;    
+    private readonly IRepository<EvaluationSession> _evaluationSessionRepository;
     private readonly IRepository<FineTunedLlmResponse> _fineTunedLlmResponseRepository;
     private readonly IRepository<FineTunedLlmWithRagResponse> _fineTunedLlmWithRagResponseRepository;
     private readonly IRepository<LlmResponse> _llmResponseRepository;
-    private readonly IRepository<LlmWithRagResponse> _llmWithRagResponseRepository;
-    private readonly IRepository<BertScoreMetric> _bertScoreMetricRepository;
-    private readonly IRepository<RougeScoreMetric> _rougeScoreMetricRepository;
+    private readonly IRepository<LlmWithRagResponse> _llmWithRagResponseRepository;    
 
     public PerformanceEvaluationDataService(PalavenDbContext dbContext,
-        IRepository<EvaluationSession> evaluationSessionRepository,        
+        IRepository<EvaluationSession> evaluationSessionRepository,
+        IRepository<InstructionEntity> instructionRepository,
         IRepository<FineTunedLlmResponse> fineTunedLlmResponseRepository,
         IRepository<FineTunedLlmWithRagResponse> fineTunedLlmWithRagResponseRepository,
         IRepository<LlmResponse> llmResponseRepository,
@@ -26,24 +25,29 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         IRepository<RougeScoreMetric> rougeScoreMetricRepository)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        _evaluationSessionRepository = evaluationSessionRepository ?? throw new ArgumentNullException(nameof(evaluationSessionRepository));        
+        _evaluationSessionRepository = evaluationSessionRepository ?? throw new ArgumentNullException(nameof(evaluationSessionRepository));
         _fineTunedLlmResponseRepository = fineTunedLlmResponseRepository ?? throw new ArgumentNullException(nameof(fineTunedLlmResponseRepository));
         _fineTunedLlmWithRagResponseRepository = fineTunedLlmWithRagResponseRepository ?? throw new ArgumentNullException(nameof(fineTunedLlmWithRagResponseRepository));
         _llmResponseRepository = llmResponseRepository ?? throw new ArgumentNullException(nameof(llmResponseRepository));
         _llmWithRagResponseRepository = llmWithRagResponseRepository ?? throw new ArgumentNullException(nameof(llmWithRagResponseRepository));
-        _bertScoreMetricRepository = bertScoreMetricRepository ?? throw new ArgumentNullException(nameof(bertScoreMetricRepository));
-        _rougeScoreMetricRepository = rougeScoreMetricRepository ?? throw new ArgumentNullException(nameof(rougeScoreMetricRepository));
     }
 
     public async Task<EvaluationSession> CreateEvaluationSessionAsync(EvaluationSession evaluationSession, CancellationToken cancellationToken)
-    {
-        evaluationSession.SessionId = Guid.NewGuid();
+    {        
         evaluationSession.CreationDate = DateTime.Now;
 
-        await _evaluationSessionRepository.AddAsync(evaluationSession, cancellationToken);
+        await _evaluationSessionRepository.AddAsync(evaluationSession, cancellationToken);        
 
         return evaluationSession;
-    }    
+    } 
+    
+    public async Task AddInstructionToEvaluationSessionAsync(IEnumerable<EvaluationSessionInstruction> instructions, CancellationToken cancellationToken)
+    {
+        foreach (var instruction in instructions)
+        {
+            await _dbContext.EvaluationSessionInstructions.AddAsync(instruction, cancellationToken);
+        }
+    }
 
     public async Task<EvaluationSession> UpdateEvaluationSessionAsync(EvaluationSession evaluationSession, CancellationToken cancellationToken)
     {
@@ -70,56 +74,9 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         return await _evaluationSessionRepository.GetByIdAsync(sessionId, cancellationToken);
     }
 
-    public async Task UpsertChatCompletionPerformanceEvaluationAsync(BertScoreMetric bertScoreMetrics, CancellationToken cancellationToken)
+    public IQueryable<EvaluationSessionInstruction> GetEvaluationSessionInstructionQuery(Func<EvaluationSessionInstruction, bool> criteria)
     {
-        var existingEvaluation = _bertScoreMetricRepository
-            .GetAll()
-            .SingleOrDefault(x => x.SessionId == bertScoreMetrics.SessionId && x.BatchNumber == bertScoreMetrics.BatchNumber);
-
-        if(existingEvaluation == null)
-        {
-            bertScoreMetrics.CreationDate = DateTime.Now;
-            await _bertScoreMetricRepository.AddAsync(bertScoreMetrics, cancellationToken);
-        }
-        else
-        {
-            existingEvaluation.BertScorePrecision = bertScoreMetrics.BertScorePrecision;
-            existingEvaluation.BertScoreRecall = bertScoreMetrics.BertScoreRecall;
-            existingEvaluation.BertScoreF1 = bertScoreMetrics.BertScoreF1;
-            existingEvaluation.ModifiedDate = DateTime.Now;
-
-            _bertScoreMetricRepository.Update(existingEvaluation);
-        }        
-    }
-
-    public async Task UpsertChatCompletionPerformanceEvaluationAsync(IEnumerable<RougeScoreMetric> rougeScoreMetrics, CancellationToken cancellationToken)
-    {
-        foreach (var rougeScoreMetric in rougeScoreMetrics.ToList())
-        {
-            await UpsertChatCompletionPerformanceEvaluationAsync(rougeScoreMetric, cancellationToken);
-        }
-    }
-
-    private async Task UpsertChatCompletionPerformanceEvaluationAsync(RougeScoreMetric rougeScoreMetric, CancellationToken cancellationToken)
-    {
-        var existingEvaluation = _rougeScoreMetricRepository
-            .GetAll()
-            .SingleOrDefault(x => x.SessionId == rougeScoreMetric.SessionId && x.BatchNumber == rougeScoreMetric.BatchNumber && string.Equals(x.RougeType, rougeScoreMetric.RougeType, StringComparison.OrdinalIgnoreCase));
-
-        if(existingEvaluation == null)
-        {
-            rougeScoreMetric.CreationDate = DateTime.Now;
-            await _rougeScoreMetricRepository.AddAsync(rougeScoreMetric, cancellationToken);
-        }
-        else
-        {
-            existingEvaluation.RougePrecision = rougeScoreMetric.RougePrecision;
-            existingEvaluation.RougeRecall = rougeScoreMetric.RougeRecall;
-            existingEvaluation.RougeF1 = rougeScoreMetric.RougeF1;
-            existingEvaluation.ModifiedDate = DateTime.Now;
-
-            _rougeScoreMetricRepository.Update(existingEvaluation);            
-        }
+        return _dbContext.EvaluationSessionInstructions.Where(criteria).AsQueryable();
     }
 
     public async Task UpsertChatCompletionResponseAsync(IEnumerable<FineTunedLlmResponse> chatCompletionResponses, CancellationToken cancellationToken)

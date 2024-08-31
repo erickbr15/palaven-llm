@@ -4,7 +4,7 @@ using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Core.PerformanceEvaluation.Queries;
 
-public class LlmChatCompletionResponseQueryHandler : IQueryHandler<LlmChatCompletionResponseQuery, IEnumerable<LlmResponseView>>
+public class LlmChatCompletionResponseQueryHandler : IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>>
 {
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
 
@@ -13,45 +13,15 @@ public class LlmChatCompletionResponseQueryHandler : IQueryHandler<LlmChatComple
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
     }
 
-    public Task<IResult<IEnumerable<LlmResponseView>>> ExecuteAsync(LlmChatCompletionResponseQuery command, CancellationToken cancellationToken)
+    public Task<IResult<IList<LlmResponseView>>> ExecuteAsync(LlmChatCompletionResponseQuery command, CancellationToken cancellationToken)
     {
         if (command == null)
         {
             throw new ArgumentNullException(nameof(command));
         }
 
-        IEnumerable<LlmResponseView> result = new List<LlmResponseView>();
+        var result = _performanceEvaluationDataService.FetchChatCompletionLlmResponses(command.SelectionCriteria);
 
-        if (string.Equals(command.ChatCompletionExcerciseType, ChatCompletionExcerciseType.LlmVanilla, StringComparison.OrdinalIgnoreCase))
-        {
-            result = _performanceEvaluationDataService.FetchChatCompletionLlmResponses(command.SelectionCriteria);
-        }
-        else if (string.Equals(command.ChatCompletionExcerciseType, ChatCompletionExcerciseType.LlmWithRag, StringComparison.OrdinalIgnoreCase))
-        {
-            result = _performanceEvaluationDataService.FetchChatCompletionLlmWithRagResponses(command.SelectionCriteria);
-        }
-
-        return Task.FromResult(Result<IEnumerable<LlmResponseView>>.Success(result));
-    }
-
-    public IResult<IList<LlmResponseView>> Search(LlmChatCompletionResponseQuery command)
-    {
-        if (command == null)
-        {
-            throw new ArgumentNullException(nameof(command));
-        }
-
-        IList<LlmResponseView> result = new List<LlmResponseView>();
-
-        if (string.Equals(command.ChatCompletionExcerciseType, ChatCompletionExcerciseType.LlmVanilla, StringComparison.OrdinalIgnoreCase))
-        {
-            result = _performanceEvaluationDataService.FetchChatCompletionLlmResponses(command.SelectionCriteria);
-        }
-        else if (string.Equals(command.ChatCompletionExcerciseType, ChatCompletionExcerciseType.LlmWithRag, StringComparison.OrdinalIgnoreCase))
-        {
-            result = _performanceEvaluationDataService.FetchChatCompletionLlmWithRagResponses(command.SelectionCriteria);
-        }
-
-        return Result<IList<LlmResponseView>>.Success(result);
+        return Task.FromResult(Result<IList<LlmResponseView>>.Success(result));
     }
 }

@@ -107,13 +107,9 @@ public class InstructionDatasetService : IInstructionDatasetService
             return Result<List<InstructionData>>.Success(new List<InstructionData>());
         }
 
-        var offset = (model.BatchNumber - 1) * evaluationSession.BatchSize;
+        var testInstructions = _instructionDataService.GetInstructionForTestingByEvaluationSession(model.SessionId, evaluationSession.BatchSize, model.BatchNumber);
 
-        var instructionDataset = _instructionDataService.GetInstructionQueryable()
-            .Where(x => x.DatasetId == evaluationSession.DatasetId)
-            .OrderBy(x => x.Id)
-            .Skip(offset)
-            .Take(evaluationSession.BatchSize)
+        var instructionDataset = testInstructions
             .Select(i=> new InstructionData
             {
                 InstructionId = i.Id,

@@ -17,15 +17,14 @@ public static class ApplicationRootExtensions
         });
                 
         services.AddTransient<IRepository<EvaluationSession>, EvaluationSessionRepository>();
-        services.AddTransient<IRepository<FineTunedLlmResponse>, FineTunedLlmResponseRepository>();
-        services.AddTransient<IRepository<FineTunedLlmWithRagResponse>, FineTunedLlmWithRagResponsesRepository>();
-        services.AddTransient<IRepository<InstructionEntity>, InstructionRepository>();
         services.AddTransient<IRepository<LlmResponse>, LlmResponseRepository>();
-        services.AddTransient<IRepository<LlmWithRagResponse>, LlmWithRagResponseRepository>();
+        services.AddTransient<IRepository<InstructionEntity>, InstructionRepository>();
         services.AddTransient<IRepository<BertScoreMetric>, BertScoreMetricRepository>();
         services.AddTransient<IRepository<RougeScoreMetric>, RougeScoreMetricRepository>();
         services.AddTransient<IRepository<FineTuningPromptEntity>, FineTuningPromptRepository>();
+        services.AddTransient<IRepository<EvaluationSessionInstruction>, EvaluationSessionInstructionRepository>();                
         services.AddTransient<IDatasetsDataService, DatasetsDataService>();
-        services.AddTransient<IPerformanceEvaluationDataService, PerformanceEvaluationDataService>();        
+        services.AddTransient<IPerformanceEvaluationDataService, PerformanceEvaluationDataService>();
+        services.AddTransient<IPerformanceMetricsDataService, PerformanceMetricsDataService>();
     }
 }

@@ -4,6 +4,7 @@ using Palaven.Core.Datasets;
 using Palaven.Core.PerformanceEvaluation;
 using Palaven.Core.PerformanceEvaluation.Commands;
 using Palaven.Core.PerformanceEvaluation.Queries;
+using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Core.Extensions;
@@ -14,7 +15,8 @@ public static class ApplicationRootExtensions
     {
         services.AddTransient<ICommandHandler<UpsertChatCompletionResponseCommand>, UpsertChatCompletionResponseCommandHandler>();
         services.AddTransient<ICommandHandler<CleanChatCompletionResponseCommand>, CleanChatCompletionResponseCommandHandler>();
-        services.AddTransient<IQueryHandler<LlmChatCompletionResponseQuery, IEnumerable<LlmResponseView>>, LlmChatCompletionResponseQueryHandler>();
+        services.AddTransient<ICommandHandler<CreateEvaluationSessionCommand, EvaluationSessionInfo>, CreateEvaluationSessionCommandHandler>();
+        services.AddTransient<IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>>, LlmChatCompletionResponseQueryHandler>();
         services.AddTransient<IInstructionDatasetService, InstructionDatasetService>();
         services.AddTransient<IFineTuningDatasetService, FineTuningDatasetService>();
         services.AddTransient<IPerformanceEvaluationService, PerformanceEvaluationService>();

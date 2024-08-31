@@ -8,47 +8,37 @@ namespace Palaven.Core.PerformanceEvaluation;
 public class PerformanceEvaluationService : IPerformanceEvaluationService
 {
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
+    private readonly IPerformanceMetricsDataService _performanceMetricsDataService;
     private readonly ICommandHandler<UpsertChatCompletionResponseCommand> _upsertChatCompletionResponseCommand;
     private readonly ICommandHandler<CleanChatCompletionResponseCommand> _cleanChatCompletionResponsesCommand;
+    private readonly ICommandHandler<CreateEvaluationSessionCommand, EvaluationSessionInfo> _createEvaluationSessionCommand;
     private readonly IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> _queryChatCompletionResponsesCommand;
 
     public PerformanceEvaluationService(IPerformanceEvaluationDataService performanceEvaluationDataService,
+        IPerformanceMetricsDataService performanceMetricsDataService,
         ICommandHandler<UpsertChatCompletionResponseCommand> upsertChatCompletionResponseCommand,
         ICommandHandler<CleanChatCompletionResponseCommand> cleanChatCompletionResponsesCommand,
+        ICommandHandler<CreateEvaluationSessionCommand, EvaluationSessionInfo> createEvaluationSessionCommand,
         IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> queryChatCompletionResponsesCommand)
     {
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
+        _performanceMetricsDataService = performanceMetricsDataService ?? throw new ArgumentNullException(nameof(performanceMetricsDataService));
         _upsertChatCompletionResponseCommand = upsertChatCompletionResponseCommand ?? throw new ArgumentNullException(nameof(upsertChatCompletionResponseCommand));
         _cleanChatCompletionResponsesCommand = cleanChatCompletionResponsesCommand ?? throw new ArgumentNullException(nameof(cleanChatCompletionResponsesCommand));
+        _createEvaluationSessionCommand = createEvaluationSessionCommand ?? throw new ArgumentNullException(nameof(createEvaluationSessionCommand));
         _queryChatCompletionResponsesCommand = queryChatCompletionResponsesCommand ?? throw new ArgumentNullException(nameof(queryChatCompletionResponsesCommand));
     }
 
-    public async Task<IResult<EvaluationSessionInfo?>> CreateEvaluationSessionAsync(CreateEvaluationSessionModel model, CancellationToken cancellationToken)
+    public async Task<IResult<EvaluationSessionInfo?>> CreateEvaluationSessionAsync(CreateEvaluationSessionCommand command, CancellationToken cancellationToken)
     {
-        var evaluationSession = new EvaluationSession
+        if (command == null)
         {
-            DatasetId = model.DatasetId,
-            BatchSize = model.BatchSize,
-            LargeLanguageModel = model.LargeLanguageModel,
-            DeviceInfo = model.DeviceInfo.ToLower(),
-            IsActive = true,
-            StartDate = DateTime.Now
-        };
+            return Result<EvaluationSessionInfo>.Fail(new List<ValidationError>(), new List<Exception> { new ArgumentNullException(nameof(command)) });
+        }
 
-        var newEvaluationSession = await _performanceEvaluationDataService.CreateEvaluationSessionAsync(evaluationSession, cancellationToken);
+        var result = await _createEvaluationSessionCommand.ExecuteAsync(command, cancellationToken);
 
-        await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
-        
-        return Result<EvaluationSessionInfo?>.Success(new EvaluationSessionInfo
-        {
-            SessionId = newEvaluationSession.SessionId,
-            DatasetId = newEvaluationSession.DatasetId,
-            BatchSize = newEvaluationSession.BatchSize,
-            LargeLanguageModel = newEvaluationSession.LargeLanguageModel,
-            DeviceInfo = newEvaluationSession.DeviceInfo,
-            IsActive = newEvaluationSession.IsActive,
-            StartDate = newEvaluationSession.StartDate
-        });
+        return result;
     }
 
     public async Task<EvaluationSessionInfo?> GetEvaluationSessionAsync(Guid sessionId, CancellationToken cancellationToken)
@@ -92,8 +82,9 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             RougeF1 = x.RougeScoreF1
         });
         
-        await _performanceEvaluationDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
-        await _performanceEvaluationDataService.UpsertChatCompletionPerformanceEvaluationAsync(rougeMetrics, cancellationToken);
+        await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
+        await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(rougeMetrics, cancellationToken);
+
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
@@ -115,8 +106,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
     {
         var criteria = new LlmChatCompletionResponseQuery
         {
-            ChatCompletionExcerciseType = chatCompletionExcerciseType,
-            SelectionCriteria = x => x.EvaluationSessionId == evaluationSessionId && x.BatchNumber == batchNumber
+            SelectionCriteria = x => x.EvaluationSessionId == evaluationSessionId && x.BatchNumber == batchNumber && x.EvaluationExercise == chatCompletionExcerciseType
         };
 
         var result = _queryChatCompletionResponsesCommand.ExecuteAsync(criteria, CancellationToken.None)

@@ -1,8 +1,10 @@
 ﻿namespace Palaven.Model.PerformanceEvaluation;
+
 public class LlmResponseView
 {
     public Guid EvaluationSessionId { get; set; }
     public Guid DatasetId { get; set; }
+    public string EvaluationExercise { get; set; } = default!;
     public int BatchSize { get; set; }
     public string LargeLanguageModel { get; set; } = default!;
     public string DeviceInfo { get; set; } = default!;

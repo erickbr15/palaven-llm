@@ -12,6 +12,7 @@ public class PalavenDbContext : DbContext, IPalavenDbContext
 
     public DbSet<InstructionEntity> Instructions { get; set; } = default!;
     public DbSet<EvaluationSession> EvaluationSessions { get; set; } = default!;
+    public DbSet<EvaluationSessionInstruction> EvaluationSessionInstructions { get; set; } = default!;
     public DbSet<FineTunedLlmResponse> FineTunedLlmResponses { get; set; } = default!;
     public DbSet<FineTunedLlmWithRagResponse> FineTunedLlmWithRagResponses { get; set; } = default!;
     public DbSet<LlmResponse> LlmResponses { get; set; } = default!;
