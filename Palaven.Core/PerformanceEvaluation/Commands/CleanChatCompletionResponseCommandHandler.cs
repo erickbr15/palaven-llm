@@ -46,29 +46,28 @@ public class CleanChatCompletionResponseCommandHandler : ICommandHandler<CleanCh
             return cleanedResponse;
         });
 
-        if (string.Equals(ChatCompletionExcerciseType.LlmVanilla, command.ChatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
-        {
-            var selectionCriteria = new Func<LlmResponse, bool>(x => x.SessionId == command.SessionId && x.BatchNumber == command.BatchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }
-        else if (string.Equals(ChatCompletionExcerciseType.LlmWithRag, command.ChatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
-        {
-            var selectionCriteria = new Func<LlmWithRagResponse, bool>(x => x.SessionId == command.SessionId && x.BatchNumber == command.BatchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }
-        else if (string.Equals(ChatCompletionExcerciseType.LlmFineTuned, command.ChatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
-        {
-            var selectionCriteria = new Func<FineTunedLlmResponse, bool>(x => x.SessionId == command.SessionId && x.BatchNumber == command.BatchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }
-        else if (string.Equals(ChatCompletionExcerciseType.LlmFineTunedAndRag, command.ChatCompletionExcerciseType, StringComparison.OrdinalIgnoreCase))
-        {
-            var selectionCriteria = new Func<FineTunedLlmWithRagResponse, bool>(x => x.SessionId == command.SessionId && x.BatchNumber == command.BatchNumber);
-            _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
-        }
+        var evaluationExerciseId = GetEvaluationExerciseId(command.ChatCompletionExcerciseType);
+        
+        var selectionCriteria = new Func<LlmResponse, bool>(x => 
+            x.SessionId == command.SessionId && 
+            x.BatchNumber == command.BatchNumber &&
+            x.EvaluationExerciseId == evaluationExerciseId);
 
+        _performanceEvaluationDataService.CleanChatCompletionResponses(selectionCriteria, cleaningStrategy);
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
-    }    
+    }
+
+    private static int GetEvaluationExerciseId(string chatCompletionExcerciseType)
+    {
+        return chatCompletionExcerciseType switch
+        {
+            ChatCompletionExcerciseType.LlmVanilla => 1,
+            ChatCompletionExcerciseType.LlmWithRag => 2,
+            ChatCompletionExcerciseType.LlmFineTuned => 3,
+            ChatCompletionExcerciseType.LlmFineTunedAndRag => 4,
+            _ => 0
+        };
+    }
 }
