@@ -36,6 +36,9 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.SWASHBUCKLE_DOTNET_CORE_VERSION }}
+    - name: Authenticate to Azure DevOps
+      run: |
+        dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.AZURE_DEVOPS_PAT }} --store-password-in-clear-text --name azure-devops https://pkgs.dev.azure.com/illium/Normandy/_packaging/illium-normandy/nuget/v3/index.json
     - name: Restore
       run: dotnet restore ${{ env.WORKING_DIRECTORY }}
     - name: Build
