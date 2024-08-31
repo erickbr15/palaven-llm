@@ -1,6 +1,6 @@
 ﻿using Liara.Common.DataAccess;
 using Palaven.Data.Sql.Services.Contracts;
-using Palaven.Model.Datasets;
+using Palaven.Model.Entities;
 
 namespace Palaven.Data.Sql.Services;
 
@@ -8,19 +8,36 @@ public class DatasetsDataService : IDatasetsDataService
 {
     private readonly PalavenDbContext _dbContext;
     private readonly IRepository<InstructionEntity> _instructionRepository;
+    private readonly IRepository<EvaluationSessionInstruction> _evaluationSessionInstructionRepository;
     private readonly IRepository<FineTuningPromptEntity> _fineTuningPromptRepository;
 
-    public DatasetsDataService(PalavenDbContext dbContext, IRepository<InstructionEntity> instructionRepository,
-        IRepository<FineTuningPromptEntity> fineTuningPromptRepository)
+    public DatasetsDataService(PalavenDbContext dbContext, 
+        IRepository<InstructionEntity> instructionRepository,
+        IRepository<FineTuningPromptEntity> fineTuningPromptRepository,
+        IRepository<EvaluationSessionInstruction> evaluationSessionInstructionRepository)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _instructionRepository = instructionRepository ?? throw new ArgumentNullException(nameof(instructionRepository));
         _fineTuningPromptRepository = fineTuningPromptRepository ?? throw new ArgumentNullException(nameof(fineTuningPromptRepository));
+        _evaluationSessionInstructionRepository = evaluationSessionInstructionRepository ?? throw new ArgumentNullException(nameof(evaluationSessionInstructionRepository));
     }
 
     public Task<InstructionEntity?> GetInstructionByIdAsync(int id, CancellationToken cancellationToken)
     {
         return _instructionRepository.GetByIdAsync(id, cancellationToken);
+    }
+
+    public IEnumerable<InstructionEntity> GetInstructionForTestingByEvaluationSession(Guid sessionId, int sessionBatchSize, int? batchNumber)
+    {
+        var instructions = from testInstruction in _evaluationSessionInstructionRepository.GetAll()
+                           join instruction in _instructionRepository.GetAll() on testInstruction.InstructionId equals instruction.Id
+                           where testInstruction.EvaluationSessionId == sessionId && testInstruction.InstructionPurpose == "test"
+                           orderby instruction.Id
+                           select instruction;
+
+        var offset = ((batchNumber ?? 1) - 1) * sessionBatchSize;
+
+        return instructions.Skip(offset).Take(sessionBatchSize).ToList();
     }
 
     public async Task<InstructionEntity> CreateAsync(InstructionEntity instruction, CancellationToken cancellationToken)

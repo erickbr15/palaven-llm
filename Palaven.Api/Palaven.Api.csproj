@@ -13,12 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Liara.Azure\Liara.Azure.csproj" />
-    <ProjectReference Include="..\Liara.Common\Liara.Common.csproj" />
-    <ProjectReference Include="..\Liara.CosmosDb\Liara.CosmosDb.csproj" />
-    <ProjectReference Include="..\Liara.EntityFrameworkCore\Liara.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\Liara.OpenAI\Liara.OpenAI.csproj" />
-    <ProjectReference Include="..\Liara.Pinecone\Liara.Pinecone.csproj" />
     <ProjectReference Include="..\Palaven.Chat\Palaven.Chat.csproj" />
     <ProjectReference Include="..\Palaven.Core\Palaven.Core.csproj" />
     <ProjectReference Include="..\Palaven.Data.Sql\Palaven.Data.Sql.csproj" />

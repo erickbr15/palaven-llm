@@ -7,15 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Liara.Azure" Version="1.0.1" />
+    <PackageReference Include="Liara.Clients" Version="6.0.1" />
+    <PackageReference Include="Liara.Common" Version="6.1.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.42.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Liara.Azure\Liara.Azure.csproj" />
-    <ProjectReference Include="..\Liara.Common\Liara.Common.csproj" />
-    <ProjectReference Include="..\Liara.CosmosDb\Liara.CosmosDb.csproj" />
-    <ProjectReference Include="..\Liara.OpenAI\Liara.OpenAI.csproj" />
-    <ProjectReference Include="..\Liara.Pinecone\Liara.Pinecone.csproj" />
     <ProjectReference Include="..\Palaven.Data\Palaven.Data.csproj" />
   </ItemGroup>
 

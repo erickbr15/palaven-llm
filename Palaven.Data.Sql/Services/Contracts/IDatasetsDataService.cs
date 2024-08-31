@@ -1,10 +1,11 @@
-﻿using Palaven.Model.Datasets;
+﻿using Palaven.Model.Entities;
 
 namespace Palaven.Data.Sql.Services.Contracts;
 
 public interface IDatasetsDataService
 {
     Task<InstructionEntity?> GetInstructionByIdAsync(int id, CancellationToken cancellationToken);
+    IEnumerable<InstructionEntity> GetInstructionForTestingByEvaluationSession(Guid sessionId, int sessionBatchSize, int? batchNumber);
     Task<FineTuningPromptEntity?> GetFineTuningPromptByIdAsync(int id, CancellationToken cancellationToken);
     Task<InstructionEntity> CreateAsync(InstructionEntity instruction, CancellationToken cancellationToken);
     Task<FineTuningPromptEntity> CreateAsync(FineTuningPromptEntity prompt, CancellationToken cancellationToken);

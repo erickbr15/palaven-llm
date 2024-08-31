@@ -52,7 +52,7 @@ while (true)
     var chatMessage = new ChatMessage
     {
         UserId = tenantId.ToString(),
-        Query = query
+        Prompt = query
     };
 
     var response = chatService.GetChatResponseAsync(chatMessage, CancellationToken.None).GetAwaiter().GetResult();

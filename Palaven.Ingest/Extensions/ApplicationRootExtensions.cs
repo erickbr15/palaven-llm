@@ -1,14 +1,14 @@
 ﻿using Liara.Azure.AI;
-using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Extensions.DependencyInjection;
 using Liara.Azure.BlobStorage;
-using Palaven.Model.Ingest.Commands;
 using Palaven.Ingest.Commands;
 using Palaven.Ingest.Services;
-using Liara.OpenAI;
 using Liara.Common.Http;
-using Liara.Pinecone;
+using Liara.Clients.OpenAI;
+using Liara.Clients.Pinecone;
+using Liara.Common;
+using Palaven.Model.Ingest;
 
 namespace Palaven.Ingest.Extensions;
 
@@ -18,7 +18,7 @@ public static class ApplicationRootExtensions
     {
         services.AddOptions<BlobStorageConnectionOptions>().BindConfiguration("BlobStorage");
         services.AddOptions<CosmosDbConnectionOptions>().BindConfiguration("CosmosDB");
-        services.AddOptions<AiMultiServiceOptions>().BindConfiguration("AiServices");
+        services.AddOptions<MultiServiceAiOptions>().BindConfiguration("AiServices");
         services.AddOptions<OpenAiOptions>().BindConfiguration("OpenAi");
         services.AddOptions<PineconeOptions>().BindConfiguration("Pinecone");
 
@@ -30,10 +30,10 @@ public static class ApplicationRootExtensions
 
     public static void AddIngestServices(this IServiceCollection services)
     {       
-        services.AddSingleton<ITraceableCommand<IngestLawDocumentModel, IngestLawDocumentTaskInfo>, StartIngestTaxLawDocument>();
-        services.AddSingleton<ITraceableCommand<ExtractLawDocumentPagesModel, IngestLawDocumentTaskInfo>, ExtractTaxLawDocumentPages>();
-        services.AddSingleton<ITraceableCommand<ExtractLawDocumentArticlesModel, IngestLawDocumentTaskInfo>, ExtractTaxLawDocumentArticles>();
-        services.AddSingleton<ITraceableCommand<CreateGoldenArticleDocumentModel, Guid>, CreateTaxLawGoldenArticleDocument>();        
+        services.AddSingleton<ICommandHandler<IngestTaxLawDocumentCommand, TaxLawDocumentIngestTask>, StartTaxLawIngestCommandHandler>();
+        services.AddSingleton<ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask>, CreateBronzeDocumentCommandHandler>();
+        services.AddSingleton<ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask>, CreateSilverDocumentCommandHandler>();
+        services.AddSingleton<ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask>, CreateGoldenDocumentCommandHandler>();        
 
         services.AddSingleton<IIngestTaxLawDocumentService, IngestTaxLawDocumentService>();
     }

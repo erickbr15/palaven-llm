@@ -3,9 +3,11 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.Datasets;
-using Palaven.Model.Ingest.Documents;
-using Palaven.Model.Ingest.Documents.Golden;
-using Palaven.Model.PerformanceEvaluation.Commands;
+using Palaven.Model.Documents;
+using Palaven.Model.Documents.Golden;
+using Palaven.Model.Entities;
+using Palaven.Model.PerformanceEvaluation;
+using System.Data;
 
 namespace Palaven.Core.Datasets;
 
@@ -28,15 +30,20 @@ public class InstructionDatasetService : IInstructionDatasetService
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
     }
 
-    public async Task CreateInstructionDatasetAsync(Guid traceId, Guid datasetId, CancellationToken cancellationToken)
+    public async Task CreateInstructionDatasetAsync(CreateInstructionDataset model, CancellationToken cancellationToken)
     {
-        var indexedGoldenArticleIds = await GetProcessedGoldenArticlesAsync(traceId, cancellationToken);
+        if(model == null)
+        {
+            return;
+        }
+        
+        var indexedGoldenArticleIds = await GetProcessedGoldenArticlesAsync(model.TraceId, cancellationToken);
 
         var tenantId = new Guid("69a03a54-4181-4d50-8274-d2d88ea911e4");
 
         var queryText = indexedGoldenArticleIds.Any() ?
-            $"SELECT * FROM c WHERE c.TraceId = \"{traceId}\" and c.id NOT IN ({string.Join(",", indexedGoldenArticleIds.Select(x => $"\"{x}\""))})" :
-            $"SELECT * FROM c WHERE c.TraceId = \"{traceId}\"";
+            $"SELECT * FROM c WHERE c.TraceId = \"{model.TraceId}\" and c.id NOT IN ({string.Join(",", indexedGoldenArticleIds.Select(x => $"\"{x}\""))})" :
+            $"SELECT * FROM c WHERE c.TraceId = \"{model.TraceId}\"";
 
         var query = new QueryDefinition(queryText);
 
@@ -60,7 +67,7 @@ public class InstructionDatasetService : IInstructionDatasetService
                         GoldenArticleId = new Guid(goldenArticle.Id),
                         LawId = goldenArticle.LawId,
                         ArticleId = goldenArticle.ArticleId,
-                        DatasetId = datasetId
+                        DatasetId = model.DatasetId
                     };
 
                     await _instructionDataService.CreateAsync(instructionEntity, cancellationToken);
@@ -72,7 +79,7 @@ public class InstructionDatasetService : IInstructionDatasetService
                 {
                     Id = Guid.NewGuid(),
                     TenantId = tenantId,
-                    TraceId = traceId,
+                    TraceId = model.TraceId,
                     Task = "instruction_dataset_creation",
                     GoldenArticleId = new Guid(goldenArticle.Id),
                     StartedAt = DateTime.Now,
@@ -92,7 +99,7 @@ public class InstructionDatasetService : IInstructionDatasetService
         }
     }
 
-    public async Task<IResult<List<InstructionData>>> FetchInstructionsDatasetAsync(QueryInstructionsDatasetModel model, CancellationToken cancellationToken)
+    public async Task<IResult<List<InstructionData>?>> FetchInstructionsDatasetAsync(FetchInstructionsDataset model, CancellationToken cancellationToken)
     {
         var evaluationSession = await _performanceEvaluationDataService.GetEvaluationSessionAsync(model.SessionId, cancellationToken);
         if(evaluationSession == null)
@@ -100,13 +107,9 @@ public class InstructionDatasetService : IInstructionDatasetService
             return Result<List<InstructionData>>.Success(new List<InstructionData>());
         }
 
-        var offset = (model.BatchNumber - 1) * evaluationSession.BatchSize;
+        var testInstructions = _instructionDataService.GetInstructionForTestingByEvaluationSession(model.SessionId, evaluationSession.BatchSize, model.BatchNumber);
 
-        var instructionDataset = _instructionDataService.GetInstructionQueryable()
-            .Where(x => x.DatasetId == evaluationSession.DatasetId)
-            .OrderBy(x => x.Id)
-            .Skip(offset)
-            .Take(evaluationSession.BatchSize)
+        var instructionDataset = testInstructions
             .Select(i=> new InstructionData
             {
                 InstructionId = i.Id,

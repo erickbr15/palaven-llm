@@ -3,5 +3,5 @@
 public class ChatMessage
 {
     public string UserId { get; set; } = default!;
-    public string Query { get; set; } = default!;
+    public string Prompt { get; set; } = default!;
 }

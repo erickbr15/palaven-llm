@@ -1,7 +1,7 @@
 ﻿using Liara.CosmosDb;
 using Microsoft.Extensions.DependencyInjection;
-using Palaven.Model.Ingest.Documents;
-using Palaven.Model.Ingest.Documents.Golden;
+using Palaven.Model.Documents;
+using Palaven.Model.Documents.Golden;
 
 namespace Palaven.Data.Extensions;
 

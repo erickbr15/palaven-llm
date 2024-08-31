@@ -1,13 +1,13 @@
-﻿using Liara.CosmosDb;
-using Liara.OpenAI;
-using Liara.OpenAI.Model.Chat;
-using Liara.OpenAI.Model.Embeddings;
-using Liara.Pinecone;
-using Liara.Pinecone.Model;
+﻿using Liara.Clients.OpenAI;
+using Liara.Clients.OpenAI.Model.Chat;
+using Liara.Clients.OpenAI.Model.Embeddings;
+using Liara.Clients.Pinecone;
+using Liara.Clients.Pinecone.Model;
+using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;
-using Palaven.Model.Ingest.Documents.Golden;
+using Palaven.Model.Documents.Golden;
 
 namespace Palaven.Chat;
 
@@ -28,7 +28,7 @@ public class OpenAIChatService : IOpenAIChatService
     {            
         var relatedArticles = await TryGetRelevantArticlesAsync(chatMessage, cancellationToken);
 
-        var messages = BuildChatMessages(chatMessage.Query, relatedArticles);
+        var messages = BuildChatMessages(chatMessage.Prompt, relatedArticles);
 
         var completionModel = new ChatCompletionCreationModel
         {
@@ -57,12 +57,12 @@ public class OpenAIChatService : IOpenAIChatService
 
         var messages = new List<Message>
         {
-            new Message
+            new()
             {
                 Role = "system",
                 Content = Resources.ChatGptPromptTemplates.AnswerMexicanTaxLawQuestionSystemRole
             },
-            new Message
+            new()
             {
                 Role = "user",
                 Content = userMessageContent
@@ -77,7 +77,7 @@ public class OpenAIChatService : IOpenAIChatService
         var createQueryEmbeddingsRequest = new CreateEmbeddingsModel
         {
             User = message.UserId,
-            Input = new List<string> { message.Query }
+            Input = new List<string> { message.Prompt }
         };
 
         var queryEmbeddings = await _openAiServiceClient.CreateEmbeddingsAsync(createQueryEmbeddingsRequest, cancellationToken);

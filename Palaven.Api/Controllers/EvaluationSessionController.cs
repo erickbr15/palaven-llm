@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Palaven.Core.Datasets;
 using Palaven.Core.PerformanceEvaluation;
+using Palaven.Model.Datasets;
 using Palaven.Model.PerformanceEvaluation;
-using Palaven.Model.PerformanceEvaluation.Commands;
 using Palaven.Model.PerformanceEvaluation.Web;
 
 namespace Palaven.Api.Controllers
@@ -28,10 +28,10 @@ namespace Palaven.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateEvaluationSession([FromBody] CreateEvaluationSessionModel inputModel)
+        public async Task<IActionResult> CreateEvaluationSession([FromBody] CreateEvaluationSessionCommand inputModel)
         {
             var creationResult = await _performanceEvaluationService.CreateEvaluationSessionAsync(inputModel, CancellationToken.None);            
-            if(creationResult.AnyErrorsOrValidationFailures)
+            if(!creationResult.IsSuccess)
             {
                 return BadRequest(creationResult);
             }
@@ -44,10 +44,10 @@ namespace Palaven.Api.Controllers
         [HttpGet("{id}/dataset/instructions")]
         public async Task<IActionResult> GetInstructionsDataset([FromRoute]Guid id, [FromQuery]int? batchNumber)
         {
-            var queryModel = new QueryInstructionsDatasetModel { SessionId = id, BatchNumber = batchNumber ?? 1 };
+            var queryModel = new FetchInstructionsDataset { SessionId = id, BatchNumber = batchNumber ?? 1 };
             var queryResult = await _datasetInstructionService.FetchInstructionsDatasetAsync(queryModel, CancellationToken.None);
 
-            if(queryResult.AnyErrorsOrValidationFailures)
+            if(!queryResult.IsSuccess)
             {
                 return BadRequest(queryResult);
             }
@@ -66,52 +66,27 @@ namespace Palaven.Api.Controllers
                 return BadRequest("Input model is required");
             }
 
-            var upsertModel = new UpsertChatCompletionResponseModel
+            var response = new ChatCompletionResponse
             {
                 BatchNumber = inputModel.BatchNumber,
                 InstructionId = inputModel.InstructionId,
                 ResponseCompletion = inputModel.ResponseCompletion,
                 ElapsedTime = inputModel.ElapsedTime,
                 SessionId = id,
-                ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmVanilla
-            };            
-            
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<UpsertChatCompletionResponseModel> { upsertModel }, 
-                CancellationToken.None);
+                EvaluationExercise = ChatCompletionExcerciseType.LlmVanilla
+            };
 
-            if(upsertResult.AnyErrorsOrValidationFailures)
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { response } };
+
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
+
+            if(!upsertResult.IsSuccess)
             {
                 return BadRequest(upsertResult);
             }
 
             return Ok(upsertResult);
-        }
-
-        [HttpPost("{id}/chatcompletion/vanilla/bulk")]
-        public async Task<IActionResult> UpsertVanillaChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
-        {
-            if (inputModel == null || !inputModel.Any())
-            {
-                return BadRequest("Input model is required");
-            }
-            
-            var responses = inputModel.ToList();
-            
-            responses.ForEach(r => {
-                r.SessionId = id;
-                r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmVanilla;
-            });             
-
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses,CancellationToken.None);
-
-            if (upsertResult.AnyErrorsOrValidationFailures)
-            {
-                return BadRequest(upsertResult);
-            }
-
-            return Ok(upsertResult);
-        }
+        }        
 
         [HttpGet("{id}/chatcompletion/vanilla/responses")]
         public IActionResult GetChatCompletionLlmResponses([FromRoute] Guid id, [FromQuery]int? batchNumber)
@@ -129,46 +104,21 @@ namespace Palaven.Api.Controllers
                 return BadRequest("Input model is required");
             }
 
-            var upsertModel = new UpsertChatCompletionResponseModel
+            var response = new ChatCompletionResponse
             {
                 BatchNumber = inputModel.BatchNumber,
                 InstructionId = inputModel.InstructionId,
                 ResponseCompletion = inputModel.ResponseCompletion,
                 ElapsedTime = inputModel.ElapsedTime,
                 SessionId = id,
-                ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmWithRag
-            };            
+                EvaluationExercise = ChatCompletionExcerciseType.LlmWithRag
+            };
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<UpsertChatCompletionResponseModel> { upsertModel },
-                CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { response } };
 
-            if (upsertResult.AnyErrorsOrValidationFailures)
-            {
-                return BadRequest(upsertResult);
-            }
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
-            return Ok(upsertResult);
-        }
-
-        [HttpPost("{id}/chatcompletion/rag/bulk")]
-        public async Task<IActionResult> UpsertRagChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
-        {
-            if (inputModel == null || !inputModel.Any())
-            {
-                return BadRequest("Input model is required");
-            }
-
-            var responses = inputModel.ToList();
-
-            responses.ForEach(r => {
-                r.SessionId = id;
-                r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmWithRag;
-            });
-
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses, CancellationToken.None);
-
-            if (upsertResult.AnyErrorsOrValidationFailures)
+            if (!upsertResult.IsSuccess)
             {
                 return BadRequest(upsertResult);
             }
@@ -184,21 +134,28 @@ namespace Palaven.Api.Controllers
         }
 
         [HttpPost("{id}/chatcompletion/finetuned")]
-        public async Task<IActionResult> UpsertFinetunedChatCompletionResponse([FromRoute] Guid id, [FromBody] UpsertChatCompletionResponseModel inputModel)
+        public async Task<IActionResult> UpsertFinetunedChatCompletionResponse([FromRoute] Guid id, [FromBody] ChatCompletionResponseModel inputModel)
         {
             if (inputModel == null)
             {
                 return BadRequest("Input model is required");
             }
+            
+            var response = new ChatCompletionResponse
+            {
+                BatchNumber = inputModel.BatchNumber,
+                InstructionId = inputModel.InstructionId,
+                ResponseCompletion = inputModel.ResponseCompletion,
+                ElapsedTime = inputModel.ElapsedTime,
+                SessionId = id,
+                EvaluationExercise = ChatCompletionExcerciseType.LlmFineTuned
+            };            
 
-            inputModel.SessionId = id;
-            inputModel.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTuned;
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { response } };
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<UpsertChatCompletionResponseModel> { inputModel },
-                CancellationToken.None);
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
 
-            if (upsertResult.AnyErrorsOrValidationFailures)
+            if (!upsertResult.IsSuccess)
             {
                 return BadRequest(upsertResult);
             }
@@ -206,47 +163,36 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/finetuned/bulk")]
-        public async Task<IActionResult> UpsertFinetunedChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
+        [HttpGet("{id}/chatcompletion/finetuned/responses")]
+        public IActionResult GetChatCompletionFineTunedLlmResponses([FromRoute] Guid id, [FromQuery] int? batchNumber)
         {
-            if (inputModel == null || !inputModel.Any())
-            {
-                return BadRequest("Input model is required");
-            }
-
-            var responses = inputModel.ToList();
-
-            responses.ForEach(r => {
-                r.SessionId = id;
-                r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTuned;
-            });
-
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses, CancellationToken.None);
-
-            if (upsertResult.AnyErrorsOrValidationFailures)
-            {
-                return BadRequest(upsertResult);
-            }
-
-            return Ok(upsertResult);
+            var responses = _performanceEvaluationService.FetchChatCompletionLlmResponses(id, batchNumber ?? 1, ChatCompletionExcerciseType.LlmFineTuned);
+            return Ok(responses);
         }
 
         [HttpPost("{id}/chatcompletion/finetuned-rag")]
-        public async Task<IActionResult> UpsertFinetunedRagChatCompletionResponse([FromRoute] Guid id, [FromBody] UpsertChatCompletionResponseModel inputModel)
+        public async Task<IActionResult> UpsertFinetunedRagChatCompletionResponse([FromRoute] Guid id, [FromBody] ChatCompletionResponseModel inputModel)
         {
             if (inputModel == null)
             {
                 return BadRequest("Input model is required");
             }
 
-            inputModel.SessionId = id;
-            inputModel.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTunedAndRag;
+            var response = new ChatCompletionResponse
+            {
+                BatchNumber = inputModel.BatchNumber,
+                InstructionId = inputModel.InstructionId,
+                ResponseCompletion = inputModel.ResponseCompletion,
+                ElapsedTime = inputModel.ElapsedTime,
+                SessionId = id,
+                EvaluationExercise = ChatCompletionExcerciseType.LlmFineTunedAndRag
+            };
 
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(
-                new List<UpsertChatCompletionResponseModel> { inputModel },
-                CancellationToken.None);
+            var command = new UpsertChatCompletionResponseCommand { ChatCompletionResponses = new List<ChatCompletionResponse> { response } };
 
-            if (upsertResult.AnyErrorsOrValidationFailures)
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(command, CancellationToken.None);
+
+            if (!upsertResult.IsSuccess)
             {
                 return BadRequest(upsertResult);
             }
@@ -254,30 +200,12 @@ namespace Palaven.Api.Controllers
             return Ok(upsertResult);
         }
 
-        [HttpPost("{id}/chatcompletion/finetuned-rag/bulk")]
-        public async Task<IActionResult> UpsertFinetunedRagChatCompletionBulkResponse([FromRoute] Guid id, [FromBody] IEnumerable<UpsertChatCompletionResponseModel> inputModel)
+        [HttpGet("{id}/chatcompletion/finetuned-rag/responses")]
+        public IActionResult GetChatCompletionFineTunedRagLlmResponses([FromRoute] Guid id, [FromQuery] int? batchNumber)
         {
-            if (inputModel == null || !inputModel.Any())
-            {
-                return BadRequest("Input model is required");
-            }
-
-            var responses = inputModel.ToList();
-
-            responses.ForEach(r => {
-                r.SessionId = id;
-                r.ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmFineTunedAndRag;
-            });
-
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionResponseAsync(responses, CancellationToken.None);
-
-            if (upsertResult.AnyErrorsOrValidationFailures)
-            {
-                return BadRequest(upsertResult);
-            }
-
-            return Ok(upsertResult);
-        }        
+            var responses = _performanceEvaluationService.FetchChatCompletionLlmResponses(id, batchNumber ?? 1, ChatCompletionExcerciseType.LlmFineTunedAndRag);
+            return Ok(responses);
+        }
 
         [HttpPost("{id}/metrics")]
         public async Task<IActionResult> UpsertBertScoreMetricsAsync([FromRoute] Guid id, [FromBody] ChatCompletionPerformanceEvaluationModel inputModel, CancellationToken cancellationToken)
@@ -287,7 +215,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest("Input model is required");
             }
 
-            var upsertModel = new UpsertChatCompletionPerformanceEvaluationModel
+            var upsertModel = new UpsertChatCompletionPerformanceEvaluation
             {
                 SessionId = id,
                 BatchNumber = inputModel.BatchNumber,                
@@ -299,7 +227,7 @@ namespace Palaven.Api.Controllers
             
             var upsertResult = await _performanceEvaluationService.UpsertChatCompletionPerformanceEvaluationAsync(upsertModel, cancellationToken);
 
-            if (upsertResult.AnyErrorsOrValidationFailures)
+            if (!upsertResult.IsSuccess)
             {
                 return BadRequest(upsertResult);
             }

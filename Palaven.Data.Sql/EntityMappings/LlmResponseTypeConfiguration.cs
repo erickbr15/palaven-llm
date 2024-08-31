@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Palaven.Model.PerformanceEvaluation;
+using Palaven.Model.Entities;
 
 namespace Palaven.Data.Sql.EntityMappings;
 
@@ -14,6 +14,7 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
         builder.Property(x => x.Id).UseIdentityColumn();
 
         builder.Property(x => x.SessionId).IsRequired();
+        builder.Property(x => x.EvaluationExerciseId).IsRequired();
         builder.Property(x => x.BatchNumber).IsRequired();
         builder.Property(x => x.InstructionId).IsRequired();
         builder.Property(x => x.ResponseCompletion)
@@ -27,7 +28,12 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
 
         builder.Property(x=> x.CreationDate).IsRequired();
         builder.Property(x=> x.ModifiedDate);
-        
+
+        builder.HasOne(x => x.EvaluationExercise)
+            .WithMany()
+            .HasForeignKey(x => x.EvaluationExerciseId)
+            .IsRequired(true);
+
         builder.HasOne(x => x.Instruction)
             .WithMany()
             .HasForeignKey(x => x.InstructionId)
@@ -40,5 +46,6 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
 
         builder.Navigation(x => x.Instruction).AutoInclude();
         builder.Navigation(x => x.EvaluationSession).AutoInclude();
+        builder.Navigation(x => x.EvaluationExercise).AutoInclude();
     }
 }

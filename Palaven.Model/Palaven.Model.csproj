@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Contracts\**" />
+    <Compile Remove="Domain\**" />
+    <EmbeddedResource Remove="Contracts\**" />
+    <EmbeddedResource Remove="Domain\**" />
+    <None Remove="Contracts\**" />
+    <None Remove="Domain\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Azure.AI.FormRecognizer" Version="4.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
