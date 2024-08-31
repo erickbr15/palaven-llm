@@ -9,27 +9,15 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
 {
     private readonly PalavenDbContext _dbContext;
     private readonly IRepository<EvaluationSession> _evaluationSessionRepository;
-    private readonly IRepository<FineTunedLlmResponse> _fineTunedLlmResponseRepository;
-    private readonly IRepository<FineTunedLlmWithRagResponse> _fineTunedLlmWithRagResponseRepository;
     private readonly IRepository<LlmResponse> _llmResponseRepository;
-    private readonly IRepository<LlmWithRagResponse> _llmWithRagResponseRepository;    
 
     public PerformanceEvaluationDataService(PalavenDbContext dbContext,
         IRepository<EvaluationSession> evaluationSessionRepository,
-        IRepository<InstructionEntity> instructionRepository,
-        IRepository<FineTunedLlmResponse> fineTunedLlmResponseRepository,
-        IRepository<FineTunedLlmWithRagResponse> fineTunedLlmWithRagResponseRepository,
-        IRepository<LlmResponse> llmResponseRepository,
-        IRepository<LlmWithRagResponse> llmWithRagResponseRepository,
-        IRepository<BertScoreMetric> bertScoreMetricRepository,
-        IRepository<RougeScoreMetric> rougeScoreMetricRepository)
+        IRepository<LlmResponse> llmResponseRepository)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _evaluationSessionRepository = evaluationSessionRepository ?? throw new ArgumentNullException(nameof(evaluationSessionRepository));
-        _fineTunedLlmResponseRepository = fineTunedLlmResponseRepository ?? throw new ArgumentNullException(nameof(fineTunedLlmResponseRepository));
-        _fineTunedLlmWithRagResponseRepository = fineTunedLlmWithRagResponseRepository ?? throw new ArgumentNullException(nameof(fineTunedLlmWithRagResponseRepository));
-        _llmResponseRepository = llmResponseRepository ?? throw new ArgumentNullException(nameof(llmResponseRepository));
-        _llmWithRagResponseRepository = llmWithRagResponseRepository ?? throw new ArgumentNullException(nameof(llmWithRagResponseRepository));
+        _llmResponseRepository = llmResponseRepository ?? throw new ArgumentNullException(nameof(llmResponseRepository));        
     }
 
     public async Task<EvaluationSession> CreateEvaluationSessionAsync(EvaluationSession evaluationSession, CancellationToken cancellationToken)
@@ -77,63 +65,7 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
     public IQueryable<EvaluationSessionInstruction> GetEvaluationSessionInstructionQuery(Func<EvaluationSessionInstruction, bool> criteria)
     {
         return _dbContext.EvaluationSessionInstructions.Where(criteria).AsQueryable();
-    }
-
-    public async Task UpsertChatCompletionResponseAsync(IEnumerable<FineTunedLlmResponse> chatCompletionResponses, CancellationToken cancellationToken)
-    {
-        foreach (var chatCompletionResponse in chatCompletionResponses.ToList())
-        {
-            await UpsertChatCompletionResponseAsync(chatCompletionResponse, cancellationToken);
-        }
-    }
-
-    private Task UpsertChatCompletionResponseAsync(FineTunedLlmResponse chatCompletionResponse, CancellationToken cancellationToken)
-    {
-        var existingResponse = _fineTunedLlmResponseRepository.GetAll().SingleOrDefault(x => x.SessionId == chatCompletionResponse.SessionId && x.InstructionId == chatCompletionResponse.InstructionId);
-
-        if(existingResponse == null)
-        {
-            chatCompletionResponse.CreationDate = DateTime.Now;
-            return _fineTunedLlmResponseRepository.AddAsync(chatCompletionResponse, cancellationToken);
-        }
-        else
-        {
-            existingResponse.ResponseCompletion = chatCompletionResponse.ResponseCompletion;
-            existingResponse.ModifiedDate = DateTime.Now;
-
-            _fineTunedLlmResponseRepository.Update(existingResponse);
-
-            return Task.CompletedTask;
-        }
-    }
-
-    public async Task UpsertChatCompletionResponseAsync(IEnumerable<FineTunedLlmWithRagResponse> chatCompletionResponses, CancellationToken cancellationToken)
-    {
-        foreach (var chatCompletionResponse in chatCompletionResponses.ToList())
-        {
-            await UpsertChatCompletionResponseAsync(chatCompletionResponse, cancellationToken);
-        }
-    }
-
-    private Task UpsertChatCompletionResponseAsync(FineTunedLlmWithRagResponse chatCompletionResponse, CancellationToken cancellationToken)
-    {
-        var existingResponse = _fineTunedLlmWithRagResponseRepository.GetAll().SingleOrDefault(x => x.SessionId == chatCompletionResponse.SessionId && x.InstructionId == chatCompletionResponse.InstructionId);
-
-        if(existingResponse == null)
-        {
-            chatCompletionResponse.CreationDate = DateTime.Now;
-            return _fineTunedLlmWithRagResponseRepository.AddAsync(chatCompletionResponse, cancellationToken);
-        }
-        else
-        {
-            existingResponse.ResponseCompletion = chatCompletionResponse.ResponseCompletion;
-            existingResponse.ModifiedDate = DateTime.Now;
-
-            _fineTunedLlmWithRagResponseRepository.Update(existingResponse);
-
-            return Task.CompletedTask;
-        }
-    }
+    }    
 
     public async Task UpsertChatCompletionResponseAsync(IEnumerable<LlmResponse> chatCompletionResponses, CancellationToken cancellationToken)
     {
@@ -163,64 +95,6 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         }
     }
 
-    public async Task UpsertChatCompletionResponseAsync(IEnumerable<LlmWithRagResponse> chatCompletionResponses, CancellationToken cancellationToken)
-    {
-        foreach(var chatCompletionResponse in chatCompletionResponses.ToList())
-        {
-            await UpsertChatCompletionResponseAsync(chatCompletionResponse, cancellationToken);
-        }
-    }
-
-    private Task UpsertChatCompletionResponseAsync(LlmWithRagResponse chatCompletionResponse, CancellationToken cancellationToken)
-    {
-        var existingResponse = _llmWithRagResponseRepository.GetAll().SingleOrDefault(x => x.SessionId == chatCompletionResponse.SessionId && x.InstructionId == chatCompletionResponse.InstructionId);
-
-        if(existingResponse == null)
-        {
-            chatCompletionResponse.CreationDate = DateTime.Now;
-            return _llmWithRagResponseRepository.AddAsync(chatCompletionResponse, cancellationToken);
-        }
-        else
-        {
-            existingResponse.ResponseCompletion = chatCompletionResponse.ResponseCompletion;
-            existingResponse.ModifiedDate = DateTime.Now;
-
-            _llmWithRagResponseRepository.Update(existingResponse);
-
-            return Task.CompletedTask;
-        }
-    }
-
-    public void CleanChatCompletionResponses(Func<FineTunedLlmResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
-    {
-        var chatCompletionResponses = _fineTunedLlmResponseRepository.GetAll().Where(selectionCriteria).ToList();
-        
-        foreach (var item in chatCompletionResponses)
-        {
-            var llmResponse = _fineTunedLlmResponseRepository.GetById(item.Id);
-
-            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
-            llmResponse.ModifiedDate = DateTime.Now;
-
-            _fineTunedLlmResponseRepository.Update(llmResponse);
-        }        
-    }  
-
-    public void CleanChatCompletionResponses(Func<FineTunedLlmWithRagResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
-    {
-        var chatCompletionResponses = _fineTunedLlmWithRagResponseRepository.GetAll().Where(selectionCriteria).ToList();
-        
-        foreach (var item in chatCompletionResponses)
-        {
-            var llmResponse = _fineTunedLlmWithRagResponseRepository.GetById(item.Id);
-
-            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
-            llmResponse.ModifiedDate = DateTime.Now;
-
-            _fineTunedLlmWithRagResponseRepository.Update(llmResponse);
-        }        
-    }
-
     public void CleanChatCompletionResponses(Func<LlmResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
     {
         var chatCompletionResponses = _llmResponseRepository.GetAll().Where(selectionCriteria).ToList();
@@ -233,21 +107,6 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
             llmResponse.ModifiedDate = DateTime.Now;
 
             _llmResponseRepository.Update(llmResponse);
-        }        
-    }
-
-    public void CleanChatCompletionResponses(Func<LlmWithRagResponse, bool> selectionCriteria, Func<string?, string> cleaningStrategy)
-    {
-        var chatCompletionResponses = _llmWithRagResponseRepository.GetAll().Where(selectionCriteria).ToList();
-        
-        foreach (var item in chatCompletionResponses)
-        {
-            var llmResponse = _llmWithRagResponseRepository.GetById(item.Id);
-
-            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
-            llmResponse.ModifiedDate = DateTime.Now;
-
-            _llmWithRagResponseRepository.Update(llmResponse);
         }        
     }
 
@@ -276,31 +135,6 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         return responses;
     }
 
-    public IList<LlmResponseView> FetchChatCompletionLlmWithRagResponses(Func<LlmResponseView, bool> selectionCriteria)
-    {
-        var responses = (from response in _dbContext.LlmWithRagResponses
-                         join evaluationSession in _dbContext.EvaluationSessions on response.SessionId equals evaluationSession.SessionId
-                         join instruction in _dbContext.Instructions on response.InstructionId equals instruction.Id
-                         select new LlmResponseView
-                         {
-                             EvaluationSessionId = evaluationSession.SessionId,
-                             DatasetId = evaluationSession.DatasetId,
-                             BatchSize = evaluationSession.BatchSize,
-                             LargeLanguageModel = evaluationSession.LargeLanguageModel,
-                             DeviceInfo = evaluationSession.DeviceInfo,
-                             ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmWithRag,
-                             InstructionId = instruction.Id,
-                             BatchNumber = response.BatchNumber,
-                             Instruction = instruction.Instruction,
-                             Response = instruction.Response,
-                             Category = instruction.Category,
-                             LlmResponseToEvaluate = response.LlmResponseToEvaluate,
-                             ElapsedTime = response.ElapsedTime
-                         }).Where(selectionCriteria).ToList();
-
-        return responses;
-    }
-
     public int SaveChanges()
     {
         return _dbContext.SaveChanges();
@@ -309,5 +143,5 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
         return _dbContext.SaveChangesAsync(cancellationToken);
-    }
+    }    
 }
