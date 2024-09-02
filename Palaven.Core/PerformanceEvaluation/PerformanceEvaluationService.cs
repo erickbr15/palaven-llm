@@ -1,9 +1,7 @@
 ﻿using Liara.Common;
-using Microsoft.EntityFrameworkCore;
 using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Palaven.Core.PerformanceEvaluation;
 
@@ -99,7 +97,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         };        
         
         await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
-        await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
+        await _performanceMetricsDataService.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

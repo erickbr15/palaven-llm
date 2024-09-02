@@ -6,4 +6,6 @@ public interface IPerformanceMetricsDataService
 {
     Task UpsertChatCompletionPerformanceEvaluationAsync(BertScoreMetric bertScoreMetrics, CancellationToken cancellationToken);
     Task UpsertChatCompletionPerformanceEvaluationAsync(IEnumerable<RougeScoreMetric> rougeScoreMetrics, CancellationToken cancellationToken);
+    int SaveChanges();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

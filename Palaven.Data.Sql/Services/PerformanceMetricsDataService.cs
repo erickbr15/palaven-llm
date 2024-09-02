@@ -6,11 +6,15 @@ namespace Palaven.Data.Sql.Services;
 
 public class PerformanceMetricsDataService : IPerformanceMetricsDataService
 {
+    private readonly PalavenDbContext _dbContext;
     private readonly IRepository<BertScoreMetric> _bertScoreMetricRepository;
     private readonly IRepository<RougeScoreMetric> _rougeScoreMetricRepository;
 
-    public PerformanceMetricsDataService(IRepository<BertScoreMetric> bertScoreMetricRepository, IRepository<RougeScoreMetric> rougeScoreMetricRepository)
+    public PerformanceMetricsDataService(PalavenDbContext dbContext,
+        IRepository<BertScoreMetric> bertScoreMetricRepository, 
+        IRepository<RougeScoreMetric> rougeScoreMetricRepository)
     {
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _bertScoreMetricRepository = bertScoreMetricRepository ?? throw new ArgumentNullException(nameof(bertScoreMetricRepository));
         _rougeScoreMetricRepository = rougeScoreMetricRepository ?? throw new ArgumentNullException(nameof(rougeScoreMetricRepository));
     }
@@ -65,5 +69,15 @@ public class PerformanceMetricsDataService : IPerformanceMetricsDataService
 
             _rougeScoreMetricRepository.Update(existingEvaluation);
         }
+    }
+
+    public int SaveChanges()
+    {
+        return _dbContext.SaveChanges();
+    }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
