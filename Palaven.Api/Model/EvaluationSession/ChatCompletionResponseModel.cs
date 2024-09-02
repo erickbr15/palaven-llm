@@ -1,4 +1,4 @@
-﻿namespace Palaven.Model.PerformanceEvaluation.Web;
+﻿namespace Palaven.Api.Model.EvaluationSession;
 
 public class ChatCompletionResponseModel
 {

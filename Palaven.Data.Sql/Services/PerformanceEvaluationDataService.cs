@@ -62,9 +62,9 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         return await _evaluationSessionRepository.GetByIdAsync(sessionId, cancellationToken);
     }
 
-    public IQueryable<EvaluationSessionInstruction> GetEvaluationSessionInstructionQuery(Func<EvaluationSessionInstruction, bool> criteria)
+    public IQueryable<EvaluationSession> GetEvaluationSessionQuery(Func<EvaluationSession, bool> criteria)
     {
-        return _dbContext.EvaluationSessionInstructions.Where(criteria).AsQueryable();
+        return _dbContext.EvaluationSessions.Where(criteria).AsQueryable();
     }    
 
     public async Task UpsertChatCompletionResponseAsync(IEnumerable<LlmResponse> chatCompletionResponses, CancellationToken cancellationToken)
@@ -122,7 +122,7 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
                              BatchSize = evaluationSession.BatchSize,
                              LargeLanguageModel = evaluationSession.LargeLanguageModel,
                              DeviceInfo = evaluationSession.DeviceInfo,
-                             ChatCompletionExcerciseType = ChatCompletionExcerciseType.LlmVanilla,
+                             EvaluationExercise = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeDescription(response.EvaluationExerciseId),
                              InstructionId = instruction.Id,
                              BatchNumber = response.BatchNumber,
                              Instruction = instruction.Instruction,
