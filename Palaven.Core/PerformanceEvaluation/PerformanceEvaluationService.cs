@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Palaven.Core.PerformanceEvaluation;
 
@@ -85,30 +86,19 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         };
     }
 
-    public async Task<IResult> UpsertChatCompletionPerformanceEvaluationAsync(UpsertChatCompletionPerformanceEvaluation model, CancellationToken cancellationToken)
+    public async Task<IResult> UpsertChatCompletionPerformanceEvaluationAsync(UpsertBertscoreBatchEvaluationCommand command, CancellationToken cancellationToken)
     {
         var bertScoreMetrics = new BertScoreMetric
         {
-            SessionId = model.SessionId,
-            BatchNumber = model.BatchNumber,
-            BertScorePrecision = model.BertScorePrecision,
-            BertScoreRecall = model.BertScoreRecall,
-            BertScoreF1 = model.BertScoreF1
-        };
-
-        var rougeMetrics = model.RougeScoreMetrics.Select(x => new RougeScoreMetric
-        {
-            SessionId = model.SessionId,
-            BatchNumber = model.BatchNumber,
-            RougeType = x.RougeType,
-            RougePrecision = x.RougeScorePrecision,
-            RougeRecall = x.RougeScoreRecall,
-            RougeF1 = x.RougeScoreF1
-        });
+            SessionId = command.SessionId,
+            EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.EvaluationExercise),
+            BatchNumber = command.BatchNumber,
+            BertScorePrecision = command.BertScorePrecision,
+            BertScoreRecall = command.BertScoreRecall,
+            BertScoreF1 = command.BertScoreF1
+        };        
         
         await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
-        await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(rougeMetrics, cancellationToken);
-
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
@@ -138,5 +128,27 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             .GetResult();
 
         return result.IsSuccess ? result.Value! : new List<LlmResponseView>();
+    }
+
+    public IList<InstructionData> FetchChatCompletionLlmInstructions(Guid evaluationSessionId, int batchNumber, string chatCompletionExcerciseType)
+    {
+        var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(chatCompletionExcerciseType);
+
+        var result = _performanceEvaluationDataService.FetchChatCompletionLlmInstructions(evaluationSessionId, evaluationExerciseId, batchNumber);
+
+        var instructions = result.Select(i => new InstructionData
+        {
+            InstructionId = i.Id,
+            DatasetId = i.DatasetId,
+            ChunckNumber = batchNumber,
+            Instruction = i.Instruction,
+            Response = i.Response,
+            Category = i.Category,
+            GoldenArticleId = i.GoldenArticleId,
+            LawId = i.LawId,
+            ArticleId = i.ArticleId
+          }).ToList();
+
+        return instructions;
     }
 }

@@ -13,14 +13,14 @@ public class LlmChatCompletionResponseQueryHandler : IQueryHandler<LlmChatComple
         _performanceEvaluationDataService = performanceEvaluationDataService ?? throw new ArgumentNullException(nameof(performanceEvaluationDataService));
     }
 
-    public Task<IResult<IList<LlmResponseView>>> ExecuteAsync(LlmChatCompletionResponseQuery command, CancellationToken cancellationToken)
+    public Task<IResult<IList<LlmResponseView>>> ExecuteAsync(LlmChatCompletionResponseQuery query, CancellationToken cancellationToken)
     {
-        if (command == null)
+        if (query == null)
         {
-            throw new ArgumentNullException(nameof(command));
+            throw new ArgumentNullException(nameof(query));
         }
 
-        var result = _performanceEvaluationDataService.FetchChatCompletionLlmResponses(command.SelectionCriteria);
+        var result = _performanceEvaluationDataService.FetchChatCompletionLlmResponses(query.SelectionCriteria);
 
         return Task.FromResult(Result<IList<LlmResponseView>>.Success(result));
     }
