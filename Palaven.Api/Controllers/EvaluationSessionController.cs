@@ -133,7 +133,7 @@ namespace Palaven.Api.Controllers
         }
 
         [HttpPost("{id}/metrics/{evaluationExercise}/bertscore")]
-        public async Task<IActionResult> UpsertBertScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise, [FromBody] BertscoreBatchEvaluationModel inputModel, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpsertBertScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise, [FromBody] BertScoreBatchEvaluationModel inputModel, CancellationToken cancellationToken)
         {
             if (inputModel == null)
             {
@@ -150,12 +150,12 @@ namespace Palaven.Api.Controllers
                 SessionId = id,
                 EvaluationExercise = evaluationExercise.ToLower(),
                 BatchNumber = inputModel.BatchNumber,                
-                BertScorePrecision = inputModel.BertScorePrecision,
-                BertScoreRecall = inputModel.BertScoreRecall,
-                BertScoreF1 = inputModel.BertScoreF1
+                Precision = inputModel.Precision,
+                Recall = inputModel.Recall,
+                F1 = inputModel.F1
             };
             
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionPerformanceEvaluationAsync(command, cancellationToken);
+            var upsertResult = await _performanceEvaluationService.UpsertBertscoreBatchEvaluationAsync(command, cancellationToken);
 
             if (!upsertResult.IsSuccess)
             {
@@ -163,6 +163,66 @@ namespace Palaven.Api.Controllers
             }
 
             return Ok(upsertResult);
+        }
+
+        [HttpGet("{id}/metrics/{evaluationExercise}/bertscore")]
+        public IActionResult GetBertScoreMetrics([FromRoute]Guid id, [FromRoute]string evaluationExercise)
+        {
+            if (!ChatCompletionExcerciseType.IsValid(evaluationExercise))
+            {
+                return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
+            }
+
+            var metrics = _performanceEvaluationService.FetchEvaluationSessionBertscoreMetrics(id, evaluationExercise.ToLower());
+
+            return Ok(metrics);
+        }
+
+        [HttpPost("{id}/metrics/{evaluationExercise}/rougescore")]
+        public async Task<IActionResult> UpsertRougeScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise, [FromBody] IList<RougeScoreBatchEvaluationModel> inputModel, CancellationToken cancellationToken)
+        {
+            if(inputModel == null || inputModel.Count == 0)
+            {
+                return BadRequest("The rouge score metrics are required");
+            }
+
+            if(!ChatCompletionExcerciseType.IsValid(evaluationExercise))
+            {
+                return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
+            }
+
+            var commands = inputModel.Select(inputModel => new UpsertRougescoreBatchEvaluationCommand
+            {
+                SessionId = id,
+                EvaluationExercise = evaluationExercise.ToLower(),
+                BatchNumber = inputModel.BatchNumber,
+                RougeType = inputModel.RougeScoreType,
+                Precision = inputModel.Precision,
+                Recall = inputModel.Recall,
+                F1 = inputModel.F1
+            }).ToList();
+
+            var upsertResult = await _performanceEvaluationService.UpsertRougeScoreBatchEvaluationAsync(commands, cancellationToken);
+
+            if (!upsertResult.IsSuccess)
+            {
+                return BadRequest(upsertResult);
+            }
+
+            return Ok(upsertResult);
+        }
+
+        [HttpGet("{id}/metrics/{evaluationExercise}/rougescore")]
+        public IActionResult GetRougeScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise)
+        {
+            if (!ChatCompletionExcerciseType.IsValid(evaluationExercise))
+            {
+                return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
+            }
+
+            var metrics = _performanceEvaluationService.FetchEvaluationSessionRougeScoreMetrics(id, evaluationExercise.ToLower());
+            
+            return Ok(metrics);
         }
     }
 }
