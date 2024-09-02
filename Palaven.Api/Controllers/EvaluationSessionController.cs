@@ -71,7 +71,7 @@ namespace Palaven.Api.Controllers
         }
 
         [Consumes("multipart/form-data")]
-        [HttpPost("{id}/chatcompletion/{evaluationExercise}")]        
+        [HttpPost("{id}/chatcompletion/{evaluationExercise}/response")]        
         public async Task<IActionResult> UpsertChatCompletionResponseAsync([FromRoute]Guid id, [FromRoute]string evaluationExercise, [FromForm] ChatCompletionResponseModel inputModel, CancellationToken cancellationToken)
         {                                    
             if(inputModel == null)
