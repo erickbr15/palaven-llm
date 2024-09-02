@@ -1,4 +1,4 @@
-﻿namespace Palaven.Model.PerformanceEvaluation.Web;
+﻿namespace Palaven.Api.Model.EvaluationSession;
 
 public class ChatCompletionPerformanceEvaluationModel
 {
@@ -6,5 +6,4 @@ public class ChatCompletionPerformanceEvaluationModel
     public float? BertScorePrecision { get; set; }
     public float? BertScoreRecall { get; set; }
     public float? BertScoreF1 { get; set; }
-    public IList<RougePerformanceEvaluationModel> RougeScoreMetrics { get; set; } = new List<RougePerformanceEvaluationModel>();
 }

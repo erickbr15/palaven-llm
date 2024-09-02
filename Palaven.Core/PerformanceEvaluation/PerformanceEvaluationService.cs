@@ -1,4 +1,5 @@
 ﻿using Liara.Common;
+using Microsoft.EntityFrameworkCore;
 using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
@@ -45,6 +46,29 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
     {
         var evaluationSession = await _performanceEvaluationDataService.GetEvaluationSessionAsync(sessionId, cancellationToken);
         
+        if(evaluationSession == null)
+        {
+            return null;
+        }
+
+        return new EvaluationSessionInfo
+        {
+            SessionId = evaluationSession.SessionId,
+            DatasetId = evaluationSession.DatasetId,
+            BatchSize = evaluationSession.BatchSize,
+            LargeLanguageModel = evaluationSession.LargeLanguageModel,
+            IsActive = evaluationSession.IsActive,
+            StartDate = evaluationSession.StartDate
+        };
+    }
+
+    public EvaluationSessionInfo? GetActiveEvaluationSessionByDataset(Guid datasetId)
+    {
+        var evaluationSession = _performanceEvaluationDataService
+            .GetEvaluationSessionQuery(x => x.DatasetId == datasetId && x.IsActive)
+            .OrderByDescending(x => x.StartDate)
+            .FirstOrDefault();
+
         if(evaluationSession == null)
         {
             return null;

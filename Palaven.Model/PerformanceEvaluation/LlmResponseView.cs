@@ -7,8 +7,7 @@ public class LlmResponseView
     public string EvaluationExercise { get; set; } = default!;
     public int BatchSize { get; set; }
     public string LargeLanguageModel { get; set; } = default!;
-    public string DeviceInfo { get; set; } = default!;
-    public string ChatCompletionExcerciseType { get; set; } = default!;
+    public string DeviceInfo { get; set; } = default!;    
     public int InstructionId { get; set; }
     public int BatchNumber { get; set; }
     public string Instruction { get; set; } = default!;
