@@ -73,7 +73,7 @@ public class PerformanceMetricsDataService : IPerformanceMetricsDataService
             .SingleOrDefault(x => x.SessionId == rougeScoreMetric.SessionId && 
                     x.BatchNumber == rougeScoreMetric.BatchNumber && 
                     x.EvaluationExerciseId == rougeScoreMetric.EvaluationExerciseId &&
-                    string.Equals(x.RougeType, rougeScoreMetric.RougeType, StringComparison.OrdinalIgnoreCase));
+                    x.RougeType == rougeScoreMetric.RougeType);
 
         if (existingEvaluation == null)
         {

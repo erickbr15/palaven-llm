@@ -176,7 +176,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             SessionId = command.SessionId,
             EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.EvaluationExercise),
             BatchNumber = command.BatchNumber,
-            RougeType = command.RougeType,
+            RougeType = command.RougeType.ToLower(),
             RougePrecision = command.Precision,
             RougeRecall = command.Recall,
             RougeF1 = command.F1
