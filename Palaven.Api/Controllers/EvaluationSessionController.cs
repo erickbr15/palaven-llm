@@ -117,26 +117,45 @@ namespace Palaven.Api.Controllers
             var responses = _performanceEvaluationService.FetchChatCompletionLlmResponses(id, batchNumber ?? 1, evaluationExercise.ToLower());
 
             return Ok(responses);
-        }        
+        }
 
-        [HttpPost("{id}/metrics")]
-        public async Task<IActionResult> UpsertBertScoreMetricsAsync([FromRoute] Guid id, [FromBody] ChatCompletionPerformanceEvaluationModel inputModel, CancellationToken cancellationToken)
+        [HttpGet("{id}/chatcompletion/{evaluationExercise}/instructions")]
+        public IActionResult GetChatCompletionLlmInstructions([FromRoute] Guid id, [FromRoute] string evaluationExercise, [FromQuery] int? batchNumber)
+        {
+            if (!ChatCompletionExcerciseType.IsValid(evaluationExercise))
+            {
+                return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
+            }
+
+            var instructions = _performanceEvaluationService.FetchChatCompletionLlmInstructions(id, batchNumber ?? 1, evaluationExercise.ToLower());
+
+            return Ok(instructions);
+        }
+
+        [HttpPost("{id}/metrics/{evaluationExercise}/bertscore")]
+        public async Task<IActionResult> UpsertBertScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise, [FromBody] BertscoreBatchEvaluationModel inputModel, CancellationToken cancellationToken)
         {
             if (inputModel == null)
             {
                 return BadRequest("Input model is required");
             }
 
-            var upsertModel = new UpsertChatCompletionPerformanceEvaluation
+            if (!ChatCompletionExcerciseType.IsValid(evaluationExercise))
+            {
+                return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
+            }
+
+            var command = new UpsertBertscoreBatchEvaluationCommand
             {
                 SessionId = id,
+                EvaluationExercise = evaluationExercise.ToLower(),
                 BatchNumber = inputModel.BatchNumber,                
                 BertScorePrecision = inputModel.BertScorePrecision,
                 BertScoreRecall = inputModel.BertScoreRecall,
                 BertScoreF1 = inputModel.BertScoreF1
             };
             
-            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionPerformanceEvaluationAsync(upsertModel, cancellationToken);
+            var upsertResult = await _performanceEvaluationService.UpsertChatCompletionPerformanceEvaluationAsync(command, cancellationToken);
 
             if (!upsertResult.IsSuccess)
             {

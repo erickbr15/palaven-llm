@@ -1,6 +1,6 @@
 ﻿namespace Palaven.Api.Model.EvaluationSession;
 
-public class ChatCompletionPerformanceEvaluationModel
+public class BertscoreBatchEvaluationModel
 {
     public int BatchNumber { get; set; }
     public float? BertScorePrecision { get; set; }

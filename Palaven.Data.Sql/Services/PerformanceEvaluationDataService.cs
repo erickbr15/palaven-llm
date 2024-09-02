@@ -139,6 +139,53 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
         return responses;
     }
 
+    public IList<InstructionEntity> FetchChatCompletionLlmInstructions(Guid evaluationSessionId, int evaluationExerciseId, int batchNumber)
+    {
+        var evaluationSession = _dbContext.EvaluationSessions.Single(x => x.SessionId == evaluationSessionId);
+
+        var datasetId = evaluationSession.DatasetId;
+
+        var batchSize = evaluationSession.BatchSize;
+        var offset = (batchNumber - 1) * batchSize;
+
+        var batchInstructionIds = (from es in _dbContext.EvaluationSessions
+                                   join esi in _dbContext.EvaluationSessionInstructions on es.SessionId equals esi.EvaluationSessionId
+                                   join i in _dbContext.Instructions on esi.InstructionId equals i.Id
+                                   where es.SessionId == evaluationSessionId &&
+                                         esi.InstructionPurpose == "test"
+                                   orderby i.Id
+                                   select i.Id)
+                           .Skip(offset)
+                           .Take(batchSize);
+
+        var instructions = (from es in _dbContext.EvaluationSessions
+                            join esi in _dbContext.EvaluationSessionInstructions on es.SessionId equals esi.EvaluationSessionId
+                            join i in _dbContext.Instructions on esi.InstructionId equals i.Id
+                            join llmr in _dbContext.LlmResponses on new
+                            {
+                                InstructionId = i.Id,
+                                EvaluationExerciseId = evaluationExerciseId,
+                                BatchNumber = batchNumber
+                            }
+                            equals new
+                            {
+                                llmr.InstructionId,
+                                llmr.EvaluationExerciseId,
+                                llmr.BatchNumber
+                            }
+                            into llmrJoin
+                            from llmrLeft in llmrJoin.DefaultIfEmpty()
+                            where es.SessionId == evaluationSessionId &&
+                                  es.DatasetId == datasetId &&
+                                  esi.InstructionPurpose == "test" &&
+                                  batchInstructionIds.Contains(i.Id) &&
+                                  llmrLeft.Instruction == null
+                            orderby i.Id
+                            select i).ToList();
+        
+        return instructions;
+    }
+
     public int SaveChanges()
     {
         return _dbContext.SaveChanges();

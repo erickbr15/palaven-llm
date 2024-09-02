@@ -35,4 +35,16 @@ public static class ChatCompletionExcerciseType
             _ => "Unknown"
         };
     }
+
+    public static int GetChatCompletionExcerciseTypeId(string chatCompletionEvaluationExcercise)
+    {
+        return chatCompletionEvaluationExcercise switch
+        {
+            LlmVanilla => 1,
+            LlmWithRag => 2,
+            LlmFineTuned => 3,
+            LlmFineTunedAndRag => 4,
+            _ => 0
+        };
+    }
 }

@@ -46,7 +46,7 @@ public class CleanChatCompletionResponseCommandHandler : ICommandHandler<CleanCh
             return cleanedResponse;
         });
 
-        var evaluationExerciseId = GetEvaluationExerciseId(command.ChatCompletionExcerciseType);
+        var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.ChatCompletionExcerciseType);
         
         var selectionCriteria = new Func<LlmResponse, bool>(x => 
             x.SessionId == command.SessionId && 
@@ -57,17 +57,5 @@ public class CleanChatCompletionResponseCommandHandler : ICommandHandler<CleanCh
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
-    }
-
-    private static int GetEvaluationExerciseId(string chatCompletionExcerciseType)
-    {
-        return chatCompletionExcerciseType switch
-        {
-            ChatCompletionExcerciseType.LlmVanilla => 1,
-            ChatCompletionExcerciseType.LlmWithRag => 2,
-            ChatCompletionExcerciseType.LlmFineTuned => 3,
-            ChatCompletionExcerciseType.LlmFineTunedAndRag => 4,
-            _ => 0
-        };
     }
 }
