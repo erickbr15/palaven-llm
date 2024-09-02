@@ -77,9 +77,13 @@ public class PerformanceEvaluationDataService : IPerformanceEvaluationDataServic
 
     private Task UpsertChatCompletionResponseAsync(LlmResponse chatCompletionResponse, CancellationToken cancellationToken)
     {
-        var existingResponse = _llmResponseRepository.GetAll().SingleOrDefault(x => x.SessionId == chatCompletionResponse.SessionId && x.InstructionId == chatCompletionResponse.InstructionId);
+        var existingResponse = _llmResponseRepository.GetAll().SingleOrDefault(x => 
+            x.SessionId == chatCompletionResponse.SessionId && 
+            x.InstructionId == chatCompletionResponse.InstructionId &&
+            x.BatchNumber == chatCompletionResponse.BatchNumber &&
+            x.EvaluationExerciseId == chatCompletionResponse.EvaluationExerciseId);
 
-        if(existingResponse == null)
+        if (existingResponse == null)
         {
             chatCompletionResponse.CreationDate = DateTime.Now;
             return _llmResponseRepository.AddAsync(chatCompletionResponse, cancellationToken);
