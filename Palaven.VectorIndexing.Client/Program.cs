@@ -51,11 +51,15 @@ await datasetService.CreateFineTuningPromptDatasetAsync(new Palaven.Model.Perfor
 }, CancellationToken.None);*/
 
 var performanceEvaluationService = host.Services.GetRequiredService<IPerformanceEvaluationService>();
-await performanceEvaluationService.CleanChatCompletionResponseAsync(new Palaven.Model.PerformanceEvaluation.CleanChatCompletionResponseCommand
+
+for(int batchNumber = 2; batchNumber < 29; batchNumber++)
 {
-    SessionId = new Guid("EB9C5839-7B20-4D7D-B3F7-17528180676D"),
-    BatchNumber = 1,
-    ChatCompletionExcerciseType = "llmvanilla"
-}, CancellationToken.None);
+    await performanceEvaluationService.CleanChatCompletionResponseAsync(new Palaven.Model.PerformanceEvaluation.CleanChatCompletionResponseCommand
+    {
+        SessionId = new Guid("EB9C5839-7B20-4D7D-B3F7-17528180676D"),
+        BatchNumber = batchNumber,
+        ChatCompletionExcerciseType = "llmvanilla"
+    }, CancellationToken.None);
+}
 
 await host.RunAsync();

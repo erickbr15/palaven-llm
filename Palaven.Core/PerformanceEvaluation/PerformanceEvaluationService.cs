@@ -82,25 +82,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             IsActive = evaluationSession.IsActive,
             StartDate = evaluationSession.StartDate
         };
-    }
-
-    public async Task<IResult> UpsertChatCompletionPerformanceEvaluationAsync(UpsertBertscoreBatchEvaluationCommand command, CancellationToken cancellationToken)
-    {
-        var bertScoreMetrics = new BertScoreMetric
-        {
-            SessionId = command.SessionId,
-            EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.EvaluationExercise),
-            BatchNumber = command.BatchNumber,
-            BertScorePrecision = command.BertScorePrecision,
-            BertScoreRecall = command.BertScoreRecall,
-            BertScoreF1 = command.BertScoreF1
-        };        
-        
-        await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
-        await _performanceMetricsDataService.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
-    }
+    }    
 
     public async Task<IResult> UpsertChatCompletionResponseAsync(UpsertChatCompletionResponseCommand command, CancellationToken cancellationToken)
     {
@@ -148,5 +130,81 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
           }).ToList();
 
         return instructions;
+    }
+
+    public async Task<IResult> UpsertBertscoreBatchEvaluationAsync(UpsertBertscoreBatchEvaluationCommand command, CancellationToken cancellationToken)
+    {
+        var bertScoreMetrics = new BertScoreMetric
+        {
+            SessionId = command.SessionId,
+            EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.EvaluationExercise),
+            BatchNumber = command.BatchNumber,
+            BertScorePrecision = command.Precision,
+            BertScoreRecall = command.Recall,
+            BertScoreF1 = command.F1
+        };
+
+        await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
+        await _performanceMetricsDataService.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    public IList<EvaluationSessionBertscoreMetrics> FetchEvaluationSessionBertscoreMetrics(Guid evaluationSessionId, string evaluationExercise)
+    {
+        var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(evaluationExercise);
+
+        var result = _performanceMetricsDataService.FetchBertScoreMetrics(b=> b.SessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId);
+
+        var metrics = result.Select(m => new EvaluationSessionBertscoreMetrics
+        {
+            EvaluationSessionId = m.SessionId,
+            EvaluationExercise = evaluationExercise.ToLower(),
+            BatchNumber = m.BatchNumber,
+            Precision = m.BertScorePrecision ?? 0,
+            Recall = m.BertScoreRecall ?? 0,
+            F1 = m.BertScoreF1 ?? 0
+        }).ToList();
+
+        return metrics;
+    }
+
+    public async Task<IResult> UpsertRougeScoreBatchEvaluationAsync(IEnumerable<UpsertRougescoreBatchEvaluationCommand> commands, CancellationToken cancellationToken)
+    {
+        var rougeScoreMetrics = commands.Select(command => new RougeScoreMetric
+        {
+            SessionId = command.SessionId,
+            EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.EvaluationExercise),
+            BatchNumber = command.BatchNumber,
+            RougeType = command.RougeType,
+            RougePrecision = command.Precision,
+            RougeRecall = command.Recall,
+            RougeF1 = command.F1
+        });
+
+        await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(rougeScoreMetrics, cancellationToken);
+        await _performanceMetricsDataService.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    public IList<EvaluationSessionRougescoreMetrics> FetchEvaluationSessionRougeScoreMetrics(Guid evaluationSessionId, string evaluationExercise)
+    {
+        var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(evaluationExercise);
+
+        var result = _performanceMetricsDataService.FetchRougeScoreMetrics(b => b.SessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId);
+
+        var metrics = result.Select(m => new EvaluationSessionRougescoreMetrics
+        {
+            EvaluationSessionId = m.SessionId,
+            EvaluationExercise = evaluationExercise.ToLower(),
+            BatchNumber = m.BatchNumber,
+            RougeType = m.RougeType,
+            Precision = m.RougePrecision ?? 0,
+            Recall = m.RougeRecall ?? 0,
+            F1 = m.RougeF1 ?? 0
+        }).ToList();
+
+        return metrics;
     }
 }

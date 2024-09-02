@@ -19,11 +19,28 @@ public class PerformanceMetricsDataService : IPerformanceMetricsDataService
         _rougeScoreMetricRepository = rougeScoreMetricRepository ?? throw new ArgumentNullException(nameof(rougeScoreMetricRepository));
     }
 
+    public IEnumerable<BertScoreMetric> FetchBertScoreMetrics(Func<BertScoreMetric, bool> criteria)
+    {
+        return _bertScoreMetricRepository.GetAll()
+            .Where(criteria)
+            .ToList();
+    }    
+
+    public IEnumerable<RougeScoreMetric> FetchRougeScoreMetrics(Func<RougeScoreMetric, bool> criteria)
+    {
+        return _rougeScoreMetricRepository.GetAll()
+            .Where(criteria)
+            .ToList();
+    }
+
     public async Task UpsertChatCompletionPerformanceEvaluationAsync(BertScoreMetric bertScoreMetrics, CancellationToken cancellationToken)
     {
+
         var existingEvaluation = _bertScoreMetricRepository
             .GetAll()
-            .SingleOrDefault(x => x.SessionId == bertScoreMetrics.SessionId && x.BatchNumber == bertScoreMetrics.BatchNumber);
+            .SingleOrDefault(x => x.SessionId == bertScoreMetrics.SessionId &&
+                                x.BatchNumber == bertScoreMetrics.BatchNumber &&
+                                x.EvaluationExerciseId == bertScoreMetrics.EvaluationExerciseId);
 
         if (existingEvaluation == null)
         {
@@ -43,7 +60,7 @@ public class PerformanceMetricsDataService : IPerformanceMetricsDataService
 
     public async Task UpsertChatCompletionPerformanceEvaluationAsync(IEnumerable<RougeScoreMetric> rougeScoreMetrics, CancellationToken cancellationToken)
     {
-        foreach (var rougeScoreMetric in rougeScoreMetrics.ToList())
+        foreach (var rougeScoreMetric in rougeScoreMetrics)
         {
             await UpsertChatCompletionPerformanceEvaluationAsync(rougeScoreMetric, cancellationToken);
         }
@@ -53,7 +70,10 @@ public class PerformanceMetricsDataService : IPerformanceMetricsDataService
     {
         var existingEvaluation = _rougeScoreMetricRepository
             .GetAll()
-            .SingleOrDefault(x => x.SessionId == rougeScoreMetric.SessionId && x.BatchNumber == rougeScoreMetric.BatchNumber && string.Equals(x.RougeType, rougeScoreMetric.RougeType, StringComparison.OrdinalIgnoreCase));
+            .SingleOrDefault(x => x.SessionId == rougeScoreMetric.SessionId && 
+                    x.BatchNumber == rougeScoreMetric.BatchNumber && 
+                    x.EvaluationExerciseId == rougeScoreMetric.EvaluationExerciseId &&
+                    string.Equals(x.RougeType, rougeScoreMetric.RougeType, StringComparison.OrdinalIgnoreCase));
 
         if (existingEvaluation == null)
         {
