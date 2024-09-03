@@ -5,5 +5,5 @@ namespace Palaven.Chat.Contracts;
 public interface IGemmaChatService
 {
     ChatMessage CreateSimpleQueryPrompt(ChatMessage message);
-    Task<ChatMessage> CreateAugmentedQueryPromptAsync(ChatMessage message, CancellationToken cancellationToken);
+    Task<ChatMessage> CreateAugmentedQueryPromptAsync(CreateAugmentedQueryPromptCommand command, CancellationToken cancellationToken);
 }

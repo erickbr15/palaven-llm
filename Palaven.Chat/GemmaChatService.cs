@@ -26,26 +26,26 @@ public class GemmaChatService : IGemmaChatService
         _articleRepository = documentRepository ?? throw new ArgumentNullException(nameof(documentRepository));
     }
 
-    public async Task<ChatMessage> CreateAugmentedQueryPromptAsync(ChatMessage message, CancellationToken cancellationToken)
+    public async Task<ChatMessage> CreateAugmentedQueryPromptAsync(CreateAugmentedQueryPromptCommand command, CancellationToken cancellationToken)
     {
-        var relatedArticles = await TryGetRelevantArticlesAsync(message, cancellationToken);
+        var relatedArticles = await TryGetRelevantArticlesAsync(command, cancellationToken);
         
         if (!relatedArticles.Any())
         {
             return new ChatMessage
             {
-                UserId = message.UserId,
-                Prompt = Resources.GemmaPromptTemplates.SimpleQuery.Replace("{instruction}", message.Prompt)
+                UserId = command.UserId.ToString(),
+                Prompt = Resources.GemmaPromptTemplates.SimpleQuery.Replace("{instruction}", command.Query)
             };
         }
 
         var augmentedQuery = Resources.GemmaPromptTemplates.AugmentedQuery
             .Replace("{articles}", string.Join("", relatedArticles.Select(a => $"<article>{a.Content}</article>")))
-            .Replace("{instruction}", message.Prompt);
+            .Replace("{instruction}", command.Query);
 
         return new ChatMessage
         {
-            UserId = message.UserId,
+            UserId = command.UserId.ToString(),
             Prompt = augmentedQuery
         };
     }
@@ -59,12 +59,12 @@ public class GemmaChatService : IGemmaChatService
         };
     }
 
-    private async Task<IEnumerable<TaxLawDocumentGoldenArticle>> TryGetRelevantArticlesAsync(ChatMessage message, CancellationToken cancellationToken)
+    private async Task<IEnumerable<TaxLawDocumentGoldenArticle>> TryGetRelevantArticlesAsync(CreateAugmentedQueryPromptCommand command, CancellationToken cancellationToken)
     {
         var createQueryEmbeddingsRequest = new CreateEmbeddingsModel
         {
-            User = message.UserId,
-            Input = new List<string> { message.Prompt }
+            User = command.UserId.ToString(),
+            Input = new List<string> { command.Query }
         };
 
         var queryEmbeddings = await _openAiServiceClient.CreateEmbeddingsAsync(createQueryEmbeddingsRequest, cancellationToken);
@@ -76,13 +76,13 @@ public class GemmaChatService : IGemmaChatService
         var queryVectorsModel = new QueryVectorsModel
         {
             IncludeMetadata = true,
-            TopK = 3,
+            TopK = command.TopK,
             Namespace = "palaven-sat",
             Vector = queryEmbeddings.Data[0].EmbeddingVector.Select(v => (double)v).ToList()
         };
 
         var queryVectorResult = await _pineconeServiceClient.QueryVectorsAsync(queryVectorsModel, cancellationToken);
-        if (queryVectorResult == null || queryVectorResult.Matches == null || !queryVectorResult.Matches.Any(match => match.Score >= 0.8))
+        if (queryVectorResult == null || queryVectorResult.Matches == null || !queryVectorResult.Matches.Any(match => match.Score >= command.MinMatchScore))
         {
             return new List<TaxLawDocumentGoldenArticle>();
         }

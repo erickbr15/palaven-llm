@@ -18,27 +18,29 @@ namespace Palaven.Api.Controllers
 
         [Consumes("multipart/form-data")]
         [HttpPost("{largeLanguageModel}/prompt/augment")]
-        public async Task<IActionResult> AugmentQuery([FromRoute] string largeLanguageModel, [FromForm] LlmQuery inputModel)
+        public async Task<IActionResult> AugmentQuery([FromRoute] string largeLanguageModel, [FromForm] QueryAugmentationModel inputModel)
         {
             if(!string.Equals(largeLanguageModel, "google-gemma", StringComparison.OrdinalIgnoreCase))
             {
                 return BadRequest($"The LLM {largeLanguageModel} is not supported for this operation.");
             }
 
-            var query = new ChatMessage
+            var command = new CreateAugmentedQueryPromptCommand
             {
-                Prompt = inputModel.Query,
-                UserId = Guid.NewGuid().ToString()
+                Query = inputModel.Query,
+                TopK = inputModel.TopK,
+                MinMatchScore = inputModel.MinMatchScore,
+                UserId = Guid.NewGuid()
             };
 
-            var chatMessage = await _gemmaChatService.CreateAugmentedQueryPromptAsync(query, CancellationToken.None);
+            var chatMessage = await _gemmaChatService.CreateAugmentedQueryPromptAsync(command, CancellationToken.None);
 
             return Ok(chatMessage);
         }
 
         [Consumes("multipart/form-data")]
         [HttpPost("{largeLanguageModel}/prompt")]
-        public IActionResult Prompt([FromRoute] string largeLanguageModel, [FromForm] LlmQuery inputModel)
+        public IActionResult Prompt([FromRoute] string largeLanguageModel, [FromForm] QueryAugmentationModel inputModel)
         {
             if(!string.Equals(largeLanguageModel, "google-gemma", StringComparison.OrdinalIgnoreCase))
             {
