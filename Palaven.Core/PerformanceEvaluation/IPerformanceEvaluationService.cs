@@ -12,8 +12,10 @@ public interface IPerformanceEvaluationService
     Task<IResult> CleanChatCompletionResponseAsync(CleanChatCompletionResponseCommand command, CancellationToken cancellationToken);
     IList<LlmResponseView> FetchChatCompletionLlmResponses(Guid evaluationSessionId, int batchNumber, string chatCompletionExcerciseType);
     IList<InstructionData> FetchChatCompletionLlmInstructions(Guid evaluationSessionId, int batchNumber, string chatCompletionExcerciseType);
-    Task<IResult> UpsertBertscoreBatchEvaluationAsync(UpsertBertscoreBatchEvaluationCommand command, CancellationToken cancellationToken);
+    Task<IResult> UpsertBertscoreBatchEvaluationAsync(UpsertBertScoreBatchEvaluationCommand command, CancellationToken cancellationToken);
     IList<EvaluationSessionBertscoreMetrics> FetchEvaluationSessionBertscoreMetrics(Guid evaluationSessionId, string evaluationExercise);
-    Task<IResult> UpsertRougeScoreBatchEvaluationAsync(IEnumerable<UpsertRougescoreBatchEvaluationCommand> commands, CancellationToken cancellationToken);
+    Task<IResult> UpsertRougeScoreBatchEvaluationAsync(IEnumerable<UpsertRougeScoreBatchEvaluationCommand> commands, CancellationToken cancellationToken);
     IList<EvaluationSessionRougescoreMetrics> FetchEvaluationSessionRougeScoreMetrics(Guid evaluationSessionId, string evaluationExercise, string rougeType);
+    Task<IResult> UpsertBleuBatchEvaluationAsync(UpsertBleuBatchEvaluationCommand command, CancellationToken cancellationToken);
+    IList<EvaluationSessionBleuMetrics> FetchEvaluationSessionBleuMetrics(Guid evaluationSessionId, string evaluationExercise);
 }
