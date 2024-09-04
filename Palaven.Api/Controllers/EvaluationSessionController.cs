@@ -213,14 +213,14 @@ namespace Palaven.Api.Controllers
         }
 
         [HttpGet("{id}/metrics/{evaluationExercise}/rougescore")]
-        public IActionResult GetRougeScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise)
+        public IActionResult GetRougeScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise, [FromQuery]string rougeType)
         {
             if (!ChatCompletionExcerciseType.IsValid(evaluationExercise))
             {
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var metrics = _performanceEvaluationService.FetchEvaluationSessionRougeScoreMetrics(id, evaluationExercise.ToLower());
+            var metrics = _performanceEvaluationService.FetchEvaluationSessionRougeScoreMetrics(id, evaluationExercise.ToLower(), rougeType);
             
             return Ok(metrics);
         }

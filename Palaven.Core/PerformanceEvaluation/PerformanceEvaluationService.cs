@@ -188,11 +188,12 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
         return Result.Success();
     }
 
-    public IList<EvaluationSessionRougescoreMetrics> FetchEvaluationSessionRougeScoreMetrics(Guid evaluationSessionId, string evaluationExercise)
+    public IList<EvaluationSessionRougescoreMetrics> FetchEvaluationSessionRougeScoreMetrics(Guid evaluationSessionId, string evaluationExercise, string rougeType)
     {
         var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(evaluationExercise);
+        rougeType = string.IsNullOrWhiteSpace(rougeType) ? "rouge1" : rougeType.ToLower();
 
-        var result = _performanceMetricsDataService.FetchRougeScoreMetrics(b => b.SessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId);
+        var result = _performanceMetricsDataService.FetchRougeScoreMetrics(b => b.SessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId && b.RougeType == rougeType);
 
         var metrics = result.Select(m => new EvaluationSessionRougescoreMetrics
         {
