@@ -15,5 +15,5 @@ public interface IPerformanceEvaluationService
     Task<IResult> UpsertBertscoreBatchEvaluationAsync(UpsertBertscoreBatchEvaluationCommand command, CancellationToken cancellationToken);
     IList<EvaluationSessionBertscoreMetrics> FetchEvaluationSessionBertscoreMetrics(Guid evaluationSessionId, string evaluationExercise);
     Task<IResult> UpsertRougeScoreBatchEvaluationAsync(IEnumerable<UpsertRougescoreBatchEvaluationCommand> commands, CancellationToken cancellationToken);
-    IList<EvaluationSessionRougescoreMetrics> FetchEvaluationSessionRougeScoreMetrics(Guid evaluationSessionId, string evaluationExercise);
+    IList<EvaluationSessionRougescoreMetrics> FetchEvaluationSessionRougeScoreMetrics(Guid evaluationSessionId, string evaluationExercise, string rougeType);
 }
