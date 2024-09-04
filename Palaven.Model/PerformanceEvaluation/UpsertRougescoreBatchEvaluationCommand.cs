@@ -1,6 +1,6 @@
 ﻿namespace Palaven.Model.PerformanceEvaluation;
 
-public class UpsertRougescoreBatchEvaluationCommand
+public class UpsertRougeScoreBatchEvaluationCommand
 {
     public Guid SessionId { get; set; }
     public string EvaluationExercise { get; set; } = string.Empty;

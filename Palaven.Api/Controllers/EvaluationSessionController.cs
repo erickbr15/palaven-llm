@@ -145,7 +145,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var command = new UpsertBertscoreBatchEvaluationCommand
+            var command = new UpsertBertScoreBatchEvaluationCommand
             {
                 SessionId = id,
                 EvaluationExercise = evaluationExercise.ToLower(),
@@ -191,7 +191,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var commands = inputModel.Select(inputModel => new UpsertRougescoreBatchEvaluationCommand
+            var commands = inputModel.Select(inputModel => new UpsertRougeScoreBatchEvaluationCommand
             {
                 SessionId = id,
                 EvaluationExercise = evaluationExercise.ToLower(),
@@ -222,6 +222,50 @@ namespace Palaven.Api.Controllers
 
             var metrics = _performanceEvaluationService.FetchEvaluationSessionRougeScoreMetrics(id, evaluationExercise.ToLower(), rougeType);
             
+            return Ok(metrics);
+        }
+
+        [HttpPost("{id}/metrics/{evaluationExercise}/bleuscore")]
+        public async Task<IActionResult> UpsertBleuScoreMetricsAsync([FromRoute] Guid id, [FromRoute] string evaluationExercise, [FromBody] BleuScoreBatchEvaluationModel inputModel, CancellationToken cancellationToken)
+        {
+            if (inputModel == null)
+            {
+                return BadRequest("Input model is required");
+            }
+
+            if (!ChatCompletionExcerciseType.IsValid(evaluationExercise))
+            {
+                return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
+            }
+
+            var command = new UpsertBleuBatchEvaluationCommand
+            {
+                SessionId = id,
+                EvaluationExercise = evaluationExercise.ToLower(),
+                BatchNumber = inputModel.BatchNumber,
+                BleuScore = inputModel.BleuScore
+            };            
+
+            var upsertResult = await _performanceEvaluationService.UpsertBleuBatchEvaluationAsync(command, cancellationToken);
+
+            if (!upsertResult.IsSuccess)
+            {
+                return BadRequest(upsertResult);
+            }
+
+            return Ok(upsertResult);
+        }
+
+        [HttpGet("{id}/metrics/{evaluationExercise}/bleuscore")]
+        public IActionResult GetBleuScoreMetrics([FromRoute] Guid id, [FromRoute] string evaluationExercise)
+        {
+            if (!ChatCompletionExcerciseType.IsValid(evaluationExercise))
+            {
+                return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
+            }
+
+            var metrics = _performanceEvaluationService.FetchEvaluationSessionBleuMetrics(id, evaluationExercise.ToLower());
+
             return Ok(metrics);
         }
     }
