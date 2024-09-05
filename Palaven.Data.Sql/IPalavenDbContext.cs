@@ -10,5 +10,6 @@ public interface IPalavenDbContext
     DbSet<EvaluationSessionInstruction> EvaluationSessionInstructions { get; set; }    
     DbSet<LlmResponse> LlmResponses { get; set; }    
     DbSet<BertScoreMetric> BertScoreMetrics { get; set; }
-    DbSet<RougeScoreMetric> RougeScoreMetrics { get; set; }    
+    DbSet<RougeScoreMetric> RougeScoreMetrics { get; set; }  
+    DbSet<BleuMetric> BleuMetrics { get; set; }
 }

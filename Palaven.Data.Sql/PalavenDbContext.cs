@@ -16,6 +16,7 @@ public class PalavenDbContext : DbContext, IPalavenDbContext
     public DbSet<LlmResponse> LlmResponses { get; set; } = default!;    
     public DbSet<BertScoreMetric> BertScoreMetrics { get; set; } = default!;
     public DbSet<RougeScoreMetric> RougeScoreMetrics { get; set; } = default!;
+    public DbSet<BleuMetric> BleuMetrics { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
