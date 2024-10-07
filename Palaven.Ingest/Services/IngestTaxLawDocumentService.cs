@@ -2,15 +2,14 @@
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Model.Documents;
-using Palaven.Model.Documents.Golden;
 using Palaven.Model.Ingest;
 
 namespace Palaven.Ingest.Services;
 
 public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
 {
-    private readonly IDocumentRepository<TaxLawDocumentArticle> _articleDocumentRepository;
-    private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleDocumentRepository;
+    private readonly IDocumentRepository<SilverDocument> _articleDocumentRepository;
+    private readonly IDocumentRepository<GoldenDocument> _goldenArticleDocumentRepository;
 
     private readonly ICommandHandler<IngestTaxLawDocumentCommand, TaxLawDocumentIngestTask> _startTaxLawIngestCommand;
     private readonly ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask> _createBronzeDocumentCommandHandler;
@@ -18,8 +17,8 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
     private readonly ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask> _createGoldenDocumentCommandHandler;    
 
     public IngestTaxLawDocumentService(
-        IDocumentRepository<TaxLawDocumentArticle> articleDocumentRepository,
-        IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleDocumentRepository,
+        IDocumentRepository<SilverDocument> articleDocumentRepository,
+        IDocumentRepository<GoldenDocument> goldenArticleDocumentRepository,
         ICommandHandler<IngestTaxLawDocumentCommand, TaxLawDocumentIngestTask> startTaxLawIngestCommand,
         ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask> createBronzeDocumentCommandHandler,
         ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask> createSilverDocumentCommandHandler,
@@ -34,7 +33,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
         _createGoldenDocumentCommandHandler = createGoldenDocumentCommandHandler ?? throw new ArgumentNullException(nameof(createGoldenDocumentCommandHandler));
     }
 
-    public async Task<IResult<TaxLawDocumentIngestTask?>> IngestTaxLawDocumentAsync(IngestTaxLawDocumentCommand command, CancellationToken cancellationToken)
+    public async Task<IResult<TaxLawDocumentIngestTask>> IngestTaxLawDocumentAsync(IngestTaxLawDocumentCommand command, CancellationToken cancellationToken)
     {
         if(command == null)
         {
@@ -72,7 +71,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
 
         var goldenArticles = await _goldenArticleDocumentRepository.GetAsync(queryGoldenArticle, continuationToken: null, queryRequestOptions: null, cancellationToken: cancellationToken);
 
-        var existingGoldenArticleIds = string.Join(",", goldenArticles.Select(ga => $"'{ga.ArticleId}'"));
+        var existingGoldenArticleIds = string.Join(",", goldenArticles.Select(ga => $"'{ga.Id}'"));
 
         var query = string.IsNullOrEmpty(existingGoldenArticleIds) ?
             new QueryDefinition($"SELECT TOP {batchSize} * FROM c WHERE c.TraceId = \"{traceId}\" and c.LawId = \"{lawId}\" and IS_NULL(c.Content) = false") :            
@@ -80,7 +79,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
 
         var articles = await _articleDocumentRepository.GetAsync(query, continuationToken: null, queryRequestOptions: null, cancellationToken: cancellationToken);
 
-        articles = articles.Where(a=> !string.IsNullOrWhiteSpace(a.Content) && a.Content.Length > 100).ToList();
+        articles = articles.Where(a=> !string.IsNullOrWhiteSpace(a.ArticleContent) && a.ArticleContent.Length > 100).ToList();
 
         foreach (var article in articles)
         {

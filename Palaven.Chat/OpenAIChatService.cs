@@ -7,7 +7,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;
-using Palaven.Model.Documents.Golden;
+using Palaven.Model.Documents;
 
 namespace Palaven.Chat;
 
@@ -15,9 +15,9 @@ public class OpenAIChatService : IOpenAIChatService
 {
     private readonly IPineconeServiceClient _pineconeServiceClient;
     private readonly IOpenAiServiceClient _openAiServiceClient;
-    private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _articleRepository;
+    private readonly IDocumentRepository<GoldenDocument> _articleRepository;
 
-    public OpenAIChatService(IPineconeServiceClient pineconeServiceClient, IOpenAiServiceClient openAiServiceClient, IDocumentRepository<TaxLawDocumentGoldenArticle> articleRepository)
+    public OpenAIChatService(IPineconeServiceClient pineconeServiceClient, IOpenAiServiceClient openAiServiceClient, IDocumentRepository<GoldenDocument> articleRepository)
     {
         _pineconeServiceClient = pineconeServiceClient ?? throw new ArgumentNullException(nameof(pineconeServiceClient));
         _openAiServiceClient = openAiServiceClient ?? throw new ArgumentNullException(nameof(openAiServiceClient));
@@ -44,12 +44,12 @@ public class OpenAIChatService : IOpenAIChatService
         return chatResponse;
     }
 
-    private IEnumerable<Message> BuildChatMessages(string query, IEnumerable<TaxLawDocumentGoldenArticle> relatedArticles)
+    private IEnumerable<Message> BuildChatMessages(string query, IEnumerable<GoldenDocument> relatedArticles)
     {
         const string userQueryMark = "{user_query}";
         const string userAdditionalInfoMark = "{additional_info}";
 
-        var additionalInformation = relatedArticles.Any() ? $"<additional_info>{string.Join("\n\n\n", relatedArticles.Select(r=>r.Content))}</additional_info>" : string.Empty;
+        var additionalInformation = relatedArticles.Any() ? $"<additional_info>{string.Join("\n\n\n", relatedArticles.Select(r=>r.ArticleContent))}</additional_info>" : string.Empty;
 
         var userMessageContent = Resources.ChatGptPromptTemplates.AnswerMexicanTaxLawQuestionUserRole
             .Replace(userQueryMark, query)
@@ -72,7 +72,7 @@ public class OpenAIChatService : IOpenAIChatService
         return messages;
     }
 
-    private async Task<IEnumerable<TaxLawDocumentGoldenArticle>> TryGetRelevantArticlesAsync(ChatMessage message, CancellationToken cancellationToken)
+    private async Task<IEnumerable<GoldenDocument>> TryGetRelevantArticlesAsync(ChatMessage message, CancellationToken cancellationToken)
     {
         var createQueryEmbeddingsRequest = new CreateEmbeddingsModel
         {
@@ -83,7 +83,7 @@ public class OpenAIChatService : IOpenAIChatService
         var queryEmbeddings = await _openAiServiceClient.CreateEmbeddingsAsync(createQueryEmbeddingsRequest, cancellationToken);
         if(queryEmbeddings == null || queryEmbeddings.Data == null || !queryEmbeddings.Data.Any())
         {
-            return new List<TaxLawDocumentGoldenArticle>();
+            return new List<GoldenDocument>();
         }
 
         var queryVectorsModel = new QueryVectorsModel
@@ -97,7 +97,7 @@ public class OpenAIChatService : IOpenAIChatService
         var queryVectorResult = await _pineconeServiceClient.QueryVectorsAsync(queryVectorsModel, cancellationToken);
         if(queryVectorResult == null || queryVectorResult.Matches == null || !queryVectorResult.Matches.Any(match=>match.Score >= 0.8))
         {
-            return new List<TaxLawDocumentGoldenArticle>();
+            return new List<GoldenDocument>();
         }
 
         var articleIds = queryVectorResult.Matches

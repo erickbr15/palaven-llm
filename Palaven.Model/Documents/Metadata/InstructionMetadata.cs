@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Palaven.Model.Documents.Golden;
+namespace Palaven.Model.Documents.Metadata;
 
 public class InstructionMetadata
 {

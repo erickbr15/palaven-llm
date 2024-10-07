@@ -5,7 +5,8 @@ using Liara.Clients.Pinecone.Model;
 using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Palaven.Model.Documents.Golden;
+using Palaven.Model.Documents;
+using Palaven.Model.Documents.Metadata;
 using Palaven.Model.VectorIndexing;
 
 namespace Palaven.VectorIndexing.Commands;
@@ -14,11 +15,11 @@ public class UploadGoldenArticleToVectorIndexCommandHandler : ICommandHandler<Up
 {
     private readonly IPineconeServiceClient _pineconeServiceClient;
     private readonly IOpenAiServiceClient _openAiServiceClient;
-    private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleRepository;
+    private readonly IDocumentRepository<GoldenDocument> _goldenArticleRepository;
 
     public UploadGoldenArticleToVectorIndexCommandHandler(IOpenAiServiceClient openAiServiceClient, 
         IPineconeServiceClient pineconeServiceClient, 
-        IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleRepository)
+        IDocumentRepository<GoldenDocument> goldenArticleRepository)
     {
         _openAiServiceClient = openAiServiceClient ?? throw new ArgumentNullException(nameof(openAiServiceClient));
         _pineconeServiceClient = pineconeServiceClient ?? throw new ArgumentNullException(nameof(pineconeServiceClient));
@@ -44,27 +45,27 @@ public class UploadGoldenArticleToVectorIndexCommandHandler : ICommandHandler<Up
         return Result<Guid>.Success(command.TraceId);
     }
 
-    private async Task<UpsertDataModel> BuildUpsertDataModel(TaxLawDocumentGoldenArticle goldenArticle)
+    private async Task<UpsertDataModel> BuildUpsertDataModel(GoldenDocument goldenArticle)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
         var vectors = new List<Vector>();
 
-        foreach (var item in goldenArticle.RetrievalAugmentationData)
+        foreach (var item in goldenArticle.Instructions)
         {
             var createEmbeddingsModel = new CreateEmbeddingsModel
             {
                 User = tenantId.ToString(),
-                Input = new List<string> { item.Instruction }
+                Input = new List<string> { item.InstructionText }
             };
 
             var embeddings = await _openAiServiceClient.CreateEmbeddingsAsync(createEmbeddingsModel, CancellationToken.None);
-            var vector = (new PineconeVectorBuilder().NewWith(embeddings!.Data[0].EmbeddingVector, goldenArticle.Id, item.Metadata)).Build();
+
+            //TODO: Implement InstructionMetadata factory
+            var vector = (new PineconeVectorBuilder().NewWith(embeddings!.Data[0].EmbeddingVector, goldenArticle.Id, new InstructionMetadata())).Build();
 
             vectors.Add(vector);
         }
-
         
-
         var upsertDataModel = new UpsertDataModel
         {
             Namespace = "palaven-sat",

@@ -3,7 +3,6 @@ using Liara.Azure.BlobStorage;
 using Liara.Clients.OpenAI;
 using Liara.Clients.Pinecone;
 using Liara.Common.Http;
-using Liara.CosmosDb;
 using Microsoft.Extensions.DependencyInjection;
 using Palaven.Chat.Contracts;
 
@@ -14,7 +13,6 @@ public static class ApplicationRootExtensions
     public static void AddAIServices(this IServiceCollection services)
     {
         services.AddOptions<BlobStorageConnectionOptions>().BindConfiguration("BlobStorage");
-        services.AddOptions<CosmosDbConnectionOptions>().BindConfiguration("CosmosDB");
         services.AddOptions<MultiServiceAiOptions>().BindConfiguration("AiServices");
         services.AddOptions<OpenAiOptions>().BindConfiguration("OpenAi");
         services.AddOptions<PineconeOptions>().BindConfiguration("Pinecone");

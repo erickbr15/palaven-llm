@@ -5,7 +5,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Palaven.Model.Documents;
-using Palaven.Model.Documents.Golden;
+using Palaven.Model.Documents.Metadata;
 using Palaven.Model.Ingest;
 using System.Net;
 
@@ -14,19 +14,19 @@ namespace Palaven.Ingest.Commands;
 public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask>
 {
     private readonly IOpenAiServiceClient _openAiChatService;
-    private readonly IDocumentRepository<TaxLawDocumentArticle> _articleDocumentRepository;
-    private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleDocumentRepository;
+    private readonly IDocumentRepository<SilverDocument> _articleDocumentRepository;
+    private readonly IDocumentRepository<GoldenDocument> _goldenArticleDocumentRepository;
 
     public CreateGoldenDocumentCommandHandler(IOpenAiServiceClient openAiChatService,
-        IDocumentRepository<TaxLawDocumentArticle> articleDocumentRepository,
-        IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleDocumentRepository)
+        IDocumentRepository<SilverDocument> articleDocumentRepository,
+        IDocumentRepository<GoldenDocument> goldenArticleDocumentRepository)
     {
         _openAiChatService = openAiChatService ?? throw new ArgumentNullException(nameof(openAiChatService));
         _articleDocumentRepository = articleDocumentRepository ?? throw new ArgumentNullException(nameof(articleDocumentRepository));
         _goldenArticleDocumentRepository = goldenArticleDocumentRepository ?? throw new ArgumentNullException(nameof(goldenArticleDocumentRepository));
     }
 
-    public async Task<IResult<TaxLawDocumentIngestTask?>> ExecuteAsync(CreateGoldenDocumentCommand inputModel, CancellationToken cancellationToken)
+    public async Task<IResult<TaxLawDocumentIngestTask>> ExecuteAsync(CreateGoldenDocumentCommand inputModel, CancellationToken cancellationToken)
     {
         try
         {
@@ -51,7 +51,7 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
                 return Result<TaxLawDocumentIngestTask>.Success(new TaxLawDocumentIngestTask());
             }            
 
-            var goldenArticle = new TaxLawDocumentGoldenArticle
+            var goldenArticle = new GoldenDocument
             {
                 Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId.ToString(),
@@ -59,12 +59,11 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
                 LawId = article.LawId,
                 LawName = "Ley del Impuesto Sobre la Renta",
                 LawAcronym = "LISR",
-                LawYear = 2024,
-                ArticleId = inputModel.ArticleId,
+                LawYear = 2024,                
                 LawDocumentVersion = article.LawDocumentVersion,
-                Article = article.Article,
-                Content = article.Content,
-                DocumentType = nameof(TaxLawDocumentGoldenArticle)
+                ArticleLawId = article.ArticleLawId,
+                ArticleContent = article.ArticleContent,
+                DocumentType = nameof(GoldenDocument)
             };
 
             await PopulateOpenEndedQuestionInstructionsAsync(goldenArticle, cancellationToken);
@@ -72,8 +71,6 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
             await PopulateExtractInformationInstructionsAsync(goldenArticle, cancellationToken);
             await PopulateExtractReferencesInstructionsAsync(goldenArticle, cancellationToken);
             await PopulateSummarizationInstructionAsync(goldenArticle, cancellationToken);
-            PopulateRetrievalAugmentationData(goldenArticle);
-
 
             var result = await _goldenArticleDocumentRepository.CreateAsync(goldenArticle, new PartitionKey(tenantId.ToString()), itemRequestOptions: null, cancellationToken);
 
@@ -90,12 +87,12 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
         }        
     }
 
-    private async Task PopulateOpenEndedQuestionInstructionsAsync(TaxLawDocumentGoldenArticle goldenArticle, CancellationToken cancellationToken)
+    private async Task PopulateOpenEndedQuestionInstructionsAsync(GoldenDocument goldenArticle, CancellationToken cancellationToken)
     {
         var systemPrompt = Resources.ChatGptPromptTemplates.SystemPromptOpenEndQuestionTemplate;
         
         var userPrompt = Resources.ChatGptPromptTemplates.UserPromptOpenEndQuestionTemplate
-            .Replace("{article}", goldenArticle.Content)
+            .Replace("{article}", goldenArticle.ArticleContent)
             .Replace("{law}", goldenArticle.LawName)
             .Replace("{year}", goldenArticle.LawYear.ToString());
 
@@ -108,14 +105,14 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
             return;
         }
 
-        PopulateGoldenArticleFineTuningInstructions(goldenArticle, instructions.Instructions, "open_end-question", new List<string> { "question-answering", "open_end-question" });        
+        PopulateGoldenDocumentInstructions(goldenArticle, instructions.Instructions, "open_end-question");
     }
 
-    private async Task PopulateCloseEndedQuestionInstructionsAsync(TaxLawDocumentGoldenArticle goldenArticle, CancellationToken cancellationToken)
+    private async Task PopulateCloseEndedQuestionInstructionsAsync(GoldenDocument goldenArticle, CancellationToken cancellationToken)
     {
         var systemPrompt = Resources.ChatGptPromptTemplates.SystemPromptClosedEndQuestionTemplate;
         var userPrompt = Resources.ChatGptPromptTemplates.UserPromptClosedEndQuestionTemplate
-            .Replace("{article}", goldenArticle.Content)
+            .Replace("{article}", goldenArticle.ArticleContent)
             .Replace("{law}", goldenArticle.LawName)
             .Replace("{year}", goldenArticle.LawYear.ToString());
 
@@ -128,14 +125,14 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
             return;
         }
 
-        PopulateGoldenArticleFineTuningInstructions(goldenArticle, instructions.Instructions, "close_end-question", new List<string> { "question-answering", "close_end-question" });
+        PopulateGoldenDocumentInstructions(goldenArticle, instructions.Instructions, "close_end-question");
     }
 
-    private async Task PopulateExtractInformationInstructionsAsync(TaxLawDocumentGoldenArticle goldenArticle, CancellationToken cancellationToken)
+    private async Task PopulateExtractInformationInstructionsAsync(GoldenDocument goldenArticle, CancellationToken cancellationToken)
     {
         var systemPrompt = Resources.ChatGptPromptTemplates.SystemPromptInformationExtractionTemplate;
         var userPrompt = Resources.ChatGptPromptTemplates.UserPromptInformationExtractionTemplate
-            .Replace("{article}", goldenArticle.Content)
+            .Replace("{article}", goldenArticle.ArticleContent)
             .Replace("{law}", goldenArticle.LawName)
             .Replace("{year}", goldenArticle.LawYear.ToString());
 
@@ -148,14 +145,14 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
             return;
         }
 
-        PopulateGoldenArticleFineTuningInstructions(goldenArticle, instructions.Instructions, "extract_information", new List<string> { "question-answering", "extract_information" });
+        PopulateGoldenDocumentInstructions(goldenArticle, instructions.Instructions, "extract_information");
     }
 
-    private async Task PopulateExtractReferencesInstructionsAsync(TaxLawDocumentGoldenArticle goldenArticle, CancellationToken cancellationToken)
+    private async Task PopulateExtractReferencesInstructionsAsync(GoldenDocument goldenArticle, CancellationToken cancellationToken)
     {
         var systemPrompt = Resources.ChatGptPromptTemplates.SystemPromptReferencesExtractionTemplate;
         var userPrompt = Resources.ChatGptPromptTemplates.UserPromptReferencesExtractionTemplate
-            .Replace("{article}", goldenArticle.Content)
+            .Replace("{article}", goldenArticle.ArticleContent)
             .Replace("{law}", goldenArticle.LawName)
             .Replace("{year}", goldenArticle.LawYear.ToString());
 
@@ -168,14 +165,14 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
             return;
         }
 
-        PopulateGoldenArticleFineTuningInstructions(goldenArticle, instructions.Instructions, "extract_references", new List<string> { "question-answering", "extract_references" });
+        PopulateGoldenDocumentInstructions(goldenArticle, instructions.Instructions, "extract_references");
     }
 
-    private async Task PopulateSummarizationInstructionAsync(TaxLawDocumentGoldenArticle goldenArticle, CancellationToken cancellationToken)
+    private async Task PopulateSummarizationInstructionAsync(GoldenDocument goldenArticle, CancellationToken cancellationToken)
     {
         var systemPrompt = Resources.ChatGptPromptTemplates.SystemPromptSummarizationTemplate;
         var userPrompt = Resources.ChatGptPromptTemplates.UserPromptSummarizationTemplate
-            .Replace("{article}", goldenArticle.Content)
+            .Replace("{article}", goldenArticle.ArticleContent)
             .Replace("{law}", goldenArticle.LawName)
             .Replace("{year}", goldenArticle.LawYear.ToString());
 
@@ -188,41 +185,8 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
             return;
         }
 
-        PopulateGoldenArticleFineTuningInstructions(goldenArticle, instructions.Instructions, "summarization", new List<string> { "summarization" });
-    }
-
-    private void PopulateRetrievalAugmentationData(TaxLawDocumentGoldenArticle goldenArticle)
-    {
-        foreach (var instruction in goldenArticle.FineTuningData)
-        {
-            goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
-            {
-                InstructionId = instruction.InstructionId,
-                Instruction = instruction.Instruction,
-                Metadata = instruction.Metadata
-            });
-        }
-
-        var goldenArticleMetadata = goldenArticle.FineTuningData[0].Metadata;
-
-        goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
-        {
-            Instruction = $"Sumariza el {goldenArticleMetadata.Article} de la {goldenArticleMetadata.LawName} del año {goldenArticleMetadata.LawYear}",
-            Metadata = goldenArticleMetadata
-        });
-
-        goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
-        {
-            Instruction = $"Realiza un resumen del {goldenArticleMetadata.Article}  de la  {goldenArticleMetadata.LawName} del año {goldenArticleMetadata.LawYear}",
-            Metadata = goldenArticleMetadata
-        });
-
-        goldenArticle.RetrievalAugmentationData.Add(new RagInstruction
-        {
-            Instruction = $"Resume el {goldenArticleMetadata.Article}  de la  {goldenArticleMetadata.LawName} del año {goldenArticleMetadata.LawYear}",
-            Metadata = goldenArticleMetadata
-        });
-    }
+        PopulateGoldenDocumentInstructions(goldenArticle, instructions.Instructions, "summarization");
+    }    
 
     private async Task<ChatCompletionInstructionsResponse?> InvokeChatGptAsync(string systemPrompt, string userPrompt, decimal? temperature, CancellationToken cancellationToken)
     {
@@ -257,26 +221,16 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
         return completionResult;
     }
 
-    private static void PopulateGoldenArticleFineTuningInstructions(TaxLawDocumentGoldenArticle goldenArticle, IList<ChatCompletionInstruction> instructions, string category, IList<string> llmFunctions)
+    private static void PopulateGoldenDocumentInstructions(GoldenDocument goldenArticle, IList<ChatCompletionInstruction> instructions, string instructionType)
     {
         foreach (var instruction in instructions)
         {
-            goldenArticle.FineTuningData.Add(new FineTuningInstruction
+            goldenArticle.Instructions.Add(new Instruction
             {
                 InstructionId = Guid.NewGuid(),
-                Instruction = instruction.Instruction,
-                Category = category,
-                Response = instruction.Response,
-                Metadata = new InstructionMetadata
-                {
-                    LawId = goldenArticle.LawId,
-                    LawName = goldenArticle.LawName,
-                    LawAcronym = goldenArticle.LawAcronym,
-                    LawYear = goldenArticle.LawYear,
-                    ArticleId = goldenArticle.ArticleId,
-                    Article = goldenArticle.Article,
-                    LlmFunctions = llmFunctions
-                }
+                InstructionText = instruction.Instruction,
+                Type = instructionType,
+                Response = instruction.Response
             });
         }
     }

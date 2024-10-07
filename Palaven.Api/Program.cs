@@ -28,7 +28,7 @@ namespace Palaven.Api
             });
             
             builder.Services.AddAIServices();
-            builder.Services.AddDataServices();
+            //builder.Services.AddDataServices();
 
             var sqlConnectionString = builder.Configuration.GetValue<string>("SqlDB:ConnectionString");
             builder.Services.AddDataSqlServices(sqlConnectionString!);

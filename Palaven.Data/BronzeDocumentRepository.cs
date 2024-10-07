@@ -4,9 +4,9 @@ using Palaven.Model.Documents;
 
 namespace Palaven.Data;
 
-public class TaxLawToIngestDocumentRepository : DocumentRepository<TaxLawToIngestDocument>
+public class BronzeDocumentRepository : DocumentRepository<BronzeDocument>
 {
-    public TaxLawToIngestDocumentRepository(CosmosClient client, CosmosContainerOptions containerOptions)
+    public BronzeDocumentRepository(CosmosClient client, CosmosContainerOptions containerOptions) 
         : base(client, containerOptions.DatabaseId, containerOptions.ContainerId)
     {
     }

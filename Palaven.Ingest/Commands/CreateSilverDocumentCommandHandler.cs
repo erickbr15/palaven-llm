@@ -5,6 +5,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Palaven.Model.Documents;
+using Palaven.Model.Documents.Metadata;
 using Palaven.Model.Ingest;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -14,19 +15,19 @@ namespace Palaven.Ingest.Commands;
 public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask>
 {
     private readonly IOpenAiServiceClient _openAiChatService;
-    private readonly IDocumentRepository<TaxLawDocumentPage> _lawPageDocumentRepository;
-    private readonly IDocumentRepository<TaxLawDocumentArticle> _articleDocumentRepository;
+    private readonly IDocumentRepository<BronzeDocument> _lawPageDocumentRepository;
+    private readonly IDocumentRepository<SilverDocument> _articleDocumentRepository;
 
     public CreateSilverDocumentCommandHandler(IOpenAiServiceClient openAiChatService,
-        IDocumentRepository<TaxLawDocumentPage> lawPageDocumentRepository, 
-        IDocumentRepository<TaxLawDocumentArticle> articleDocumentRepository)
+        IDocumentRepository<BronzeDocument> lawPageDocumentRepository, 
+        IDocumentRepository<SilverDocument> articleDocumentRepository)
     {
         _openAiChatService = openAiChatService ?? throw new ArgumentNullException(nameof(openAiChatService));
         _lawPageDocumentRepository = lawPageDocumentRepository ?? throw new ArgumentNullException(nameof(lawPageDocumentRepository));
         _articleDocumentRepository = articleDocumentRepository ?? throw new ArgumentNullException(nameof(articleDocumentRepository));
     }
 
-    public async Task<IResult<TaxLawDocumentIngestTask?>> ExecuteAsync(CreateSilverDocumentCommand inputModel, CancellationToken cancellationToken)
+    public async Task<IResult<TaxLawDocumentIngestTask>> ExecuteAsync(CreateSilverDocumentCommand inputModel, CancellationToken cancellationToken)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
 
@@ -44,7 +45,7 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
             article.Id = Guid.NewGuid().ToString();
             article.TenantId = tenantId.ToString();
             article.TraceId = inputModel.TraceId;
-            article.DocumentType = nameof(TaxLawDocumentArticle);
+            article.DocumentType = nameof(SilverDocument);
             article.LawDocumentVersion = documentPages.FirstOrDefault()?.LawDocumentVersion ?? string.Empty;
             article.LawId = documentPages.FirstOrDefault()?.LawId ?? Guid.Empty;
 
@@ -59,11 +60,11 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
         return Result<TaxLawDocumentIngestTask>.Success(new TaxLawDocumentIngestTask { TraceId = inputModel.TraceId });
     }
 
-    private async Task<IList<TaxLawDocumentArticle>> ExtractArticlesAsync(IList<TaxLawDocumentPage> pages, CancellationToken cancellationToken)
+    private async Task<IList<SilverDocument>> ExtractArticlesAsync(IList<BronzeDocument> pages, CancellationToken cancellationToken)
     {
         var lines = new Queue<TaxLawDocumentLine>(pages.SelectMany(p => p.Lines).OrderBy(p=> p.PageNumber).ThenBy(p=>p.LineNumber));
         var articleLines = new List<TaxLawDocumentLine>();
-        var articles = new List<TaxLawDocumentArticle>();
+        var articles = new List<SilverDocument>();
 
         while (lines.Any())
         {
@@ -109,7 +110,7 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
         return articles;
     }
 
-    private async Task<TaxLawDocumentArticle> ExtractArticleAsync(IEnumerable<TaxLawDocumentLine> articleLines, CancellationToken cancellationToken)
+    private async Task<SilverDocument> ExtractArticleAsync(IEnumerable<TaxLawDocumentLine> articleLines, CancellationToken cancellationToken)
     {
         var articleContent = string.Join(Environment.NewLine, articleLines.Select(l=>l.Content.Trim()));
 
@@ -147,13 +148,13 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
             // ignored
         }
 
-        var documentArticle = new TaxLawDocumentArticle
+        var documentArticle = new SilverDocument
         {
-            Article = completionResult!.Article,
-            Content = completionResult.Content            
+            ArticleLawId = completionResult!.Article,
+            ArticleContent = completionResult.Content            
         };
 
-        documentArticle.ArticleLineIds.AddRange(articleLines.Select(l => l.LineId));
+        (documentArticle.ArticleLines as List<TaxLawDocumentLine>)!.AddRange(articleLines);
 
         return documentArticle;
     }

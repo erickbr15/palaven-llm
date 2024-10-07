@@ -4,7 +4,6 @@ using Liara.Clients.OpenAI;
 using Liara.Clients.Pinecone;
 using Liara.Common;
 using Liara.Common.Http;
-using Liara.CosmosDb;
 using Microsoft.Extensions.DependencyInjection;
 using Palaven.Model.VectorIndexing;
 using Palaven.VectorIndexing.Commands;
@@ -16,7 +15,6 @@ public static class ApplicationRootExtensions
     public static void AddAIServices(this IServiceCollection services)
     {
         services.AddOptions<BlobStorageConnectionOptions>().BindConfiguration("BlobStorage");
-        services.AddOptions<CosmosDbConnectionOptions>().BindConfiguration("CosmosDB");
         services.AddOptions<MultiServiceAiOptions>().BindConfiguration("AiServices");
         services.AddOptions<OpenAiOptions>().BindConfiguration("OpenAi");
         services.AddOptions<PineconeOptions>().BindConfiguration("Pinecone");

@@ -2,15 +2,17 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Hosting;
-using Palaven.Data.Extensions;
 using Palaven.Data.Sql.Extensions;
 using Palaven.VectorIndexing.Extensions;
 using Palaven.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using Palaven.Core.Datasets;
 using Palaven.Core.PerformanceEvaluation;
 
-var hostBuilder = new HostBuilder()
+internal class Program
+{
+    private static async Task Main(string[] args)
+    {
+        var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration((hostingContext, configBuilder) =>
     {
         var appConfigurationEndpoint = Environment.GetEnvironmentVariable("AppConfigurationEndpoint");
@@ -30,8 +32,8 @@ var hostBuilder = new HostBuilder()
     .ConfigureServices((hostContext, services) =>
     {
         services.AddAIServices();
-        services.AddDataServices();
-        
+        //services.AddDataServices();
+
         var sqlConnectionString = hostContext.Configuration.GetValue<string>("SqlDB:ConnectionString");
         services.AddDataSqlServices(sqlConnectionString!);
 
@@ -39,27 +41,29 @@ var hostBuilder = new HostBuilder()
         services.AddPalavenCoreServices();
     });
 
-var host = hostBuilder.Build();
+        var host = hostBuilder.Build();
 
-/*
-var datasetService = host.Services.GetRequiredService<IFineTuningDatasetService>();
+        /*
+        var datasetService = host.Services.GetRequiredService<IFineTuningDatasetService>();
 
-await datasetService.CreateFineTuningPromptDatasetAsync(new Palaven.Model.PerformanceEvaluation.CreateFineTuningDataset
-{
-    DatasetId = new Guid("F0444B12-5485-4299-B03B-3BDB6D4A2578"),
-    LargeLanguageModel = "google-gemma-7b",
-}, CancellationToken.None);*/
+        await datasetService.CreateFineTuningPromptDatasetAsync(new Palaven.Model.PerformanceEvaluation.CreateFineTuningDataset
+        {
+            DatasetId = new Guid("F0444B12-5485-4299-B03B-3BDB6D4A2578"),
+            LargeLanguageModel = "google-gemma-7b",
+        }, CancellationToken.None);*/
 
-var performanceEvaluationService = host.Services.GetRequiredService<IPerformanceEvaluationService>();
+        var performanceEvaluationService = host.Services.GetRequiredService<IPerformanceEvaluationService>();
 
-for(int batchNumber = 2; batchNumber < 29; batchNumber++)
-{
-    await performanceEvaluationService.CleanChatCompletionResponseAsync(new Palaven.Model.PerformanceEvaluation.CleanChatCompletionResponseCommand
-    {
-        SessionId = new Guid("EB9C5839-7B20-4D7D-B3F7-17528180676D"),
-        BatchNumber = batchNumber,
-        ChatCompletionExcerciseType = "llmvanilla"
-    }, CancellationToken.None);
+        for (int batchNumber = 2; batchNumber < 29; batchNumber++)
+        {
+            await performanceEvaluationService.CleanChatCompletionResponseAsync(new Palaven.Model.PerformanceEvaluation.CleanChatCompletionResponseCommand
+            {
+                SessionId = new Guid("EB9C5839-7B20-4D7D-B3F7-17528180676D"),
+                BatchNumber = batchNumber,
+                ChatCompletionExcerciseType = "llmvanilla"
+            }, CancellationToken.None);
+        }
+
+        await host.RunAsync();
+    }
 }
-
-await host.RunAsync();

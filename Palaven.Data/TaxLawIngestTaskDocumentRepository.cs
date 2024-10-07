@@ -1,13 +1,13 @@
 ﻿using Liara.CosmosDb;
-using Microsoft.Extensions.Options;
+using Microsoft.Azure.Cosmos;
 using Palaven.Model.Documents;
 
 namespace Palaven.Data;
 
-public class TaxLawIngestTaskDocumentRepository : CosmosDbRepository<TaxLawIngestTaskDocument>
+public class TaxLawIngestTaskDocumentRepository : DocumentRepository<TaxLawIngestTaskDocument>
 {
-    public TaxLawIngestTaskDocumentRepository(IOptions<CosmosDbConnectionOptions> options) 
-        : base(options, "ingesttasks")
+    public TaxLawIngestTaskDocumentRepository(CosmosClient client, CosmosContainerOptions containerOptions) 
+        : base(client, containerOptions.DatabaseId, containerOptions.ContainerId)
     {
     }
 }

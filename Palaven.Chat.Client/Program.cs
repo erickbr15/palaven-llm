@@ -28,7 +28,7 @@ var hostBuilder = new HostBuilder()
     .ConfigureServices((hostContext, services) =>
     {
         services.AddAIServices();
-        services.AddDataServices();
+        //services.AddDataServices();
         services.AddChatServices();
     });
 

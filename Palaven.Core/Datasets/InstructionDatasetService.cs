@@ -4,7 +4,6 @@ using Microsoft.Azure.Cosmos;
 using Palaven.Data.Sql.Services.Contracts;
 using Palaven.Model.Datasets;
 using Palaven.Model.Documents;
-using Palaven.Model.Documents.Golden;
 using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
 using System.Data;
@@ -14,13 +13,13 @@ namespace Palaven.Core.Datasets;
 public class InstructionDatasetService : IInstructionDatasetService
 {
     private readonly IDocumentRepository<DatasetGenerationTaskDocument> _datasetGenerationTasksRepository;
-    private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleRepository;
+    private readonly IDocumentRepository<GoldenDocument> _goldenArticleRepository;
     private readonly IDatasetsDataService _instructionDataService;
     private readonly IPerformanceEvaluationDataService _performanceEvaluationDataService;
 
     public InstructionDatasetService(
         IDocumentRepository<DatasetGenerationTaskDocument> datasetGenerationTasksRepository,
-        IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleRepository,
+        IDocumentRepository<GoldenDocument> goldenArticleRepository,
         IDatasetsDataService instructionDataService,
         IPerformanceEvaluationDataService performanceEvaluationDataService)
     {
@@ -57,16 +56,16 @@ public class InstructionDatasetService : IInstructionDatasetService
         {
             try
             {
-                foreach (var instruction in goldenArticle.FineTuningData)
+                foreach (var instruction in goldenArticle.Instructions)
                 {
                     var instructionEntity = new InstructionEntity
                     {
-                        Instruction = instruction.Instruction,
+                        Instruction = instruction.InstructionText,
                         Response = instruction.Response,
-                        Category = instruction.Category,
+                        Category = instruction.Type,
                         GoldenArticleId = new Guid(goldenArticle.Id),
                         LawId = goldenArticle.LawId,
-                        ArticleId = goldenArticle.ArticleId,
+                        //ArticleId = goldenArticle.ArticleLawId, TODO: Adjust the instruction entity to remove this property
                         DatasetId = model.DatasetId
                     };
 
@@ -99,7 +98,7 @@ public class InstructionDatasetService : IInstructionDatasetService
         }
     }
 
-    public async Task<IResult<List<InstructionData>?>> FetchInstructionsDatasetAsync(FetchInstructionsDataset model, CancellationToken cancellationToken)
+    public async Task<IResult<List<InstructionData>>> FetchInstructionsDatasetAsync(FetchInstructionsDataset model, CancellationToken cancellationToken)
     {
         var evaluationSession = await _performanceEvaluationDataService.GetEvaluationSessionAsync(model.SessionId, cancellationToken);
         if(evaluationSession == null)

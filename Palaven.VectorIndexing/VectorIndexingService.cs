@@ -2,7 +2,6 @@
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Model.Documents;
-using Palaven.Model.Documents.Golden;
 using Palaven.Model.VectorIndexing;
 
 namespace Palaven.VectorIndexing;
@@ -10,12 +9,12 @@ namespace Palaven.VectorIndexing;
 public class VectorIndexingService : IVectorIndexingService
 {
     private readonly IDocumentRepository<DatasetGenerationTaskDocument> _datasetGenerationTasksRepository;
-    private readonly IDocumentRepository<TaxLawDocumentGoldenArticle> _goldenArticleRepository;
+    private readonly IDocumentRepository<GoldenDocument> _goldenArticleRepository;
     private readonly ICommandHandler<UploadGoldenArticleToVectorIndexCommand, Guid> _uploadGoldenArticleToVectorIndex;
 
     public VectorIndexingService(
         IDocumentRepository<DatasetGenerationTaskDocument> datasetGenerationTasksRepository,
-        IDocumentRepository<TaxLawDocumentGoldenArticle> goldenArticleRepository,
+        IDocumentRepository<GoldenDocument> goldenArticleRepository,
         ICommandHandler<UploadGoldenArticleToVectorIndexCommand, Guid> uploadGoldenArticleToVectorIndex)
     {
         _datasetGenerationTasksRepository = datasetGenerationTasksRepository ?? throw new ArgumentNullException(nameof(datasetGenerationTasksRepository));
@@ -41,7 +40,7 @@ public class VectorIndexingService : IVectorIndexingService
             new QueryRequestOptions { PartitionKey = new PartitionKey(tenantId.ToString()) },
             cancellationToken);
         
-        foreach (var goldenArticle in goldenArticles!)
+        foreach (var goldenArticle in goldenArticles ?? new List<GoldenDocument>())
         {
             var indexCreationResult = await _uploadGoldenArticleToVectorIndex.ExecuteAsync(new UploadGoldenArticleToVectorIndexCommand { TraceId = traceId, GoldenArticleId = new Guid(goldenArticle.Id) }, cancellationToken);
             if (indexCreationResult.IsSuccess)

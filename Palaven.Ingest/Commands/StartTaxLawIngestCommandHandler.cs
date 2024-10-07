@@ -2,7 +2,6 @@
 using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Options;
 using Palaven.Model.Documents;
 using Palaven.Model.Ingest;
 using System.Net;
@@ -14,15 +13,9 @@ public class StartTaxLawIngestCommandHandler : ICommandHandler<IngestTaxLawDocum
     private readonly IBlobStorageService _storageService;
     private readonly IDocumentRepository<TaxLawToIngestDocument> _repository;
 
-    public StartTaxLawIngestCommandHandler(IOptions<BlobStorageConnectionOptions> storageOptions, IDocumentRepository<TaxLawToIngestDocument> repository)
+    public StartTaxLawIngestCommandHandler(IBlobStorageService blobStorageService, IDocumentRepository<TaxLawToIngestDocument> repository)
     {
-        var options = storageOptions?.Value ?? throw new ArgumentNullException(nameof(storageOptions));
-
-        var blobContainerName = options.Containers.TryGetValue(BlobStorageIngestContainers.LawDocsV1, out var containerName) ? 
-            containerName : 
-            throw new InvalidOperationException($"Unable to find the container name {BlobStorageIngestContainers.LawDocsV1}");
-
-        _storageService = new BlobStorageService(options.ConnectionString, blobContainerName);
+        _storageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 

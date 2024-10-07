@@ -4,8 +4,8 @@ using Liara.Azure.BlobStorage;
 using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Options;
 using Palaven.Model.Documents;
+using Palaven.Model.Documents.Metadata;
 using Palaven.Model.Ingest;
 using System.Net;
 
@@ -15,22 +15,16 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
 {
     private readonly IBlobStorageService _blobStorageService;
     private readonly IDocumentRepository<TaxLawToIngestDocument> _lawDocumentToIngestRepository;
-    private readonly IDocumentRepository<TaxLawDocumentPage> _lawPageDocumentRepository;
+    private readonly IDocumentRepository<BronzeDocument> _lawPageDocumentRepository;
     private readonly IDocumentLayoutAnalyzerService _documentAnalyzer;
 
     public CreateBronzeDocumentCommandHandler(
-        IOptions<BlobStorageConnectionOptions> storageOptions,
+        IBlobStorageService blobStorageService,
         IDocumentRepository<TaxLawToIngestDocument> lawDocumentToIngestRepository,
-        IDocumentRepository<TaxLawDocumentPage> lawPageDocumentRepository,
+        IDocumentRepository<BronzeDocument> lawPageDocumentRepository,
         IDocumentLayoutAnalyzerService documentAnalyzer)
-    {   
-        var options = storageOptions?.Value ?? throw new ArgumentNullException(nameof(storageOptions));
-
-        var blobContainerName = options.Containers.TryGetValue(BlobStorageIngestContainers.LawDocsV1, out var containerName) ?
-            containerName :
-            throw new InvalidOperationException($"Unable to find the container name {BlobStorageIngestContainers.LawDocsV1}");
-
-        _blobStorageService = new BlobStorageService(options.ConnectionString, blobContainerName);
+    {
+        _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
         _lawDocumentToIngestRepository = lawDocumentToIngestRepository ?? throw new ArgumentNullException(nameof(lawDocumentToIngestRepository));
         _lawPageDocumentRepository = lawPageDocumentRepository ?? throw new ArgumentNullException(nameof(lawPageDocumentRepository));
         _documentAnalyzer = documentAnalyzer ?? throw new ArgumentNullException(nameof(documentAnalyzer));
@@ -57,7 +51,7 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
         return new Result<TaxLawDocumentIngestTask> { Value = new TaxLawDocumentIngestTask { TraceId = command.TraceId } };
     }
 
-    private async Task<TaxLawDocumentPage?> GetLastestExtractedPageAsync(Guid traceId, CancellationToken cancellationToken)
+    private async Task<BronzeDocument?> GetLastestExtractedPageAsync(Guid traceId, CancellationToken cancellationToken)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
 
@@ -113,16 +107,16 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
         }
     }
 
-    private TaxLawDocumentPage BuildTaxLawDocumentPage(Guid traceId, TaxLawToIngestDocument taxLawToIngestDocument, DocumentPage page)
+    private BronzeDocument BuildTaxLawDocumentPage(Guid traceId, TaxLawToIngestDocument taxLawToIngestDocument, DocumentPage page)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
 
-        var taxLawPage = new TaxLawDocumentPage
+        var taxLawPage = new BronzeDocument
         {
             Id = Guid.NewGuid().ToString(),
             TenantId = tenantId.ToString(),
             TraceId = traceId,
-            DocumentType = nameof(TaxLawDocumentPage),
+            DocumentType = nameof(BronzeDocument),
             LawDocumentVersion = taxLawToIngestDocument.LawDocumentVersion,
             LawId = taxLawToIngestDocument.LawId,
             PageNumber = page.PageNumber

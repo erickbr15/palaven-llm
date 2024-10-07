@@ -1,5 +1,4 @@
 ﻿using Liara.Azure.AI;
-using Liara.CosmosDb;
 using Microsoft.Extensions.DependencyInjection;
 using Liara.Azure.BlobStorage;
 using Palaven.Ingest.Commands;
@@ -17,7 +16,6 @@ public static class ApplicationRootExtensions
     public static void AddAIServices(this IServiceCollection services)
     {
         services.AddOptions<BlobStorageConnectionOptions>().BindConfiguration("BlobStorage");
-        services.AddOptions<CosmosDbConnectionOptions>().BindConfiguration("CosmosDB");
         services.AddOptions<MultiServiceAiOptions>().BindConfiguration("AiServices");
         services.AddOptions<OpenAiOptions>().BindConfiguration("OpenAi");
         services.AddOptions<PineconeOptions>().BindConfiguration("Pinecone");

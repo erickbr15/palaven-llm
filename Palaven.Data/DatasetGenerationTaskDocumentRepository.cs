@@ -1,13 +1,13 @@
 ﻿using Liara.CosmosDb;
-using Microsoft.Extensions.Options;
+using Microsoft.Azure.Cosmos;
 using Palaven.Model.Documents;
 
 namespace Palaven.Data;
 
-public class DatasetGenerationTaskDocumentRepository : CosmosDbRepository<DatasetGenerationTaskDocument>
+public class DatasetGenerationTaskDocumentRepository : DocumentRepository<DatasetGenerationTaskDocument>
 {
-    public DatasetGenerationTaskDocumentRepository(IOptions<CosmosDbConnectionOptions> options)
-        : base(options, "datasetgenerationtasks")
+    public DatasetGenerationTaskDocumentRepository(CosmosClient client, CosmosContainerOptions containerOptions)
+        : base(client, containerOptions.DatabaseId, containerOptions.ContainerId)
     {
     }
 }
