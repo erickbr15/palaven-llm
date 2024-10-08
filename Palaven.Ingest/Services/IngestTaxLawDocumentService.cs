@@ -1,7 +1,7 @@
 ﻿using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Palaven.Model.Documents;
+using Palaven.Model.Data.Documents;
 using Palaven.Model.Ingest;
 
 namespace Palaven.Ingest.Services;
@@ -11,7 +11,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
     private readonly IDocumentRepository<SilverDocument> _articleDocumentRepository;
     private readonly IDocumentRepository<GoldenDocument> _goldenArticleDocumentRepository;
 
-    private readonly ICommandHandler<IngestTaxLawDocumentCommand, TaxLawDocumentIngestTask> _startTaxLawIngestCommand;
+    private readonly ICommandHandler<StartTaxLawIngestCommand, TaxLawDocumentIngestTask> _startTaxLawIngestCommand;
     private readonly ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask> _createBronzeDocumentCommandHandler;
     private readonly ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask> _createSilverDocumentCommandHandler;
     private readonly ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask> _createGoldenDocumentCommandHandler;    
@@ -19,7 +19,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
     public IngestTaxLawDocumentService(
         IDocumentRepository<SilverDocument> articleDocumentRepository,
         IDocumentRepository<GoldenDocument> goldenArticleDocumentRepository,
-        ICommandHandler<IngestTaxLawDocumentCommand, TaxLawDocumentIngestTask> startTaxLawIngestCommand,
+        ICommandHandler<StartTaxLawIngestCommand, TaxLawDocumentIngestTask> startTaxLawIngestCommand,
         ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask> createBronzeDocumentCommandHandler,
         ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask> createSilverDocumentCommandHandler,
         ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask> createGoldenDocumentCommandHandler)
@@ -33,7 +33,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
         _createGoldenDocumentCommandHandler = createGoldenDocumentCommandHandler ?? throw new ArgumentNullException(nameof(createGoldenDocumentCommandHandler));
     }
 
-    public async Task<IResult<TaxLawDocumentIngestTask>> IngestTaxLawDocumentAsync(IngestTaxLawDocumentCommand command, CancellationToken cancellationToken)
+    public async Task<IResult<TaxLawDocumentIngestTask>> IngestTaxLawDocumentAsync(StartTaxLawIngestCommand command, CancellationToken cancellationToken)
     {
         if(command == null)
         {

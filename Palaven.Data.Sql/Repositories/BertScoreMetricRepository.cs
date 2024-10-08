@@ -1,5 +1,5 @@
 ﻿using Liara.EntityFrameworkCore;
-using Palaven.Model.Entities;
+using Palaven.Model.Data.Entities;
 
 namespace Palaven.Data.Sql.Repositories;
 

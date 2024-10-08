@@ -4,7 +4,7 @@ using Liara.Common.DataAccess;
 using Palaven.Data.Sql.Repositories;
 using Palaven.Data.Sql.Services;
 using Palaven.Data.Sql.Services.Contracts;
-using Palaven.Model.Entities;
+using Palaven.Model.Data.Entities;
 
 namespace Palaven.Data.Sql.Extensions;
 

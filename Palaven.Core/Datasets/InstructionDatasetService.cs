@@ -2,8 +2,8 @@
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Data.Sql.Services.Contracts;
+using Palaven.Model.Data.Documents;
 using Palaven.Model.Datasets;
-using Palaven.Model.Documents;
 using Palaven.Model.Entities;
 using Palaven.Model.PerformanceEvaluation;
 using System.Data;

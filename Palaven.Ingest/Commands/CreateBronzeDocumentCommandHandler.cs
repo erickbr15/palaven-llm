@@ -4,7 +4,7 @@ using Liara.Azure.BlobStorage;
 using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Palaven.Model.Documents;
+using Palaven.Model.Data.Documents;
 using Palaven.Model.Documents.Metadata;
 using Palaven.Model.Ingest;
 using System.Net;
@@ -14,13 +14,13 @@ namespace Palaven.Ingest.Commands;
 public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask>
 {
     private readonly IBlobStorageService _blobStorageService;
-    private readonly IDocumentRepository<TaxLawToIngestDocument> _lawDocumentToIngestRepository;
+    private readonly IDocumentRepository<StartTaxLawIngestTaskDocument> _lawDocumentToIngestRepository;
     private readonly IDocumentRepository<BronzeDocument> _lawPageDocumentRepository;
     private readonly IDocumentLayoutAnalyzerService _documentAnalyzer;
 
     public CreateBronzeDocumentCommandHandler(
         IBlobStorageService blobStorageService,
-        IDocumentRepository<TaxLawToIngestDocument> lawDocumentToIngestRepository,
+        IDocumentRepository<StartTaxLawIngestTaskDocument> lawDocumentToIngestRepository,
         IDocumentRepository<BronzeDocument> lawPageDocumentRepository,
         IDocumentLayoutAnalyzerService documentAnalyzer)
     {
@@ -68,7 +68,7 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
         return lastestPage;
     }
 
-    private async Task ExtractDocumentPagesAsync(Guid traceId, TaxLawToIngestDocument taxLawToIngestDocument, int? latestExtractedPageNumber, CancellationToken cancellationToken)
+    private async Task ExtractDocumentPagesAsync(Guid traceId, StartTaxLawIngestTaskDocument taxLawToIngestDocument, int? latestExtractedPageNumber, CancellationToken cancellationToken)
     {        
         var documentContent = await _blobStorageService.ReadAsync(taxLawToIngestDocument.FileName, cancellationToken);
                 
@@ -81,7 +81,7 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
         }
     }
 
-    private async Task ExtractAndSavePageChunkAsync(Guid traceId, TaxLawToIngestDocument taxLawToIngestDocument, byte[] documentContent, int startPage, int endPage, CancellationToken cancellationToken)
+    private async Task ExtractAndSavePageChunkAsync(Guid traceId, StartTaxLawIngestTaskDocument taxLawToIngestDocument, byte[] documentContent, int startPage, int endPage, CancellationToken cancellationToken)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
         var analysisOptions = new AnalyzeDocumentOptions
@@ -107,7 +107,7 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
         }
     }
 
-    private BronzeDocument BuildTaxLawDocumentPage(Guid traceId, TaxLawToIngestDocument taxLawToIngestDocument, DocumentPage page)
+    private BronzeDocument BuildTaxLawDocumentPage(Guid traceId, StartTaxLawIngestTaskDocument taxLawToIngestDocument, DocumentPage page)
     {
         var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
 

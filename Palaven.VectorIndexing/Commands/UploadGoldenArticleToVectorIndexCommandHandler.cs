@@ -5,7 +5,7 @@ using Liara.Clients.Pinecone.Model;
 using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Palaven.Model.Documents;
+using Palaven.Model.Data.Documents;
 using Palaven.Model.Documents.Metadata;
 using Palaven.Model.VectorIndexing;
 

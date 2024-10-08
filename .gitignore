@@ -437,3 +437,6 @@ $RECYCLE.BIN/
 **/local.settings.json
 **/host.json
 **/config.ini
+**/finetuning-gemma
+**/finetuning-gemma/*
+**/*crt

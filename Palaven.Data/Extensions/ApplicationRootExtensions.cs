@@ -2,7 +2,7 @@
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
-using Palaven.Model.Documents;
+using Palaven.Model.Data.Documents;
 
 namespace Palaven.Data.Extensions;
 
@@ -23,9 +23,9 @@ public static class ApplicationRootExtensions
             return new TaxLawIngestTaskDocumentRepository(client, containerOptions);
         });
 
-        services.AddTransient<IDocumentRepository<TaxLawToIngestDocument>>(provider => {
+        services.AddTransient<IDocumentRepository<StartTaxLawIngestTaskDocument>>(provider => {
 
-            var containerId = typeof(TaxLawToIngestDocument).Name.ToLower();
+            var containerId = typeof(StartTaxLawIngestTaskDocument).Name.ToLower();
             var containerOptions = cosmosOptions.ContainerOptions[containerId];
             var client = provider.GetRequiredService<CosmosClient>();
 

@@ -33,6 +33,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Palaven.Api", "3 - Pala
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Palaven.Functions", "4 - Palaven.Functions", "{EE1E4C43-A409-403C-8752-55C2608F52CA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 - Palaven.WebApp", "5 - Palaven.WebApp", "{B06D678A-E85F-485F-9E18-219683DC958E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.WebRazor", "Palaven.WebRazor\Palaven.WebRazor.csproj", "{9D19BBAA-CE5D-4AD3-9231-68C1EE9CA267}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,10 @@ Global
 		{6A4987A8-3FA3-4C0F-8F01-78A169A478D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A4987A8-3FA3-4C0F-8F01-78A169A478D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A4987A8-3FA3-4C0F-8F01-78A169A478D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D19BBAA-CE5D-4AD3-9231-68C1EE9CA267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D19BBAA-CE5D-4AD3-9231-68C1EE9CA267}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D19BBAA-CE5D-4AD3-9231-68C1EE9CA267}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D19BBAA-CE5D-4AD3-9231-68C1EE9CA267}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +107,7 @@ Global
 		{0DB9AA47-969D-44AA-8F04-2D6AA23A5617} = {B1E3584C-275F-4E89-9D17-BF74882D5465}
 		{084FA55C-BAB2-4437-9960-5462591433E2} = {DA527458-A1A3-4D2D-A383-A705EA181EF4}
 		{6A4987A8-3FA3-4C0F-8F01-78A169A478D0} = {B1E3584C-275F-4E89-9D17-BF74882D5465}
+		{9D19BBAA-CE5D-4AD3-9231-68C1EE9CA267} = {B06D678A-E85F-485F-9E18-219683DC958E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E278837F-4CA4-43C3-9874-FE884FA0982F}

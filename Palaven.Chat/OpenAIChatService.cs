@@ -7,7 +7,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;
-using Palaven.Model.Documents;
+using Palaven.Model.Data.Documents;
 
 namespace Palaven.Chat;
 

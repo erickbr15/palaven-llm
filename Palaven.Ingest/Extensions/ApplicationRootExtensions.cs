@@ -28,7 +28,7 @@ public static class ApplicationRootExtensions
 
     public static void AddIngestServices(this IServiceCollection services)
     {       
-        services.AddSingleton<ICommandHandler<IngestTaxLawDocumentCommand, TaxLawDocumentIngestTask>, StartTaxLawIngestCommandHandler>();
+        services.AddSingleton<ICommandHandler<StartTaxLawIngestCommand, TaxLawDocumentIngestTask>, StartTaxLawIngestCommandHandler>();
         services.AddSingleton<ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask>, CreateBronzeDocumentCommandHandler>();
         services.AddSingleton<ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask>, CreateSilverDocumentCommandHandler>();
         services.AddSingleton<ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask>, CreateGoldenDocumentCommandHandler>();        

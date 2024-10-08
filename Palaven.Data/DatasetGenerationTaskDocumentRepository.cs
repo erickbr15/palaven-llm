@@ -1,6 +1,6 @@
 ﻿using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Palaven.Model.Documents;
+using Palaven.Model.Data.Documents;
 
 namespace Palaven.Data;
 

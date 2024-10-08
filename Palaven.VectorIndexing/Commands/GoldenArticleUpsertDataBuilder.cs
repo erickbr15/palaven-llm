@@ -1,6 +1,6 @@
 ﻿using Liara.Clients.Pinecone.Model;
 using Newtonsoft.Json.Linq;
-using Palaven.Model.Documents.Metadata;
+using Palaven.Model.Data.Documents.Metadata;
 
 namespace Palaven.VectorIndexing.Commands;
 

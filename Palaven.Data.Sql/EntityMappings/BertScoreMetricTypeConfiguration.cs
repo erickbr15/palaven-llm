@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Palaven.Model.Entities;
+using Palaven.Model.Data.Entities;
 
 namespace Palaven.Data.Sql.EntityMappings;
 
