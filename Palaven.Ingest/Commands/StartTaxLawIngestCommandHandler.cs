@@ -3,6 +3,7 @@ using Liara.Azure.BlobStorage;
 using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Options;
 using Palaven.Model;
 using Palaven.Model.Data.Documents;
 using Palaven.Model.Ingest;
@@ -16,9 +17,9 @@ public class StartTaxLawIngestCommandHandler : ICommandHandler<StartTaxLawIngest
     private readonly IDocumentRepository<EtlTaskDocument> _repository;
     private readonly BlobStorageOptions _blobStorageOptions;
 
-    public StartTaxLawIngestCommandHandler(BlobStorageOptions blobStorageOptions, IBlobStorageService blobStorageService, IDocumentRepository<EtlTaskDocument> repository)
+    public StartTaxLawIngestCommandHandler(IOptions<BlobStorageOptions> blobStorageOptions, IBlobStorageService blobStorageService, IDocumentRepository<EtlTaskDocument> repository)
     {
-        _blobStorageOptions = blobStorageOptions ?? throw new ArgumentNullException(nameof(blobStorageOptions));
+        _blobStorageOptions = blobStorageOptions?.Value ?? throw new ArgumentNullException(nameof(blobStorageOptions));
         _storageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }

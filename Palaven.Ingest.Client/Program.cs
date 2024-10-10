@@ -13,9 +13,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Palaven.Data.Extensions;
 using Palaven.Data.NoSql;
 using Palaven.Ingest.Extensions;
+using Palaven.Model;
 using Palaven.Model.Data.Documents;
 using Palaven.Model.Ingest;
 
@@ -51,19 +53,7 @@ var hostBuilder = new HostBuilder()
 
 var host = hostBuilder.Build();
 
-var service1 = host.Services.GetRequiredService<IHttpProxy>();
-var service2 = host.Services.GetRequiredService<IDocumentLayoutAnalyzerService>();
-var service3 = host.Services.GetRequiredService<IBlobStorageService>();
-var service4 = host.Services.GetRequiredService<IOpenAiServiceClient>();
-var service5 = host.Services.GetRequiredService<IPineconeServiceClient>();
-
-var service6 = host.Services.GetRequiredService<IDocumentRepository<EtlTaskDocument>>();
-/*
-var service8 = host.Services.GetRequiredService<IDocumentRepository<DatasetGenerationTaskDocument>>();
-var service9 = host.Services.GetRequiredService<IDocumentRepository<BronzeDocument>>();
-var service10 = host.Services.GetRequiredService<IDocumentRepository<SilverDocument>>();
-var service11 = host.Services.GetRequiredService<IDocumentRepository<GoldenDocument>>();*/
-var service12 = host.Services.GetRequiredService<ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument>>();
+var options = host.Services.GetRequiredService<IOptions<BlobStorageOptions>>();
 
 
 

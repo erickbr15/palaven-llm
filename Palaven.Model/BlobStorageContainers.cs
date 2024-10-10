@@ -2,6 +2,6 @@
 
 public static class BlobStorageContainers
 {
-    public const string EtlInbox = "etl-inbox";
-    public const string LawDocs = "lawdocs-v1";
+    public const string EtlInbox = "EtlInbox";
+    public const string LawDocs = "LawDocs";
 }
