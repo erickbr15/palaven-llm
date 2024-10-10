@@ -7,6 +7,9 @@ public class EtlTaskDocument
     [JsonProperty(PropertyName = "id")]
     public string Id { get; set; } = default!;
 
+    [JsonProperty(PropertyName = "tenant_id")]
+    public Guid TenantId { get; set; }
+
     [JsonProperty(PropertyName = "trace_id")]
     public Guid TraceId { get; set; }
 

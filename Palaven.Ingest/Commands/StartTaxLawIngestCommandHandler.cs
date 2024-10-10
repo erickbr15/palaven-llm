@@ -3,6 +3,7 @@ using Liara.Azure.BlobStorage;
 using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
+using Palaven.Model;
 using Palaven.Model.Data.Documents;
 using Palaven.Model.Ingest;
 using System.Net;
@@ -13,9 +14,11 @@ public class StartTaxLawIngestCommandHandler : ICommandHandler<StartTaxLawIngest
 {
     private readonly IBlobStorageService _storageService;
     private readonly IDocumentRepository<EtlTaskDocument> _repository;
+    private readonly BlobStorageOptions _blobStorageOptions;
 
-    public StartTaxLawIngestCommandHandler(IBlobStorageService blobStorageService, IDocumentRepository<EtlTaskDocument> repository)
+    public StartTaxLawIngestCommandHandler(BlobStorageOptions blobStorageOptions, IBlobStorageService blobStorageService, IDocumentRepository<EtlTaskDocument> repository)
     {
+        _blobStorageOptions = blobStorageOptions ?? throw new ArgumentNullException(nameof(blobStorageOptions));
         _storageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
@@ -35,6 +38,7 @@ public class StartTaxLawIngestCommandHandler : ICommandHandler<StartTaxLawIngest
         {
             Id = documentId.ToString(),
             TraceId = traceId,
+            TenantId = command.UserId,
             UserId = command.UserId,
             FileName = fileName,
             UntrustedFileName = command.UntrustedFileName,
@@ -45,7 +49,7 @@ public class StartTaxLawIngestCommandHandler : ICommandHandler<StartTaxLawIngest
             IsTaskCompleted = false
         };        
         
-        var result = await _repository.CreateAsync(lawToIngestDocument, new PartitionKey(lawToIngestDocument.YearLaw), itemRequestOptions: null, cancellationToken);
+        var result = await _repository.CreateAsync(lawToIngestDocument, new PartitionKey(lawToIngestDocument.UserId.ToString()), itemRequestOptions: null, cancellationToken);
 
         if (result.StatusCode != HttpStatusCode.Created)
         {
@@ -54,7 +58,8 @@ public class StartTaxLawIngestCommandHandler : ICommandHandler<StartTaxLawIngest
 
         var uploadBlobModel = new AppendBlobModel
         {
-            BlobContent = command.FileContent,
+            BlobContainerName = _blobStorageOptions.Containers[BlobStorageContainers.EtlInbox],
+            BlobContent = command.FileContent,            
             BlobName = fileName,
             CreateOptions = new AppendBlobCreateOptions
             {

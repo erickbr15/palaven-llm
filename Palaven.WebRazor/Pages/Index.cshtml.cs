@@ -7,38 +7,28 @@ using Palaven.WebRazor2.Utilities;
 using Liara.Common;
 using Palaven.Model.Data.Documents;
 using Palaven.Model.Ingest;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Palaven.WebRazor2.Pages
 {
     [AuthorizeForScopes(ScopeKeySection = "MicrosoftGraph:Scopes")]
-    public class IndexModel : PageModel
+    public class IndexModel(ILogger<IndexModel> logger, GraphServiceClient graphServiceClient, ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> startIngestCommandHandler) : PageModel
     {
-        private readonly long _fileSizeLimit;
+        private readonly long _fileSizeLimit = 4000000;
         private readonly string[] _permittedExtensions = { ".pdf" };
-        private readonly GraphServiceClient _graphServiceClient;
-        private readonly ILogger<IndexModel> _logger;
-        private readonly ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> _startIngestCommandHandler;
-
-        private Guid _userId;
-
+        private readonly GraphServiceClient _graphServiceClient = graphServiceClient ?? throw new ArgumentNullException(nameof(graphServiceClient));
+        private readonly ILogger<IndexModel> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> _startIngestCommandHandler = startIngestCommandHandler ?? throw new ArgumentNullException(nameof(startIngestCommandHandler));
 
         [BindProperty]
         public BufferedSingleFile InputModel { get; set; }
         public string Result { get; private set; }
 
-        public IndexModel(ILogger<IndexModel> logger, GraphServiceClient graphServiceClient, ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> startIngestCommandHandler)
-        {
-            _fileSizeLimit = 4000000;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _graphServiceClient = graphServiceClient ?? throw new ArgumentNullException(nameof(graphServiceClient));
-            _startIngestCommandHandler = startIngestCommandHandler ?? throw new ArgumentNullException(nameof(startIngestCommandHandler));
-        }
-
         public async Task OnGet()
         {
             var user = await _graphServiceClient.Me.Request().GetAsync();
-            ViewData["GraphApiResult"] = $"{user.Id} - {user.DisplayName}";            
-            _userId = new Guid(user.Id);            
+            ViewData["GraphApiResult"] = $"{user.Id} - {user.DisplayName}";
+            ViewData["UserId"] = user.Id;           
         }
 
         public async Task<IActionResult> OnPostUploadAsync()
@@ -68,7 +58,7 @@ namespace Palaven.WebRazor2.Pages
                 AcronymLaw = InputModel.Acronym,
                 NameLaw = InputModel.Law,
                 YearLaw = InputModel.Year,
-                UserId = _userId,
+                UserId = new Guid(InputModel.UserId),
                 UntrustedFileName = formFile.UntrustedName,
                 FileExtension = formFile.Extension,
                 FileContent = formFile.Content
