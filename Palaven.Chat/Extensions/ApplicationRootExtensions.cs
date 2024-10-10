@@ -1,19 +1,15 @@
 ﻿using Liara.Azure.AI;
-using Liara.Azure.BlobStorage;
 using Liara.Clients.OpenAI;
 using Liara.Clients.Pinecone;
 using Liara.Common.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Palaven.Chat.Contracts;
 
 namespace Palaven.Chat.Extensions;
 
 public static class ApplicationRootExtensions
 {
     public static void AddAIServices(this IServiceCollection services)
-    {
-        services.AddOptions<BlobStorageConnectionOptions>().BindConfiguration("BlobStorage");
-        services.AddOptions<MultiServiceAiOptions>().BindConfiguration("AiServices");
+    {        
         services.AddOptions<OpenAiOptions>().BindConfiguration("OpenAi");
         services.AddOptions<PineconeOptions>().BindConfiguration("Pinecone");
 

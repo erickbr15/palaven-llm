@@ -4,7 +4,6 @@ using Liara.Clients.Pinecone;
 using Liara.Clients.Pinecone.Model;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
-using Palaven.Chat.Contracts;
 using Palaven.Model.Chat;
 using Palaven.Model.Data.Documents;
 

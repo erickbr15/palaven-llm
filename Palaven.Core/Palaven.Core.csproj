@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Palaven.Data.NoSql\Palaven.Data.NoSql.csproj" />
     <ProjectReference Include="..\Palaven.Data.Sql\Palaven.Data.Sql.csproj" />
-    <ProjectReference Include="..\Palaven.Data\Palaven.Data.csproj" />
     <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
   </ItemGroup>
 

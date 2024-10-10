@@ -5,10 +5,17 @@ namespace Palaven.WebRazor2.Model;
 public class BufferedSingleFile
 {
     [Required]
-    [Display(Name = "File")]
+    [Display(Name = "PDF Document")]
     public IFormFile FormFile { get; set; } = default!;
+    
+    [Display(Name = "Law name")]
+    [StringLength(250, MinimumLength = 0)]
+    public string Law { get; set; } = default!;
 
-    [Display(Name = "Note")]
-    [StringLength(50, MinimumLength = 0)]
-    public string Note { get; set; } = default!;
+    [Display(Name = "Law name")]
+    [StringLength(20, MinimumLength = 0)]
+    public string Acronym { get; set; } = default!;
+
+    [Display(Name = "Law year")]    
+    public int Year { get; set; }
 }

@@ -12,23 +12,37 @@
 <div>Graph API result</div>
 <div>@ViewData["GraphApiResult"]</div>
 
-<h1>Upload one buffered file to a database with one file upload control</h1>
+<h2>Upload PDF document related to Mexican tax law</h2>
 
 <form enctype="multipart/form-data" method="post">
     <dl>
         <dt>
-            <label asp-for="FileUpload.Note"></label>
+            <label asp-for="InputModel.Law"></label>
         </dt>
         <dd>
-            <input asp-for="FileUpload.Note" type="text" />
-            <span asp-validation-for="FileUpload.Note"></span>
+            <input asp-for="InputModel.Law" type="text" />
+            <span asp-validation-for="InputModel.Law"></span>
         </dd>
         <dt>
-            <label asp-for="FileUpload.FormFile"></label>
+            <label asp-for="InputModel.Acronym"></label>
         </dt>
         <dd>
-            <input asp-for="FileUpload.FormFile" type="file" />
-            <span asp-validation-for="FileUpload.FormFile"></span>
+            <input asp-for="InputModel.Acronym" type="text" />
+            <span asp-validation-for="InputModel.Acronym"></span>
+        </dd>
+        <dt>
+            <label asp-for="InputModel.Year"></label>
+        </dt>
+        <dd>
+            <input asp-for="InputModel.Year" type="text" />
+            <span asp-validation-for="InputModel.Year"></span>
+        </dd>
+        <dt>
+            <label asp-for="InputModel.FormFile"></label>
+        </dt>
+        <dd>
+            <input asp-for="InputModel.FormFile" type="file" />
+            <span asp-validation-for="InputModel.FormFile"></span>
         </dd>
     </dl>
     <input asp-page-handler="Upload" class="btn" type="submit" value="Upload" />

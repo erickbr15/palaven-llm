@@ -5,7 +5,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Palaven.Model.Data.Documents;
-using Palaven.Model.Documents.Metadata;
+using Palaven.Model.Data.Documents.Metadata;
 using Palaven.Model.Ingest;
 using System.Net;
 

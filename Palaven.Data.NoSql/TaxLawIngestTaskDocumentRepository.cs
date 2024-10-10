@@ -4,7 +4,7 @@ using Palaven.Model.Data.Documents;
 
 namespace Palaven.Data;
 
-public class TaxLawIngestTaskDocumentRepository : DocumentRepository<TaxLawIngestTaskDocument>
+public class TaxLawIngestTaskDocumentRepository : DocumentRepository<EtlTaskDocument>
 {
     public TaxLawIngestTaskDocumentRepository(CosmosClient client, CosmosContainerOptions containerOptions) 
         : base(client, containerOptions.DatabaseId, containerOptions.ContainerId)
