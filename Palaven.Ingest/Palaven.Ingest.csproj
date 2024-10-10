@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.22.1" />
-    <PackageReference Include="Liara.Azure" Version="8.0.4" />
+    <PackageReference Include="Liara.Azure" Version="8.0.5" />
     <PackageReference Include="Liara.Clients" Version="8.0.3" />
     <PackageReference Include="Liara.Common" Version="8.0.4" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
