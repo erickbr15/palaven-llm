@@ -37,10 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.WebRazor", "Palaven
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Data.NoSql", "Palaven.Data.NoSql\Palaven.Data.NoSql.csproj", "{E6DC81FE-150D-42FA-B728-F6489053FF13}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liara.Extensions", "..\liara-extensions\Liara.Extensions.csproj", "{02F909B2-21E7-4EF3-B7E6-9B7C591DAC44}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liara.Azure", "..\liara-azure\Liara.Azure\Liara.Azure.csproj", "{15D5FF05-2D5F-4BF3-BBFE-0BB33F31EB76}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,14 +91,6 @@ Global
 		{E6DC81FE-150D-42FA-B728-F6489053FF13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6DC81FE-150D-42FA-B728-F6489053FF13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6DC81FE-150D-42FA-B728-F6489053FF13}.Release|Any CPU.Build.0 = Release|Any CPU
-		{02F909B2-21E7-4EF3-B7E6-9B7C591DAC44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{02F909B2-21E7-4EF3-B7E6-9B7C591DAC44}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{02F909B2-21E7-4EF3-B7E6-9B7C591DAC44}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{02F909B2-21E7-4EF3-B7E6-9B7C591DAC44}.Release|Any CPU.Build.0 = Release|Any CPU
-		{15D5FF05-2D5F-4BF3-BBFE-0BB33F31EB76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{15D5FF05-2D5F-4BF3-BBFE-0BB33F31EB76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{15D5FF05-2D5F-4BF3-BBFE-0BB33F31EB76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{15D5FF05-2D5F-4BF3-BBFE-0BB33F31EB76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

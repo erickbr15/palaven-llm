@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\liara-extensions\Liara.Extensions.csproj" />
     <ProjectReference Include="..\Palaven.Data.NoSql\Palaven.Data.NoSql.csproj" />
     <ProjectReference Include="..\Palaven.Ingest\Palaven.Ingest.csproj" />
   </ItemGroup>
