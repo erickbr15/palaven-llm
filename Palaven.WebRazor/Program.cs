@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Palaven.Data.NoSql;
-using Liara.Extensions;
 using Palaven.Data.Extensions;
 using Palaven.Ingest.Extensions;
+using Liara.Common.Extensions;
+using Liara.Azure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
