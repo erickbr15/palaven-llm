@@ -6,7 +6,7 @@ using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Model.Data.Documents;
-using Palaven.Model.Documents.Metadata;
+using Palaven.Model.Data.Documents.Metadata;
 using Palaven.Model.VectorIndexing;
 
 namespace Palaven.VectorIndexing.Commands;

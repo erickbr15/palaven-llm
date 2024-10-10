@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Reflection;
 using Microsoft.Net.Http.Headers;
+using Palaven.WebRazor.Model;
 
 namespace Palaven.WebRazor2.Utilities
 {
@@ -51,9 +52,7 @@ namespace Palaven.WebRazor2.Utilities
         // systems. For more information, see the topic that accompanies this sample
         // app.
 
-        public static async Task<byte[]> ProcessFormFile<T>(IFormFile formFile,
-            ModelStateDictionary modelState, string[] permittedExtensions,
-            long sizeLimit)
+        public static async Task<TaxLawFile> ProcessFormFile<T>(IFormFile formFile, ModelStateDictionary modelState, string[] permittedExtensions,long sizeLimit)
         {
             var fieldDisplayName = string.Empty;
 
@@ -61,42 +60,37 @@ namespace Palaven.WebRazor2.Utilities
             // property associated with this IFormFile. If a display
             // name isn't found, error messages simply won't show
             // a display name.
-            MemberInfo property =
-                typeof(T).GetProperty(formFile.Name.Substring(formFile.Name.IndexOf(".",StringComparison.Ordinal) + 1));
+            MemberInfo property = typeof(T).GetProperty(formFile.Name.Substring(formFile.Name.IndexOf(".",StringComparison.Ordinal) + 1));
 
-            if (property != null)
+            if (property != null && property.GetCustomAttribute(typeof(DisplayAttribute)) is DisplayAttribute displayAttribute)
             {
-                if (property.GetCustomAttribute(typeof(DisplayAttribute)) is
-                    DisplayAttribute displayAttribute)
-                {
-                    fieldDisplayName = $"{displayAttribute.Name} ";
-                }
+                fieldDisplayName = $"{displayAttribute.Name} ";
             }
 
             // Don't trust the file name sent by the client. To display
             // the file name, HTML-encode the value.
-            var trustedFileNameForDisplay = WebUtility.HtmlEncode(
-                formFile.FileName);
+            var trustedFileNameForDisplay = WebUtility.HtmlEncode(formFile.FileName);
 
             // Check the file length. This check doesn't catch files that only have 
             // a BOM as their content.
             if (formFile.Length == 0)
             {
-                modelState.AddModelError(formFile.Name,
-                    $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
+                modelState.AddModelError(formFile.Name, $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
 
-                return Array.Empty<byte>();
+                return new TaxLawFile();
             }
-
-            if (formFile.Length > sizeLimit)
+            else if (formFile.Length > sizeLimit)
             {
                 var megabyteSizeLimit = sizeLimit / 1048576;
-                modelState.AddModelError(formFile.Name,
-                    $"{fieldDisplayName}({trustedFileNameForDisplay}) exceeds " +
-                    $"{megabyteSizeLimit:N1} MB.");
-
-                return Array.Empty<byte>();
+                modelState.AddModelError(formFile.Name, $"{fieldDisplayName}({trustedFileNameForDisplay}) exceeds {megabyteSizeLimit:N1} MB.");
+                return new TaxLawFile();
             }
+
+            var file = new TaxLawFile
+            {
+                UntrustedName = trustedFileNameForDisplay,
+                Extension = Path.GetExtension(formFile.FileName).ToLowerInvariant()
+            };
 
             try
             {
@@ -109,33 +103,27 @@ namespace Palaven.WebRazor2.Utilities
                     // empty after removing the BOM.
                     if (memoryStream.Length == 0)
                     {
-                        modelState.AddModelError(formFile.Name,
-                            $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
+                        modelState.AddModelError(formFile.Name, $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
                     }
 
-                    if (!IsValidFileExtensionAndSignature(
-                        formFile.FileName, memoryStream, permittedExtensions))
+                    if (!IsValidFileExtensionAndSignature(formFile.FileName, memoryStream, permittedExtensions))
                     {
-                        modelState.AddModelError(formFile.Name,
-                            $"{fieldDisplayName}({trustedFileNameForDisplay}) file " +
-                            "type isn't permitted or the file's signature " +
-                            "doesn't match the file's extension.");
+                        modelState.AddModelError(formFile.Name, $"{fieldDisplayName}({trustedFileNameForDisplay}) file " +
+                            "type isn't permitted or the file's signature doesn't match the file's extension.");
                     }
                     else
                     {
-                        return memoryStream.ToArray();
+                        file.Content = memoryStream.ToArray();
                     }
                 }
             }
             catch (Exception ex)
             {
-                modelState.AddModelError(formFile.Name,
-                    $"{fieldDisplayName}({trustedFileNameForDisplay}) upload failed. " +
-                    $"Please contact the Help Desk for support. Error: {ex.HResult}");
-                // Log the exception
+                modelState.AddModelError(formFile.Name, $"{fieldDisplayName}({trustedFileNameForDisplay}) upload failed. Please contact the Help Desk for support. Error: {ex.HResult}");
+                return new TaxLawFile();
             }
 
-            return Array.Empty<byte>();
+            return file;
         }
 
         public static async Task<byte[]> ProcessStreamedFile(

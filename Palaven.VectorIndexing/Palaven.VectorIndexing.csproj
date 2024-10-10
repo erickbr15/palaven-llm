@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Liara.Azure" Version="8.0.0" />
     <PackageReference Include="Liara.Clients" Version="8.0.1" />
     <PackageReference Include="Liara.Common" Version="8.0.0" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.43.1" />
@@ -15,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\liara-azure\Liara.Azure\Liara.Azure.csproj" />
     <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
   </ItemGroup>
 

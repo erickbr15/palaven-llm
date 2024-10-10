@@ -1,11 +1,12 @@
 using Azure.Identity;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Palaven.Data.NoSql;
+using Liara.Extensions;
+using Palaven.Data.Extensions;
+using Palaven.Ingest.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,14 @@ builder.Services.AddAuthorization(options =>
 // Add services to the container.
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
+
+var palavenCosmosOptions = new PalavenCosmosOptions();
+builder.Configuration.Bind("CosmosDB", palavenCosmosOptions);
+
+builder.Services.AddLiaraCommonServices();
+builder.Services.AddLiaraAzureServices(builder.Configuration);
+builder.Services.AddNoSqlDataServices(palavenCosmosOptions);
+builder.Services.AddIngestCommands();
 
 var app = builder.Build();
 

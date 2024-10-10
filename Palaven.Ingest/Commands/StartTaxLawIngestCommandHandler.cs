@@ -12,9 +12,9 @@ namespace Palaven.Ingest.Commands;
 public class StartTaxLawIngestCommandHandler : ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument>
 {
     private readonly IBlobStorageService _storageService;
-    private readonly IDocumentRepository<StartTaxLawIngestTaskDocument> _repository;
+    private readonly IDocumentRepository<EtlTaskDocument> _repository;
 
-    public StartTaxLawIngestCommandHandler(IBlobStorageService blobStorageService, IDocumentRepository<StartTaxLawIngestTaskDocument> repository)
+    public StartTaxLawIngestCommandHandler(IBlobStorageService blobStorageService, IDocumentRepository<EtlTaskDocument> repository)
     {
         _storageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -71,10 +71,3 @@ public class StartTaxLawIngestCommandHandler : ICommandHandler<StartTaxLawIngest
         return new Result<EtlTaskDocument> { Value = lawToIngestDocument };
     }    
 }
-
-/*
-         * using var memoryStream = new MemoryStream();
-
-        await blobDownloadInfo.Value.Content.CopyToAsync(memoryStream, cancellationToken);
-
-        return memoryStream.ToArray();*/

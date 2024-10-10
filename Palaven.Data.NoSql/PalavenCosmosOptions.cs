@@ -1,7 +1,7 @@
 ﻿using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 
-namespace Palaven.Data.Extensions;
+namespace Palaven.Data.NoSql;
 
 public class PalavenCosmosOptions
 {

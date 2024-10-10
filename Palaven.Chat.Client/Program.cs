@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Palaven.Chat.Contracts;
+using Palaven.Chat;
 using Palaven.Chat.Extensions;
 using Palaven.Data.Extensions;
 using Palaven.Model.Chat;

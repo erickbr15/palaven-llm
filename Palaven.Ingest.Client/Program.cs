@@ -1,11 +1,22 @@
 ﻿using Azure.Identity;
+using Liara.Azure.AI;
+using Liara.Azure.BlobStorage;
+using Liara.Clients.OpenAI;
+using Liara.Clients.Pinecone;
+using Liara.Common;
+using Liara.Common.Http;
+using Liara.CosmosDb;
+using Liara.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Palaven.Data.Extensions;
+using Palaven.Data.NoSql;
+using Palaven.Ingest;
 using Palaven.Ingest.Extensions;
-using Palaven.Ingest.Services;
+using Palaven.Model.Data.Documents;
+using Palaven.Model.Ingest;
 
 var hostBuilder = new HostBuilder()
     .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -26,12 +37,33 @@ var hostBuilder = new HostBuilder()
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddAIServices();
-        //services.AddDataServices();
-        services.AddIngestServices();        
+        var palavenCosmosOptions = new PalavenCosmosOptions();
+        hostContext.Configuration.Bind("CosmosDB", palavenCosmosOptions);
+
+        services.AddLiaraCommonServices();
+        services.AddLiaraAzureServices(hostContext.Configuration);
+        services.AddLiaraOpenAIServices();
+        services.AddLiaraPineconeServices();
+        services.AddNoSqlDataServices(palavenCosmosOptions);
+        services.AddIngestCommands();
     });
 
 var host = hostBuilder.Build();
+
+var service1 = host.Services.GetRequiredService<IHttpProxy>();
+var service2 = host.Services.GetRequiredService<IDocumentLayoutAnalyzerService>();
+var service3 = host.Services.GetRequiredService<IBlobStorageService>();
+var service4 = host.Services.GetRequiredService<IOpenAiServiceClient>();
+var service5 = host.Services.GetRequiredService<IPineconeServiceClient>();
+
+var service6 = host.Services.GetRequiredService<IDocumentRepository<EtlTaskDocument>>();
+/*
+var service8 = host.Services.GetRequiredService<IDocumentRepository<DatasetGenerationTaskDocument>>();
+var service9 = host.Services.GetRequiredService<IDocumentRepository<BronzeDocument>>();
+var service10 = host.Services.GetRequiredService<IDocumentRepository<SilverDocument>>();
+var service11 = host.Services.GetRequiredService<IDocumentRepository<GoldenDocument>>();*/
+var service12 = host.Services.GetRequiredService<ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument>>();
+
 
 
 // * CREATES THE BRONZE DOCUMENT

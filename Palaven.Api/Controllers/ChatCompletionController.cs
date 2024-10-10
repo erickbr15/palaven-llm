@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Palaven.Api.Model.ChatCompletion;
-using Palaven.Chat.Contracts;
+using Palaven.Chat;
 using Palaven.Model.Chat;
 
 namespace Palaven.Api.Controllers

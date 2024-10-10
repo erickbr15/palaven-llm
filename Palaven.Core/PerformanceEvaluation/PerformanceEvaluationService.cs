@@ -1,6 +1,6 @@
 ﻿using Liara.Common;
 using Palaven.Data.Sql.Services.Contracts;
-using Palaven.Model.Entities;
+using Palaven.Model.Data.Entities;
 using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Core.PerformanceEvaluation;

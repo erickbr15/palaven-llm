@@ -5,7 +5,7 @@ using Liara.Common;
 using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Model.Data.Documents;
-using Palaven.Model.Documents.Metadata;
+using Palaven.Model.Data.Documents.Metadata;
 using Palaven.Model.Ingest;
 using System.Net;
 
@@ -69,14 +69,24 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
     }
 
     private async Task ExtractDocumentPagesAsync(Guid traceId, StartTaxLawIngestTaskDocument taxLawToIngestDocument, int? latestExtractedPageNumber, CancellationToken cancellationToken)
-    {        
-        var documentContent = await _blobStorageService.ReadAsync(taxLawToIngestDocument.FileName, cancellationToken);
-                
+    {
+        var downloadBlobModel = new DownloadBlobModel
+        {
+            BlobName = taxLawToIngestDocument.FileName,
+            BlobContainerName = "lawdocs"
+        };
+
+        var blobDownloadInfo = await _blobStorageService.ReadAsync(downloadBlobModel, cancellationToken);
+
+        using var memoryStream = new MemoryStream();
+        await blobDownloadInfo!.Content.CopyToAsync(memoryStream, cancellationToken);
+        var documentContent = memoryStream.ToArray();
+       
         var startingPage = latestExtractedPageNumber.HasValue ? latestExtractedPageNumber.Value + 1 : 1;
 
-        for (var currentPage = startingPage; currentPage <= taxLawToIngestDocument.TotalNumberOfPages; currentPage += taxLawToIngestDocument.ChunkSizeExtractionData)
+        for (var currentPage = startingPage; currentPage <= 100; currentPage += 15)
         {
-            var endPage = currentPage + taxLawToIngestDocument.ChunkSizeExtractionData - 1;
+            var endPage = currentPage + 15 - 1;
             await ExtractAndSavePageChunkAsync(traceId, taxLawToIngestDocument, documentContent, startPage: currentPage, endPage, cancellationToken);
         }
     }
@@ -116,9 +126,7 @@ public class CreateBronzeDocumentCommandHandler : ICommandHandler<CreateBronzeDo
             Id = Guid.NewGuid().ToString(),
             TenantId = tenantId.ToString(),
             TraceId = traceId,
-            DocumentType = nameof(BronzeDocument),
-            LawDocumentVersion = taxLawToIngestDocument.LawDocumentVersion,
-            LawId = taxLawToIngestDocument.LawId,
+            DocumentType = nameof(BronzeDocument),            
             PageNumber = page.PageNumber
         };
 

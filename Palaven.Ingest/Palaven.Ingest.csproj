@@ -8,14 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.22.1" />
-    <PackageReference Include="Liara.Azure" Version="8.0.2" />
     <PackageReference Include="Liara.Clients" Version="8.0.1" />
     <PackageReference Include="Liara.Common" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Palaven.Data\Palaven.Data.csproj" />
+    <ProjectReference Include="..\..\liara-azure\Liara.Azure\Liara.Azure.csproj" />
+    <ProjectReference Include="..\Palaven.Data.NoSql\Palaven.Data.NoSql.csproj" />
     <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
   </ItemGroup>
 

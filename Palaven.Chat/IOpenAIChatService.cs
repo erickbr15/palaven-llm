@@ -1,6 +1,6 @@
 ﻿using Palaven.Model.Chat;
 
-namespace Palaven.Chat.Contracts;
+namespace Palaven.Chat;
 
 public interface IOpenAIChatService
 {
