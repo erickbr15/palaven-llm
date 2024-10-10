@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Liara.Clients" Version="8.0.1" />
-    <PackageReference Include="Liara.Common" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.43.1" />
+    <PackageReference Include="Liara.Clients" Version="8.0.3" />
+    <PackageReference Include="Liara.Common" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.44.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>
 
