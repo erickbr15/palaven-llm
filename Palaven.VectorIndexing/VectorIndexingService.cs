@@ -42,7 +42,7 @@ public class VectorIndexingService : IVectorIndexingService
         
         foreach (var goldenArticle in goldenArticles ?? new List<GoldenDocument>())
         {
-            var indexCreationResult = await _uploadGoldenArticleToVectorIndex.ExecuteAsync(new UploadGoldenArticleToVectorIndexCommand { TraceId = traceId, GoldenArticleId = new Guid(goldenArticle.Id) }, cancellationToken);
+            var indexCreationResult = await _uploadGoldenArticleToVectorIndex.ExecuteAsync(new UploadGoldenArticleToVectorIndexCommand { TraceId = traceId, GoldenArticleId = goldenArticle.Id }, cancellationToken);
             if (indexCreationResult.IsSuccess)
             {
                 var datasetGenerationTaskDocument = new DatasetGenerationTaskDocument
@@ -51,7 +51,7 @@ public class VectorIndexingService : IVectorIndexingService
                     TenantId = tenantId,
                     TraceId = traceId,
                     Task = "vector_index_creation",
-                    GoldenArticleId = new Guid(goldenArticle.Id),
+                    GoldenArticleId = goldenArticle.Id,
                     StartedAt = DateTime.Now,
                     FinishedAt = DateTime.Now
                 };

@@ -22,16 +22,6 @@ public static class ApplicationRootExtensions
             var client = provider.GetRequiredService<CosmosClient>();
 
             return new TaxLawIngestTaskDocumentRepository(client, containerOptions);
-        });        
-
-        services.AddTransient<IDocumentRepository<DatasetGenerationTaskDocument>>(provider => {
-
-            var containerId = typeof(DatasetGenerationTaskDocument).Name;
-            var containerOptions = cosmosOptions.ContainerOptions[containerId];
-            var client = provider.GetRequiredService<CosmosClient>();
-
-            return new DatasetGenerationTaskDocumentRepository(client, containerOptions);
-
         });
 
         services.AddTransient<IDocumentRepository<BronzeDocument>>(provider => {
@@ -42,6 +32,16 @@ public static class ApplicationRootExtensions
 
             return new BronzeDocumentRepository(client, containerOptions);
         });
+
+        services.AddTransient<IDocumentRepository<DatasetGenerationTaskDocument>>(provider => {
+
+            var containerId = typeof(DatasetGenerationTaskDocument).Name;
+            var containerOptions = cosmosOptions.ContainerOptions[containerId];
+            var client = provider.GetRequiredService<CosmosClient>();
+
+            return new DatasetGenerationTaskDocumentRepository(client, containerOptions);
+
+        });        
 
         services.AddTransient<IDocumentRepository<SilverDocument>>(provider => {
 

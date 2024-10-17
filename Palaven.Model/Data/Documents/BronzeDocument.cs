@@ -6,29 +6,14 @@ namespace Palaven.Model.Data.Documents;
 /// <summary>
 ///     Represents the full ETL bronze document
 /// </summary>
-public class BronzeDocument
-{
-    [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "tenantId")]
-    public string TenantId { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "trace_id")]
-    public Guid TraceId { get; set; }
-
-    [JsonProperty(PropertyName = "law_id")]
-    public Guid LawId { get; set; }
-
-    [JsonProperty(PropertyName = "law_document_version")]
-    public string LawDocumentVersion { get; set; } = default!;
-
+public class BronzeDocument : MedalDocument
+{    
     [JsonProperty(PropertyName = "page_number")]
     public int PageNumber { get; set; }
 
-    [JsonProperty(PropertyName = "lines")]
-    public IList<TaxLawDocumentLine> Lines { get; set; } = new List<TaxLawDocumentLine>();
+    [JsonProperty(PropertyName = "document_paragraphs")]
+    public IList<TaxLawDocumentParagraph> Paragraphs { get; set; } = new List<TaxLawDocumentParagraph>();    
 
-    [JsonProperty(PropertyName = "document_type")]
-    public string DocumentType { get; set; } = default!;
+    [JsonProperty(PropertyName = "metadata")]
+    public IDictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();  
 }

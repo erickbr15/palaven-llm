@@ -16,7 +16,7 @@ public class CreateEvaluationSessionCommandHandler : ICommandHandler<CreateEvalu
         _datasetDataService = datasetDataService ?? throw new ArgumentNullException(nameof(datasetDataService));
     }
 
-    public async Task<IResult<EvaluationSessionInfo?>> ExecuteAsync(CreateEvaluationSessionCommand command, CancellationToken cancellationToken)
+    public async Task<IResult<EvaluationSessionInfo>> ExecuteAsync(CreateEvaluationSessionCommand command, CancellationToken cancellationToken)
     {
         if (command == null)
         {
@@ -31,7 +31,7 @@ public class CreateEvaluationSessionCommandHandler : ICommandHandler<CreateEvalu
 
         await _performanceEvaluationDataService.SaveChangesAsync(cancellationToken);
 
-        return Result<EvaluationSessionInfo?>.Success(new EvaluationSessionInfo
+        return Result<EvaluationSessionInfo>.Success(new EvaluationSessionInfo
         {
             SessionId = newEvaluationSession.SessionId,
             DatasetId = newEvaluationSession.DatasetId,

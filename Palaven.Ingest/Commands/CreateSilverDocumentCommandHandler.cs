@@ -9,35 +9,51 @@ using Palaven.Model.Data.Documents.Metadata;
 using Palaven.Model.Ingest;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Palaven.Ingest.Commands;
 
 public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask>
 {
     private readonly IOpenAiServiceClient _openAiChatService;
-    private readonly IDocumentRepository<BronzeDocument> _lawPageDocumentRepository;
-    private readonly IDocumentRepository<SilverDocument> _articleDocumentRepository;
+    private readonly IDocumentRepository<EtlTaskDocument> _taskDocumentRepository;
+    private readonly IDocumentRepository<BronzeDocument> _bronzeStageRepository;
+    private readonly IDocumentRepository<SilverDocument> _silverStageRepository;
 
-    public CreateSilverDocumentCommandHandler(IOpenAiServiceClient openAiChatService,
-        IDocumentRepository<BronzeDocument> lawPageDocumentRepository, 
-        IDocumentRepository<SilverDocument> articleDocumentRepository)
+    public CreateSilverDocumentCommandHandler(IOpenAiServiceClient openAiChatService, IDocumentRepository<EtlTaskDocument> taskDocumentRepository,
+        IDocumentRepository<BronzeDocument> bronzeStageRepository, 
+        IDocumentRepository<SilverDocument> silverStageRepository)
     {
         _openAiChatService = openAiChatService ?? throw new ArgumentNullException(nameof(openAiChatService));
-        _lawPageDocumentRepository = lawPageDocumentRepository ?? throw new ArgumentNullException(nameof(lawPageDocumentRepository));
-        _articleDocumentRepository = articleDocumentRepository ?? throw new ArgumentNullException(nameof(articleDocumentRepository));
+        _taskDocumentRepository = taskDocumentRepository ?? throw new ArgumentNullException(nameof(taskDocumentRepository));
+        _bronzeStageRepository = bronzeStageRepository ?? throw new ArgumentNullException(nameof(bronzeStageRepository));
+        _silverStageRepository = silverStageRepository ?? throw new ArgumentNullException(nameof(silverStageRepository));
     }
 
     public async Task<IResult<TaxLawDocumentIngestTask>> ExecuteAsync(CreateSilverDocumentCommand inputModel, CancellationToken cancellationToken)
     {
-        var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
+        if (inputModel == null)
+        {
+            return Result<TaxLawDocumentIngestTask>.Fail(new List<ValidationError>(), new List<Exception> { new ArgumentNullException(nameof(inputModel)) });
+        }
 
-        var query = new QueryDefinition($"SELECT * FROM c WHERE c.TraceId = \"{inputModel.TraceId}\"");
+        var etlTask = await FetchLatestEtlTaskVersionAsync(inputModel.OperationId, cancellationToken);
+        if (etlTask == null)
+        {
+            return Result<TaxLawDocumentIngestTask>.Fail(new List<ValidationError>(), new List<Exception> { new InvalidOperationException("Unable to fetch the latest ETL task document.") });
+        }
 
-        var queryResults = await _lawPageDocumentRepository.GetAsync(query, continuationToken: null,
-            new QueryRequestOptions { PartitionKey = new PartitionKey(tenantId.ToString()) },
-            cancellationToken);
+        var isBronzeProcessCompleted = etlTask.Metadata.ContainsKey(EtlMetadataKeys.BronzeLayerCompleted) &&
+                                       bool.TryParse(etlTask.Metadata[EtlMetadataKeys.BronzeLayerCompleted], out var bronzeLayerCompleted) &&
+                                       bronzeLayerCompleted;
+        if (!isBronzeProcessCompleted)
+        {
+            return Result<TaxLawDocumentIngestTask>.Fail(new List<ValidationError>(), new List<Exception> { new InvalidOperationException("The bronze layer process is not completed.") });
+        }
 
-        var documentPages = queryResults.ToList();
+        var bronzeDocuments = await FetchBronzeDocumentsAsync(etlTask, cancellationToken);
+
+        /*
         var articles = await ExtractArticlesAsync(documentPages, cancellationToken);
 
         foreach (var article in articles)
@@ -45,11 +61,9 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
             article.Id = Guid.NewGuid().ToString();
             article.TenantId = tenantId.ToString();
             article.TraceId = inputModel.TraceId;
-            article.DocumentType = nameof(SilverDocument);
-            article.LawDocumentVersion = documentPages.FirstOrDefault()?.LawDocumentVersion ?? string.Empty;
-            article.LawId = documentPages.FirstOrDefault()?.LawId ?? Guid.Empty;
+            article.DocumentType = nameof(SilverDocument);            
 
-            var result = await _articleDocumentRepository.CreateAsync(article, new PartitionKey(tenantId.ToString()), itemRequestOptions: null, cancellationToken);
+            var result = await _silverStageRepository.CreateAsync(article, new PartitionKey(tenantId.ToString()), itemRequestOptions: null, cancellationToken);
 
             if (result.StatusCode != HttpStatusCode.Created)
             {
@@ -58,27 +72,70 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
         }
 
         return Result<TaxLawDocumentIngestTask>.Success(new TaxLawDocumentIngestTask { TraceId = inputModel.TraceId });
+        */
+        throw new NotImplementedException();
+    }
+
+    private async Task<EtlTaskDocument?> FetchLatestEtlTaskVersionAsync(Guid operationId, CancellationToken cancellationToken)
+    {
+        var query = new QueryDefinition($"SELECT * FROM c WHERE c.id = \"{operationId}\"");
+
+        var queryResults = await _taskDocumentRepository.GetAsync(
+            query,
+            continuationToken: null,
+            queryRequestOptions: null,
+            cancellationToken);
+
+        return queryResults.SingleOrDefault();
+    }
+
+    private async Task<IList<BronzeDocument>> FetchBronzeDocumentsAsync(EtlTaskDocument etlTaskDocument, CancellationToken cancellationToken)
+    {                        
+        var query = new QueryDefinition($"SELECT * FROM c WHERE c.trace_id = \"{etlTaskDocument.Id}\"");
+
+        var queryResults = await _bronzeStageRepository.GetAsync(query, 
+            continuationToken: null,
+            new QueryRequestOptions { PartitionKey = new PartitionKey(etlTaskDocument.TenantId.ToString()) },
+            cancellationToken);
+
+        return queryResults.ToList();
     }
 
     private async Task<IList<SilverDocument>> ExtractArticlesAsync(IList<BronzeDocument> pages, CancellationToken cancellationToken)
     {
-        var lines = new Queue<TaxLawDocumentLine>(pages.SelectMany(p => p.Lines).OrderBy(p=> p.PageNumber).ThenBy(p=>p.LineNumber));
-        var articleLines = new List<TaxLawDocumentLine>();
+        /*
+        var documentLines = pages
+            .SelectMany(p => p.Paragraphs)
+            .OrderBy(p => p.PageNumber)
+            .ThenBy(p => p.LineNumber);
+
+        var documentMetadata = pages[0].Metadata;
+
+        var linesProcessingQueue = new Queue<TaxLawDocumentParagraph>(documentLines);
+        var workingArticleLineList = new List<TaxLawDocumentParagraph>();
+        
         var articles = new List<SilverDocument>();
 
-        while (lines.Any())
+        while (linesProcessingQueue.Any())
         {
-            var line = lines.Dequeue();
+            var line = linesProcessingQueue.Dequeue();
             if (line.LineNumber == 1) 
             {
+                do
+                {
+                    line = linesProcessingQueue.Dequeue();
+                } while (linesProcessingQueue.Count > 0 && !string.Equals(line.Content, "Secretaría de Servicios Parlamentarios"));
+
+
+
                 while (true)
                 {
                     if (string.Equals(line.Content, "Secretaría de Servicios Parlamentarios"))
                     {
-                        line = lines.Dequeue();
+                        line = linesProcessingQueue.Dequeue();
                         break;
                     }
-                    line = lines.Dequeue();
+                    line = linesProcessingQueue.Dequeue();
                 }                
             }
 
@@ -89,28 +146,30 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
                 continue;
             }
             
-            if (line.Content.StartsWith("Artículo") && !articleLines.Any())
+            if (line.Content.StartsWith("Artículo") && !workingArticleLineList.Any())
             {
-                articleLines.Add(line);
+                workingArticleLineList.Add(line);
             }
             else if (line.Content.StartsWith("Artículo"))
             {
-                var article = await ExtractArticleAsync(articleLines, cancellationToken);
+                var article = await ExtractArticleAsync(workingArticleLineList, cancellationToken);
                 articles.Add(article);
 
-                articleLines.Clear();
-                articleLines.Add(line);                
+                workingArticleLineList.Clear();
+                workingArticleLineList.Add(line);                
             }
-            else if (articleLines.Any())
+            else if (workingArticleLineList.Any())
             {
-                articleLines.Add(line);
+                workingArticleLineList.Add(line);
             }
         }
 
         return articles;
+        */
+        throw new NotImplementedException();
     }
 
-    private async Task<SilverDocument> ExtractArticleAsync(IEnumerable<TaxLawDocumentLine> articleLines, CancellationToken cancellationToken)
+    private async Task<SilverDocument> ExtractArticleAsync(IEnumerable<TaxLawDocumentParagraph> articleLines, CancellationToken cancellationToken)
     {
         var articleContent = string.Join(Environment.NewLine, articleLines.Select(l=>l.Content.Trim()));
 
@@ -150,11 +209,11 @@ public class CreateSilverDocumentCommandHandler : ICommandHandler<CreateSilverDo
 
         var documentArticle = new SilverDocument
         {
-            ArticleLawId = completionResult!.Article,
+            ArticleId = completionResult!.Article,
             ArticleContent = completionResult.Content            
         };
 
-        (documentArticle.ArticleLines as List<TaxLawDocumentLine>)!.AddRange(articleLines);
+        (documentArticle.Lines as List<TaxLawDocumentParagraph>)!.AddRange(articleLines);
 
         return documentArticle;
     }

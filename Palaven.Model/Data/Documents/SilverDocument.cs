@@ -6,32 +6,20 @@ namespace Palaven.Model.Data.Documents;
 /// <summary>
 ///     Represents the full ETL silver document
 /// </summary>
-public class SilverDocument
+public class SilverDocument : MedalDocument
 {
-    [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "tenant_id")]
-    public string TenantId { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "trace_id")]
-    public Guid TraceId { get; set; }
-
-    [JsonProperty(PropertyName = "law_id")]
-    public Guid LawId { get; set; }
-
-    [JsonProperty(PropertyName = "law_document_version")]
-    public string LawDocumentVersion { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "article_law_id")]
-    public string ArticleLawId { get; set; } = default!;
+    /// <summary>
+    ///     Article law id. Example: Artículo 1
+    /// </summary>
+    [JsonProperty(PropertyName = "article_id")]
+    public string ArticleId { get; set; } = default!;
 
     [JsonProperty(PropertyName = "article_content")]
     public string ArticleContent { get; set; } = default!;
 
-    [JsonProperty(PropertyName = "article_lines")]
-    public IList<TaxLawDocumentLine> ArticleLines { get; set; } = new List<TaxLawDocumentLine>();
+    [JsonProperty(PropertyName = "document_lines")]
+    public IList<TaxLawDocumentParagraph> Lines { get; set; } = new List<TaxLawDocumentParagraph>();
 
-    [JsonProperty(PropertyName = "document_type")]
-    public string DocumentType { get; set; } = default!;
+    [JsonProperty(PropertyName = "metadata")]
+    public IDictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();
 }

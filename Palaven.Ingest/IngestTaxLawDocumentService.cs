@@ -3,6 +3,7 @@ using Liara.CosmosDb;
 using Microsoft.Azure.Cosmos;
 using Palaven.Model.Data.Documents;
 using Palaven.Model.Ingest;
+using Palaven.Model.VectorIndexing;
 
 namespace Palaven.Ingest;
 
@@ -12,7 +13,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
     private readonly IDocumentRepository<GoldenDocument> _goldenArticleDocumentRepository;
 
     private readonly ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> _startTaxLawIngestCommand;
-    private readonly ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask> _createBronzeDocumentCommandHandler;
+    private readonly ICommandHandler<CompleteBronzeDocumentCommand, TaxLawDocumentIngestTask> _createBronzeDocumentCommandHandler;
     private readonly ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask> _createSilverDocumentCommandHandler;
     private readonly ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask> _createGoldenDocumentCommandHandler;
 
@@ -20,7 +21,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
         IDocumentRepository<SilverDocument> articleDocumentRepository,
         IDocumentRepository<GoldenDocument> goldenArticleDocumentRepository,
         ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> startTaxLawIngestCommand,
-        ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask> createBronzeDocumentCommandHandler,
+        ICommandHandler<CompleteBronzeDocumentCommand, TaxLawDocumentIngestTask> createBronzeDocumentCommandHandler,
         ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask> createSilverDocumentCommandHandler,
         ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask> createGoldenDocumentCommandHandler)
     {
@@ -88,8 +89,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
 
         foreach (var article in articles)
         {
-            var articleId = new Guid(article.Id);
-            await _createGoldenDocumentCommandHandler.ExecuteAsync(new CreateGoldenDocumentCommand { TraceId = traceId, ArticleId = articleId }, cancellationToken);
+            await _createGoldenDocumentCommandHandler.ExecuteAsync(new CreateGoldenDocumentCommand { TraceId = traceId, ArticleId = article.Id }, cancellationToken);
         }
     }
 
@@ -100,7 +100,7 @@ public class IngestTaxLawDocumentService : IIngestTaxLawDocumentService
 
         foreach (var goldenArticle in goldenArticles)
         {
-            await _goldenArticleDocumentRepository.DeleteAsync(goldenArticle.Id, new PartitionKey(goldenArticle.TenantId), itemRequestOptions: null, cancellationToken);
+            await _goldenArticleDocumentRepository.DeleteAsync(goldenArticle.Id.ToString(), new PartitionKey(goldenArticle.TenantId.ToString()), itemRequestOptions: null, cancellationToken);
         }
     }
 }

@@ -61,7 +61,7 @@ public class UploadGoldenArticleToVectorIndexCommandHandler : ICommandHandler<Up
             var embeddings = await _openAiServiceClient.CreateEmbeddingsAsync(createEmbeddingsModel, CancellationToken.None);
 
             //TODO: Implement InstructionMetadata factory
-            var vector = (new PineconeVectorBuilder().NewWith(embeddings!.Data[0].EmbeddingVector, goldenArticle.Id, new InstructionMetadata())).Build();
+            var vector = (new PineconeVectorBuilder().NewWith(embeddings!.Data[0].EmbeddingVector, goldenArticle.Id.ToString(), new InstructionMetadata())).Build();
 
             vectors.Add(vector);
         }

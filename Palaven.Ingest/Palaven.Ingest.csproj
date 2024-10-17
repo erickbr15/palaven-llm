@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.22.1" />
-    <PackageReference Include="Liara.Azure" Version="8.0.5" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
+    <PackageReference Include="Azure.Storage.Queues" Version="12.20.1" />
+    <PackageReference Include="Liara.Azure" Version="8.0.8" />
     <PackageReference Include="Liara.Clients" Version="8.0.3" />
     <PackageReference Include="Liara.Common" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.6" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>
 
@@ -25,12 +27,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ChatGptPromptTemplates.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\EtlProcessDetails.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EtlProcessDetails.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Resources\ChatGptPromptTemplates.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ChatGptPromptTemplates.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\EtlProcessDetails.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>EtlProcessDetails.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

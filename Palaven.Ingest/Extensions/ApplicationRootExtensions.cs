@@ -6,17 +6,19 @@ using Palaven.Model.Data.Documents;
 using Palaven.Model;
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Azure;
 
 namespace Palaven.Ingest.Extensions;
 
 public static class ApplicationRootExtensions
 {    
     public static void AddIngestCommands(this IServiceCollection services)
-    {
-        services.AddOptions<BlobStorageOptions>().BindConfiguration("BlobStorage");
-        services.AddSingleton<ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument>, StartTaxLawIngestCommandHandler>();
+    {        
+        services.AddSingleton<ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument>, StartTaxLawIngestProcessCommandHandler>();
+        services.AddSingleton<ICommandHandler<StartBronzeDocumentCommand, string>, StartBronzeDocumentCommandHandler>();
+        services.AddSingleton<ICommandHandler<CompleteBronzeDocumentCommand, EtlTaskDocument>, CompleteBronzeDocumentCommandHandler>();
 
-        /*services.AddSingleton<ICommandHandler<CreateBronzeDocumentCommand, TaxLawDocumentIngestTask>, CreateBronzeDocumentCommandHandler>();
+        /*
         services.AddSingleton<ICommandHandler<CreateSilverDocumentCommand, TaxLawDocumentIngestTask>, CreateSilverDocumentCommandHandler>();
         services.AddSingleton<ICommandHandler<CreateGoldenDocumentCommand, TaxLawDocumentIngestTask>, CreateGoldenDocumentCommandHandler>();*/
     }

@@ -28,6 +28,8 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
 
     public async Task<IResult<TaxLawDocumentIngestTask>> ExecuteAsync(CreateGoldenDocumentCommand inputModel, CancellationToken cancellationToken)
     {
+        throw new NotImplementedException();
+        /*
         try
         {
             var tenantId = new Guid("69A03A54-4181-4D50-8274-D2D88EA911E4");
@@ -61,7 +63,7 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
                 LawAcronym = "LISR",
                 LawYear = 2024,                
                 LawDocumentVersion = article.LawDocumentVersion,
-                ArticleLawId = article.ArticleLawId,
+                ArticleLawId = article.ArticleId,
                 ArticleContent = article.ArticleContent,
                 DocumentType = nameof(GoldenDocument)
             };
@@ -84,9 +86,10 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
         catch (Exception ex)
         {
             return Result<TaxLawDocumentIngestTask>.Fail(new List<ValidationError>(), new List<Exception> { ex });
-        }        
+        }   */     
     }
 
+    /*
     private async Task PopulateOpenEndedQuestionInstructionsAsync(GoldenDocument goldenArticle, CancellationToken cancellationToken)
     {
         var systemPrompt = Resources.ChatGptPromptTemplates.SystemPromptOpenEndQuestionTemplate;
@@ -234,4 +237,5 @@ public class CreateGoldenDocumentCommandHandler : ICommandHandler<CreateGoldenDo
             });
         }
     }
+    */
 }

@@ -63,8 +63,7 @@ public class InstructionDatasetService : IInstructionDatasetService
                         Instruction = instruction.InstructionText,
                         Response = instruction.Response,
                         Category = instruction.Type,
-                        GoldenArticleId = new Guid(goldenArticle.Id),
-                        LawId = goldenArticle.LawId,
+                        GoldenArticleId = goldenArticle.Id,
                         //ArticleId = goldenArticle.ArticleLawId, TODO: Adjust the instruction entity to remove this property
                         DatasetId = model.DatasetId
                     };
@@ -80,7 +79,7 @@ public class InstructionDatasetService : IInstructionDatasetService
                     TenantId = tenantId,
                     TraceId = model.TraceId,
                     Task = "instruction_dataset_creation",
-                    GoldenArticleId = new Guid(goldenArticle.Id),
+                    GoldenArticleId = goldenArticle.Id,
                     StartedAt = DateTime.Now,
                     FinishedAt = DateTime.Now
                 };

@@ -8,8 +8,9 @@ using Palaven.Data.Extensions;
 using Palaven.Ingest.Extensions;
 using Liara.Common.Extensions;
 using Liara.Azure.Extensions;
+using Liara.Azure.Storage;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
 var appConfigurationEndpoint = Environment.GetEnvironmentVariable("AppConfigurationEndpoint");
 
@@ -45,6 +46,8 @@ builder.Services.AddRazorPages()
 var palavenCosmosOptions = new PalavenCosmosOptions();
 builder.Configuration.Bind("CosmosDB", palavenCosmosOptions);
 
+
+builder.Services.AddOptions<AzureStorageOptions>().BindConfiguration("AzureStorage");
 builder.Services.AddLiaraCommonServices();
 builder.Services.AddLiaraAzureServices(builder.Configuration);
 builder.Services.AddNoSqlDataServices(palavenCosmosOptions);

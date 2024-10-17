@@ -3,44 +3,20 @@ using Palaven.Model.Data.Documents.Metadata;
 
 namespace Palaven.Model.Data.Documents;
 
-public class GoldenDocument
+public class GoldenDocument : MedalDocument
 {
-    [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "tenantId")]
-    public string TenantId { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "trace_id")]
-    public Guid TraceId { get; set; }
-
-    [JsonProperty(PropertyName = "law_id")]
-    public Guid LawId { get; set; }
-
-    [JsonProperty(PropertyName = "law_name")]
-    public string LawName { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "law_acronym")]
-    public string LawAcronym { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "law_year")]
-    public int LawYear { get; set; }
-
-    [JsonProperty(PropertyName = "article_law_id")]
-    public string ArticleLawId { get; set; } = default!;
+    /// <summary>
+    ///     Article law id. Example: Artículo 1
+    /// </summary>
+    [JsonProperty(PropertyName = "article_id")]
+    public string ArticleId { get; set; } = default!;
 
     [JsonProperty(PropertyName = "article_content")]
     public string ArticleContent { get; set; } = default!;
 
-    [JsonProperty(PropertyName = "article_lines")]
-    public IList<TaxLawDocumentLine> ArticleLines { get; set; } = new List<TaxLawDocumentLine>();
+    [JsonProperty(PropertyName = "document_lines")]
+    public IList<TaxLawDocumentParagraph> Lines { get; set; } = new List<TaxLawDocumentParagraph>();
 
     [JsonProperty(PropertyName = "instructions")]
-    public IList<Instruction> Instructions { get; set; } = new List<Instruction>();
-
-    [JsonProperty(PropertyName = "law_document_version")]
-    public string LawDocumentVersion { get; set; } = default!;
-
-    [JsonProperty(PropertyName = "document_type")]
-    public string DocumentType { get; set; } = default!;
+    public IList<Instruction> Instructions { get; set; } = new List<Instruction>();    
 }

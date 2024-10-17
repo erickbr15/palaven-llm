@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Palaven.Ingest.Test": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AppConfigurationEndpoint": "https://palaven-config.azconfig.io"
+      }
+    }
+  }
+}
