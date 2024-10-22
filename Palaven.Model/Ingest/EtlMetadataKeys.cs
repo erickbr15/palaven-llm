@@ -11,5 +11,9 @@ public static class EtlMetadataKeys
     public const string BronzeLayerCompleted = "BronzeLayerCompleted";
     public const string BronzeLayerProcessed = "BronzeLayerProcessed";
     public const string BronzeLayerDetectedPageCount = "BronzeLayerDetectedPageCount";
-    public const string BronzeLayerIngestedPageCount = "BronzeLayerIngestedPageCount";        
+    public const string BronzeLayerIngestedPageCount = "BronzeLayerIngestedPageCount";   
+    public const string SilverLayerCompleted = "SilverLayerCompleted";
+    public const string SilverLayerProcessed = "SilverLayerProcessed";
+    public const string SilverLayerExtractedArticleCount = "SilverLayerExtractedArticleCount ";
+    public const string SilverLayerIngestedArticleCount = "SilverLayerIngestedArticleCount";
 }

@@ -39,7 +39,7 @@ public class CompleteBronzeDocumentFunction
     }
 
     [Function(nameof(CompleteBronzeDocumentFunction))]
-    public async Task Run([TimerTrigger("0 */3 * * * *")] TimerInfo timer, CancellationToken cancellationToken)
+    public async Task Run([TimerTrigger("0 */5 * * * *")] TimerInfo timer, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
@@ -49,6 +49,11 @@ public class CompleteBronzeDocumentFunction
         }
 
         var azureResponse = await _bronzeStageQueue.ReceiveMessageAsync(cancellationToken: cancellationToken);
+        if(azureResponse.Value is null)
+        {
+            return;
+        }
+
         if (!TryToDeserializeMessage(azureResponse.Value.Body.ToString(), out var analysisMessage))
         {
             await _bronzeStageQueue.DeleteMessageAsync(azureResponse.Value.MessageId, azureResponse.Value.PopReceipt, cancellationToken);

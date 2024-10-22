@@ -120,4 +120,7 @@
   <data name="BronzeStageStartDocumentAnalysis" xml:space="preserve">
     <value>Bronze stage. Document analysis is started using Azure AI Document Intelligence.</value>
   </data>
+  <data name="TaxLawDocumentHeadingStrings" xml:space="preserve">
+    <value>LEY DEL IMPUESTO SOBRE LA RENTA|Última Reforma DOF|ESTADOS UNIDOS MEXICANOS|CÁMARA DE DIPUTADOS DEL H. CONGRESO DE LA UNIÓN|Secretría General|Secretaría de Servicios Parlamentarios|UNIDOS|ESTADOS|NOS|Párrafo con fracciones|Párrafo adicionado|Párrafo reformado|ESTADO</value>
+  </data>
 </root>

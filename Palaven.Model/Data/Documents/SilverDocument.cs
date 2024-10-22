@@ -17,8 +17,8 @@ public class SilverDocument : MedalDocument
     [JsonProperty(PropertyName = "article_content")]
     public string ArticleContent { get; set; } = default!;
 
-    [JsonProperty(PropertyName = "document_lines")]
-    public IList<TaxLawDocumentParagraph> Lines { get; set; } = new List<TaxLawDocumentParagraph>();
+    [JsonProperty(PropertyName = "article_paragraphs")]
+    public IList<TaxLawDocumentParagraph> Paragraphs { get; set; } = new List<TaxLawDocumentParagraph>();
 
     [JsonProperty(PropertyName = "metadata")]
     public IDictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();

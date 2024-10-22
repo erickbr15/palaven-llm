@@ -12,6 +12,13 @@
       "type": "storage.emulator",
       "connectionId": "BlobStorage",
       "dynamicId": null
+    },
+    "storage3": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/westus/connectors/AzureStorageLawDocs_8B5C2E15FA",
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/palavenlawdocstorage",
+      "type": "storage.azure",
+      "connectionId": "AzureStorageLawDocs"
     }
   }
 }

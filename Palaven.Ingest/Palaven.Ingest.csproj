@@ -27,10 +27,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ChatGptPromptTemplates.resx</DependentUpon>
     </Compile>
-    <Compile Update="Resources\EtlProcessDetails.Designer.cs">
+    <Compile Update="Resources\Etl.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>EtlProcessDetails.resx</DependentUpon>
+      <DependentUpon>Etl.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -39,9 +39,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ChatGptPromptTemplates.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\EtlProcessDetails.resx">
+    <EmbeddedResource Update="Resources\Etl.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>EtlProcessDetails.Designer.cs</LastGenOutput>
+      <LastGenOutput>Etl.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

@@ -22,14 +22,14 @@ namespace Palaven.Ingest.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class EtlProcessDetails {
+    internal class Etl {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal EtlProcessDetails() {
+        internal Etl() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Palaven.Ingest.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Palaven.Ingest.Resources.EtlProcessDetails", typeof(EtlProcessDetails).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Palaven.Ingest.Resources.Etl", typeof(Etl).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,6 +66,15 @@ namespace Palaven.Ingest.Resources {
         internal static string BronzeStageStartDocumentAnalysis {
             get {
                 return ResourceManager.GetString("BronzeStageStartDocumentAnalysis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LEY DEL IMPUESTO SOBRE LA RENTA|Última Reforma DOF|ESTADOS UNIDOS MEXICANOS|CÁMARA DE DIPUTADOS DEL H. CONGRESO DE LA UNIÓN|Secretría General|Secretaría de Servicios Parlamentarios|UNIDOS|ESTADOS|NOS|Párrafo con fracciones|Párrafo adicionado|Párrafo reformado|ESTADO.
+        /// </summary>
+        internal static string TaxLawDocumentHeadingStrings {
+            get {
+                return ResourceManager.GetString("TaxLawDocumentHeadingStrings", resourceCulture);
             }
         }
     }

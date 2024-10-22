@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Etl.FunctionApp", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Palaven.Framework.Testing", "1 - Palaven.Framework.Testing", "{4A512285-0E5A-4C67-BBED-9984A880A8BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.Ingest.Test", "Palaven.Ingest.Test\Palaven.Ingest.Test.csproj", "{759D16E3-2E7E-47E1-A369-3BC4EC1F13BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Ingest.Test", "Palaven.Ingest.Test\Palaven.Ingest.Test.csproj", "{759D16E3-2E7E-47E1-A369-3BC4EC1F13BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using Liara.Azure.Storage;
 using Liara.Common;
 using Microsoft.Azure.Functions.Worker;
@@ -42,7 +43,7 @@ public class StartBronzeDocumentFunction
     }
 
     [Function(nameof(StartBronzeDocumentFunction))]
-    public async Task Run([QueueTrigger("document-analysis-queue", Connection = "AzureStorageLawDocs")] Azure.Storage.Queues.Models.QueueMessage message, CancellationToken cancellationToken)
+    public async Task Run([QueueTrigger("document-analysis-queue", Connection = "AzureStorageLawDocs")] QueueMessage message, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"C# Queue trigger function processed: {message.MessageText}");
 

@@ -33,16 +33,6 @@ public static class ApplicationRootExtensions
             return new BronzeDocumentRepository(client, containerOptions);
         });
 
-        services.AddTransient<IDocumentRepository<DatasetGenerationTaskDocument>>(provider => {
-
-            var containerId = typeof(DatasetGenerationTaskDocument).Name;
-            var containerOptions = cosmosOptions.ContainerOptions[containerId];
-            var client = provider.GetRequiredService<CosmosClient>();
-
-            return new DatasetGenerationTaskDocumentRepository(client, containerOptions);
-
-        });        
-
         services.AddTransient<IDocumentRepository<SilverDocument>>(provider => {
 
             var containerId = typeof(SilverDocument).Name;
@@ -60,6 +50,16 @@ public static class ApplicationRootExtensions
             var client = provider.GetRequiredService<CosmosClient>();
 
             return new GoldenDocumentRepository(client, containerOptions);
-        });        
+        });
+
+        services.AddTransient<IDocumentRepository<DatasetGenerationTaskDocument>>(provider => {
+
+            var containerId = typeof(DatasetGenerationTaskDocument).Name;
+            var containerOptions = cosmosOptions.ContainerOptions[containerId];
+            var client = provider.GetRequiredService<CosmosClient>();
+
+            return new DatasetGenerationTaskDocumentRepository(client, containerOptions);
+
+        });
     }
 }

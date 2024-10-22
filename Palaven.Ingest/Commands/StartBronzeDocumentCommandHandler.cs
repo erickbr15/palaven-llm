@@ -41,7 +41,7 @@ public class StartBronzeDocumentCommandHandler : ICommandHandler<StartBronzeDocu
             analyzeDocumentOptions,
             cancellationToken: cancellationToken);
         
-        etlTask.Details.Add($"{DateTime.UtcNow.ToString()}.{EtlProcessDetails.BronzeStageStartDocumentAnalysis}. OperationId: {analysisOperation.Id}");
+        etlTask.Details.Add($"{DateTime.UtcNow.ToString()}.{Etl.BronzeStageStartDocumentAnalysis}. OperationId: {analysisOperation.Id}");
         
         var dbResponse = await _taskDocumentRepository.UpsertAsync(etlTask, new PartitionKey(etlTask.UserId.ToString()), itemRequestOptions: null, cancellationToken);
         if(dbResponse.StatusCode != HttpStatusCode.OK)
