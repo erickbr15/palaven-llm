@@ -1,9 +1,6 @@
 using Azure.Identity;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using Palaven.Chat.Extensions;
-using Palaven.Data.Extensions;
-using Palaven.Data.Sql.Extensions;
-using Palaven.Core.Extensions;
+using Palaven.Infrastructure.Llm.Extensions;
 
 namespace Palaven.Api
 {
@@ -26,15 +23,8 @@ namespace Palaven.Api
                     kv.SetCredential(new DefaultAzureCredential());
                 });
             });
-            
-            builder.Services.AddAIServices();
-            //builder.Services.AddDataServices();
 
-            var sqlConnectionString = builder.Configuration.GetValue<string>("SqlDB:ConnectionString");
-            builder.Services.AddDataSqlServices(sqlConnectionString!);
-
-            builder.Services.AddChatServices();
-            builder.Services.AddPalavenCoreServices();
+            builder.Services.AddLlmServices();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

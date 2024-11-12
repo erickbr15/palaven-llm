@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Liara.Common" Version="8.2.1" />
+    <PackageReference Include="Liara.Persistence.Abstractions" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Palaven.Application.Abstractions\Palaven.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\Palaven.Application.Model\Palaven.Application.Model.csproj" />
+    <ProjectReference Include="..\Palaven.Infrastructure.Abstractions\Palaven.Infrastructure.Abstractions.csproj" />
+    <ProjectReference Include="..\Palaven.Infrastructure.Model\Palaven.Infrastructure.Model.csproj" />
+  </ItemGroup>
+
+</Project>

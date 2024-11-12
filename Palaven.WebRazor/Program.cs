@@ -3,12 +3,13 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using Palaven.Data.NoSql;
-using Palaven.Data.Extensions;
-using Palaven.Ingest.Extensions;
 using Liara.Common.Extensions;
-using Liara.Azure.Extensions;
-using Liara.Azure.Storage;
+using Liara.Integrations.Azure;
+using Palaven.Application.Ingest.Extensions;
+using Palaven.Infrastructure.MicrosoftAzure.Extensions;
+using Palaven.Persistence.CosmosDB.Extensions;
+using Liara.Integrations.Extensions;
+
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
@@ -43,15 +44,16 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
 
-var palavenCosmosOptions = new PalavenCosmosOptions();
-builder.Configuration.Bind("CosmosDB", palavenCosmosOptions);
-
-
-builder.Services.AddOptions<AzureStorageOptions>().BindConfiguration("AzureStorage");
 builder.Services.AddLiaraCommonServices();
-builder.Services.AddLiaraAzureServices(builder.Configuration);
-builder.Services.AddNoSqlDataServices(palavenCosmosOptions);
-builder.Services.AddIngestCommands();
+builder.Services.AddLiaraOpenAIServices();
+builder.Services.AddAzureAIServices(builder.Configuration);
+builder.Services.AddAzureStorageServices(builder.Configuration);
+
+var palavenDBConfig = builder.Configuration.GetSection("CosmosDB:Containers");
+var palavenDBConnectionString = builder.Configuration.GetConnectionString("PalavenCosmosDB");
+
+builder.Services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
+builder.Services.AddIngestServices();
 
 var app = builder.Build();
 

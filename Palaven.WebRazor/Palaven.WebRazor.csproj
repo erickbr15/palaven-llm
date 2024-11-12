@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.12.1" />
+    <PackageReference Include="Azure.Identity" Version="1.13.1" />
     <PackageReference Include="Liara.Azure" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.10" />
@@ -18,8 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Palaven.Data.NoSql\Palaven.Data.NoSql.csproj" />
-    <ProjectReference Include="..\Palaven.Ingest\Palaven.Ingest.csproj" />
+    <ProjectReference Include="..\Palaven.Application.Abstractions\Palaven.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\Palaven.Application.Ingest\Palaven.Application.Ingest.csproj" />
+    <ProjectReference Include="..\Palaven.Application.Model\Palaven.Application.Model.csproj" />
+    <ProjectReference Include="..\Palaven.Infrastructure.MicrosoftAzure\Palaven.Infrastructure.MicrosoftAzure.csproj" />
+    <ProjectReference Include="..\Palaven.Persistence.CosmosDB\Palaven.Persistence.CosmosDB.csproj" />
   </ItemGroup>
 
 </Project>

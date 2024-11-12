@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Palaven.Api.Model.EvaluationSession;
-using Palaven.Core.Datasets;
-using Palaven.Core.PerformanceEvaluation;
+using Palaven.Application.Abstractions.DatasetManagement;
+using Palaven.Application.Abstractions.PerformanceMetrics;
+using Palaven.Application.Model.PerformanceEvaluation;
+using Palaven.Application.Model.PerformanceMetrics;
+using Palaven.Application.PerformanceEvaluation;
+using Palaven.Infrastructure.Model.PerformanceEvaluation;
 using Palaven.Model.Datasets;
-using Palaven.Model.PerformanceEvaluation;
 
 namespace Palaven.Api.Controllers
 {
@@ -12,11 +15,14 @@ namespace Palaven.Api.Controllers
     public class EvaluationSessionController : ControllerBase
     {
         private readonly IPerformanceEvaluationService _performanceEvaluationService;
+        private readonly IPerformanceMetricsService _performanceMetricsService;
         private readonly IInstructionDatasetService _datasetInstructionService;
 
-        public EvaluationSessionController(IPerformanceEvaluationService performanceEvaluationService, IInstructionDatasetService datasetInstructionService)
+        public EvaluationSessionController(IPerformanceEvaluationService performanceEvaluationService, IPerformanceMetricsService performanceMetricsService, 
+            IInstructionDatasetService datasetInstructionService)
         {
             _performanceEvaluationService = performanceEvaluationService ?? throw new ArgumentNullException(nameof(performanceEvaluationService));
+            _performanceMetricsService = performanceMetricsService ?? throw new ArgumentNullException(nameof(performanceMetricsService));
             _datasetInstructionService = datasetInstructionService ?? throw new ArgumentNullException(nameof(datasetInstructionService));
         }        
 
@@ -56,7 +62,7 @@ namespace Palaven.Api.Controllers
         [HttpGet("{id}/dataset/instructions")]
         public async Task<IActionResult> GetInstructionsDatasetAsync([FromRoute]Guid id, [FromQuery]int? batchNumber, CancellationToken cancellationToken)
         {
-            var queryModel = new FetchInstructionsDataset { SessionId = id, BatchNumber = batchNumber ?? 1 };
+            var queryModel = new FetchInstructionsDatasetRequest { SessionId = id, BatchNumber = batchNumber ?? 1 };
 
             var queryResult = await _datasetInstructionService.FetchInstructionsDatasetAsync(queryModel, cancellationToken);
 
@@ -145,7 +151,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var command = new UpsertBertScoreBatchEvaluationCommand
+            var command = new UpsertBertScoreBatchEvaluationRequest
             {
                 SessionId = id,
                 EvaluationExercise = evaluationExercise.ToLower(),
@@ -155,7 +161,7 @@ namespace Palaven.Api.Controllers
                 F1 = inputModel.F1
             };
             
-            var upsertResult = await _performanceEvaluationService.UpsertBertscoreBatchEvaluationAsync(command, cancellationToken);
+            var upsertResult = await _performanceMetricsService.UpsertBertscoreBatchEvaluationAsync(command, cancellationToken);
 
             if (!upsertResult.IsSuccess)
             {
@@ -173,7 +179,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var metrics = _performanceEvaluationService.FetchEvaluationSessionBertscoreMetrics(id, evaluationExercise.ToLower());
+            var metrics = _performanceMetricsService.FetchEvaluationSessionBertscoreMetrics(id, evaluationExercise.ToLower());
 
             return Ok(metrics);
         }
@@ -191,7 +197,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var commands = inputModel.Select(inputModel => new UpsertRougeScoreBatchEvaluationCommand
+            var commands = inputModel.Select(inputModel => new UpsertRougeScoreBatchEvaluationRequest
             {
                 SessionId = id,
                 EvaluationExercise = evaluationExercise.ToLower(),
@@ -202,7 +208,7 @@ namespace Palaven.Api.Controllers
                 F1 = inputModel.F1
             }).ToList();
 
-            var upsertResult = await _performanceEvaluationService.UpsertRougeScoreBatchEvaluationAsync(commands, cancellationToken);
+            var upsertResult = await _performanceMetricsService.UpsertRougeScoreBatchEvaluationAsync(commands, cancellationToken);
 
             if (!upsertResult.IsSuccess)
             {
@@ -220,7 +226,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var metrics = _performanceEvaluationService.FetchEvaluationSessionRougeScoreMetrics(id, evaluationExercise.ToLower(), rougeType);
+            var metrics = _performanceMetricsService.FetchEvaluationSessionRougeScoreMetrics(id, evaluationExercise.ToLower(), rougeType);
             
             return Ok(metrics);
         }
@@ -238,7 +244,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var command = new UpsertBleuBatchEvaluationCommand
+            var command = new UpsertBleuBatchEvaluationRequest
             {
                 SessionId = id,
                 EvaluationExercise = evaluationExercise.ToLower(),
@@ -246,7 +252,7 @@ namespace Palaven.Api.Controllers
                 BleuScore = inputModel.BleuScore
             };            
 
-            var upsertResult = await _performanceEvaluationService.UpsertBleuBatchEvaluationAsync(command, cancellationToken);
+            var upsertResult = await _performanceMetricsService.UpsertBleuBatchEvaluationAsync(command, cancellationToken);
 
             if (!upsertResult.IsSuccess)
             {
@@ -264,7 +270,7 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"Invalid evaluation exercise {evaluationExercise}");
             }
 
-            var metrics = _performanceEvaluationService.FetchEvaluationSessionBleuMetrics(id, evaluationExercise.ToLower());
+            var metrics = _performanceMetricsService.FetchEvaluationSessionBleuMetrics(id, evaluationExercise.ToLower());
 
             return Ok(metrics);
         }

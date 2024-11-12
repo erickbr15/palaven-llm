@@ -1,16 +1,18 @@
 using Azure.Identity;
-using Liara.Azure.Extensions;
-using Liara.Azure.Storage;
-using Liara.Clients.Extensions;
 using Liara.Common.Extensions;
+using Liara.Integrations.Azure;
+using Liara.Integrations.Extensions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Palaven.Data.Extensions;
-using Palaven.Data.NoSql;
-using Palaven.Ingest.Extensions;
+using Palaven.Application.Ingest.Extensions;
+using Palaven.Infrastructure.MicrosoftAzure.Extensions;
+using Palaven.Infrastructure.VectorIndexing.Extensions;
+using Palaven.Persistence.CosmosDB.Extensions;
+using Palaven.VectorIndexing.Extensions;
+
 
 var host = new HostBuilder()    
     .ConfigureFunctionsWebApplication()
@@ -30,21 +32,26 @@ var host = new HostBuilder()
         });
     })
     .ConfigureServices((hostContext, services) =>
-    {        
-        var palavenCosmosOptions = new PalavenCosmosOptions();
-        hostContext.Configuration.Bind("CosmosDB", palavenCosmosOptions);
-
-        services.AddOptions<AzureStorageOptions>().BindConfiguration("AzureStorage");
-
-        services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();
-
+    {
         services.AddLiaraCommonServices();
-        services.AddLiaraAzureServices(hostContext.Configuration);
         services.AddLiaraOpenAIServices();
         services.AddLiaraPineconeServices();
-        services.AddNoSqlDataServices(palavenCosmosOptions);
-        services.AddIngestCommands();
+
+        services.AddAzureAIServices(hostContext.Configuration);
+        services.AddAzureStorageServices(hostContext.Configuration);
+
+        var palavenDBConfig = hostContext.Configuration.GetSection("CosmosDB:Containers");
+        var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
+
+        services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
+        
+        services.AddIngestServices();
+        services.AddVectorIndexingServices();
+        services.AddPalavenVectorIndexingServices();
+
+
+        services.AddApplicationInsightsTelemetryWorkerService();
+        services.ConfigureFunctionsApplicationInsights();                
     })
     .Build();
 

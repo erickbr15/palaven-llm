@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Liara.Integrations" Version="8.2.4" />
+    <PackageReference Include="Liara.Persistence.Abstractions" Version="8.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Palaven.Infrastructure.Abstractions\Palaven.Infrastructure.Abstractions.csproj" />
+    <ProjectReference Include="..\Palaven.Persistence.CosmosDB\Palaven.Persistence.CosmosDB.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\ChatGptPromptTemplates.Designer.cs">
+      <DependentUpon>ChatGptPromptTemplates.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\GemmaPromptTemplates.Designer.cs">
+      <DependentUpon>GemmaPromptTemplates.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\ChatGptPromptTemplates.resx">
+      <LastGenOutput>ChatGptPromptTemplates.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\GemmaPromptTemplates.resx">
+      <LastGenOutput>GemmaPromptTemplates.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

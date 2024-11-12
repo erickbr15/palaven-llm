@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Palaven.Api.Model.ChatCompletion;
-using Palaven.Chat;
-using Palaven.Model.Chat;
+using Palaven.Infrastructure.Abstractions.AI.Llm;
+using Palaven.Infrastructure.Model.AI.Llm;
+using Palaven.Infrastructure.Model.Persistence.Documents;
 
 namespace Palaven.Api.Controllers
 {
@@ -9,11 +10,13 @@ namespace Palaven.Api.Controllers
     [ApiController]
     public class ChatCompletionController : ControllerBase
     {
-        private readonly IGemmaChatService _gemmaChatService;
+        private readonly IPromptEngineeringService<string> _promptEngineeringService;
+        private readonly IRetrievalService _retrievalService;
 
-        public ChatCompletionController(IGemmaChatService gemmaChatService)
+        public ChatCompletionController(IPromptEngineeringService<string> promptEngineeringService, IRetrievalService retrievalService)
         {
-            _gemmaChatService = gemmaChatService ?? throw new ArgumentNullException(nameof(gemmaChatService));
+            _promptEngineeringService = promptEngineeringService ?? throw new ArgumentNullException(nameof(promptEngineeringService));
+            _retrievalService = retrievalService ?? throw new ArgumentNullException(nameof(retrievalService));
         }
 
         [Consumes("multipart/form-data")]
@@ -25,17 +28,19 @@ namespace Palaven.Api.Controllers
                 return BadRequest($"The LLM {largeLanguageModel} is not supported for this operation.");
             }
 
-            var command = new CreateAugmentedQueryPromptCommand
+            var retrievalOptions = new RetrievalOptions
             {
-                Query = inputModel.Query,
-                TopK = inputModel.TopK,
-                MinMatchScore = inputModel.MinMatchScore,
-                UserId = Guid.NewGuid()
+                IncludeValues = true,
+                MinimumMatchScore = inputModel.MinMatchScore,
+                Namespace = "palaven",
+                TopK = inputModel.TopK               
             };
 
-            var chatMessage = await _gemmaChatService.CreateAugmentedQueryPromptAsync(command, CancellationToken.None);
+            var relatedDocuments = await _retrievalService.RetrieveRelatedDocumentsAsync<GoldenDocument>(new List<string> { inputModel.Query }, retrievalOptions, CancellationToken.None);
+            
+            var augmentedPrompt = _promptEngineeringService.CreateAugmentedQueryPrompt(inputModel.Query, relatedDocuments);            
 
-            return Ok(chatMessage);
+            return Ok(augmentedPrompt);
         }
 
         [Consumes("multipart/form-data")]
@@ -45,17 +50,11 @@ namespace Palaven.Api.Controllers
             if(!string.Equals(largeLanguageModel, "google-gemma", StringComparison.OrdinalIgnoreCase))
             {
                 return BadRequest($"The LLM {largeLanguageModel} is not supported for this operation.");
-            }
+            }            
 
-            var query = new ChatMessage
-            {
-                Prompt = inputModel.Query,
-                UserId = Guid.NewGuid().ToString()
-            };
+            var prompt = _promptEngineeringService.CreateSimpleQueryPrompt(inputModel.Query);
 
-            var chatMessage = _gemmaChatService.CreateSimpleQueryPrompt(query);
-
-            return Ok(chatMessage);
+            return Ok(prompt);
         }
     }
 }

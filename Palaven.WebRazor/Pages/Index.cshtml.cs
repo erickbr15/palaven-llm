@@ -4,20 +4,19 @@ using Microsoft.Identity.Web;
 using Microsoft.Graph;
 using Palaven.WebRazor2.Model;
 using Palaven.WebRazor2.Utilities;
-using Liara.Common;
-using Palaven.Model.Data.Documents;
-using Palaven.Model.Ingest;
+using Palaven.Application.Abstractions.Ingest;
+using Palaven.Application.Model.Ingest;
 
 namespace Palaven.WebRazor2.Pages
 {
     [AuthorizeForScopes(ScopeKeySection = "MicrosoftGraph:Scopes")]
-    public class IndexModel(ILogger<IndexModel> logger, GraphServiceClient graphServiceClient, ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> startIngestCommandHandler) : PageModel
+    public class IndexModel(ILogger<IndexModel> logger, GraphServiceClient graphServiceClient, IStartIngestionChoreographyService startIngestService) : PageModel
     {
         private readonly long _fileSizeLimit = 4000000;
         private readonly string[] _permittedExtensions = { ".pdf" };
         private readonly GraphServiceClient _graphServiceClient = graphServiceClient ?? throw new ArgumentNullException(nameof(graphServiceClient));
         private readonly ILogger<IndexModel> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        private readonly ICommandHandler<StartTaxLawIngestCommand, EtlTaskDocument> _startIngestCommandHandler = startIngestCommandHandler ?? throw new ArgumentNullException(nameof(startIngestCommandHandler));
+        private readonly IStartIngestionChoreographyService _startIngestService = startIngestService ?? throw new ArgumentNullException(nameof(startIngestService));
 
         [BindProperty]
         public BufferedSingleFile InputModel { get; set; }
@@ -63,7 +62,7 @@ namespace Palaven.WebRazor2.Pages
                 FileContent = formFile.Content
             };
 
-            var result = await _startIngestCommandHandler.ExecuteAsync(startIngestCommand, cancellationToken: CancellationToken.None);
+            var result = await _startIngestService.StartIngestionAsync(startIngestCommand, cancellationToken: CancellationToken.None);
 
             // **WARNING!**
             // In the following example, the file is saved without

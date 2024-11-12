@@ -10,11 +10,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CreateSilverDocumentTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Resources\LISR-2024.pdf" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.13.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Liara.Common" Version="8.2.1" />
+    <PackageReference Include="Liara.Integrations" Version="8.2.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
@@ -23,9 +30,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Palaven.Data.NoSql\Palaven.Data.NoSql.csproj" />
-    <ProjectReference Include="..\Palaven.Ingest\Palaven.Ingest.csproj" />
-    <ProjectReference Include="..\Palaven.Model\Palaven.Model.csproj" />
+    <ProjectReference Include="..\Palaven.Application.Abstractions\Palaven.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\Palaven.Application.Ingest\Palaven.Application.Ingest.csproj" />
+    <ProjectReference Include="..\Palaven.Application.Model\Palaven.Application.Model.csproj" />
+    <ProjectReference Include="..\Palaven.Application.VectorIndexing\Palaven.Application.VectorIndexing.csproj" />
+    <ProjectReference Include="..\Palaven.Infrastructure.Abstractions\Palaven.Infrastructure.Abstractions.csproj" />
+    <ProjectReference Include="..\Palaven.Infrastructure.MicrosoftAzure\Palaven.Infrastructure.MicrosoftAzure.csproj" />
+    <ProjectReference Include="..\Palaven.Infrastructure.VectorIndexing\Palaven.Infrastructure.VectorIndexing.csproj" />
+    <ProjectReference Include="..\Palaven.Persistence.CosmosDB\Palaven.Persistence.CosmosDB.csproj" />
   </ItemGroup>
 
   <ItemGroup>
