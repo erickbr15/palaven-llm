@@ -18,7 +18,7 @@ public class CurateArticlesFunction
     }
 
     [Function(nameof(CurateArticlesFunction))]
-    public async Task Run([QueueTrigger("curate-articles-queue", Connection = "AzureStorageLawDocs")] QueueMessage message, FunctionContext context)
+    public async Task RunAsync([QueueTrigger("curate-articles-queue")] QueueMessage message, FunctionContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Queue trigger function [curate-articles-queue] started: {message.MessageText}");
 
@@ -39,7 +39,7 @@ public class CurateArticlesFunction
             PopReceipt = message.PopReceipt
         };
 
-        var result = await _choreographyService.CurateArticlesAsync(curateArticleMessage, context.CancellationToken);
+        var result = await _choreographyService.CurateArticlesAsync(curateArticleMessage, cancellationToken);
 
         if (result.HasErrors)
         {

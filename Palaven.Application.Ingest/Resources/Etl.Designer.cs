@@ -70,6 +70,150 @@ namespace Palaven.Application.Ingest.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred during the process. Operation ID: {0}.
+        /// </summary>
+        internal static string NotificacionEtlError {
+            get {
+                return ResourceManager.GetString("NotificacionEtlError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process to curate an articles batch was invoked successfully. Operation ID {0}. Message ID: {1}.
+        /// </summary>
+        internal static string NotificationArticleCurationInvoked {
+            get {
+                return ResourceManager.GetString("NotificationArticleCurationInvoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process to curate an articles batch by AI model finishes successfully. Operation ID {0}. Message ID {1}.
+        /// </summary>
+        internal static string NotificationArticleCurationSuccess {
+            get {
+                return ResourceManager.GetString("NotificationArticleCurationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred during the document analysis process. OperationId: {0}.
+        /// </summary>
+        internal static string NotificationDocumentAnalysisError {
+            get {
+                return ResourceManager.GetString("NotificationDocumentAnalysisError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The choreography service to start the document analysis has been invoked. OperationId: {0}.
+        /// </summary>
+        internal static string NotificationDocumentAnalysisInvoked {
+            get {
+                return ResourceManager.GetString("NotificationDocumentAnalysisInvoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The document analysis started successfully in Azure. Document analysis operation id: {0}.
+        /// </summary>
+        internal static string NotificationDocumentAnalysisStartedInAzure {
+            get {
+                return ResourceManager.GetString("NotificationDocumentAnalysisStartedInAzure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The choreography service finishes the process successfully. The extract document pages message was enqueueded. OperationId {0}.
+        /// </summary>
+        internal static string NotificationDocumentAnalysisSuccess {
+            get {
+                return ResourceManager.GetString("NotificationDocumentAnalysisSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process to extract articles from pages was invoked successfully. Operation ID {0}.
+        /// </summary>
+        internal static string NotificationExtractArticlesInvoked {
+            get {
+                return ResourceManager.GetString("NotificationExtractArticlesInvoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process to extract articles from pages finishes successfully. The messages to request the article curation by AI is enqueued. Operation ID {0}.
+        /// </summary>
+        internal static string NotificationExtractArticlesSuccess {
+            get {
+                return ResourceManager.GetString("NotificationExtractArticlesSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The document analysis process by Azure was completed. Analysis operation ID {0}.
+        /// </summary>
+        internal static string NotificationExtractPagesAzureAnalysisCompleted {
+            get {
+                return ResourceManager.GetString("NotificationExtractPagesAzureAnalysisCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The document analysis process by Azure is still in progress. Analysis operation ID {0}..
+        /// </summary>
+        internal static string NotificationExtractPagesAzureAnalysisIncomplete {
+            get {
+                return ResourceManager.GetString("NotificationExtractPagesAzureAnalysisIncomplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The extract document pages process was invoked. OperationId {0}..
+        /// </summary>
+        internal static string NotificationExtractPagesInvoked {
+            get {
+                return ResourceManager.GetString("NotificationExtractPagesInvoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process to extract the pages finishes successfully. The message to extract the articles from pages was enqueueded. Operation ID {0}.
+        /// </summary>
+        internal static string NotificationExtractPagesSuccess {
+            get {
+                return ResourceManager.GetString("NotificationExtractPagesSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process to generate the golden instructions was invoked successfully. Operation ID {0}. Message ID: {1}.
+        /// </summary>
+        internal static string NotificationGenerateInstructionsInvoked {
+            get {
+                return ResourceManager.GetString("NotificationGenerateInstructionsInvoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process to generate the golden instructions finishes successfully. Operation ID {0}. Message ID: {1}.
+        /// </summary>
+        internal static string NotificationGenerateInstructionsSuccess {
+            get {
+                return ResourceManager.GetString("NotificationGenerateInstructionsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ingest process started successfully. Etl task created in CosmosDB [Id: {0}]. PDF file stored in etl-inbox blob storage [File:{1}]. Message to start document analysis was enqueued..
+        /// </summary>
+        internal static string NotificationStartTaxLawIngest {
+            get {
+                return ResourceManager.GetString("NotificationStartTaxLawIngest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LEY DEL IMPUESTO SOBRE LA RENTA|Última Reforma DOF|ESTADOS UNIDOS MEXICANOS|CÁMARA DE DIPUTADOS DEL H. CONGRESO DE LA UNIÓN|Secretría General|Secretaría de Servicios Parlamentarios|UNIDOS|ESTADOS|NOS|Párrafo con fracciones|Párrafo adicionado|Párrafo reformado|ESTADO.
         /// </summary>
         internal static string TaxLawDocumentHeadingStrings {

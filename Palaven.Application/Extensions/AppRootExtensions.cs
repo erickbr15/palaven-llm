@@ -11,6 +11,7 @@ using Palaven.Application.DatasetManagement;
 using Palaven.Application.PerformanceEvaluation;
 using Palaven.Application.Abstractions.PerformanceMetrics;
 using Palaven.Application.PerformanceMetrics;
+using Palaven.Application.DatasetsManagement;
 
 namespace Palaven.Application.Extensions;
 
@@ -21,6 +22,7 @@ public static class AppRootExtensions
         services.AddSingleton<ICommandHandler<CreateInstructionDatasetCommand>, CreateInstructionDatasetCommandHandler>();
         services.AddSingleton<IFineTuningDatasetService,FineTuningDatasetService>();
         services.AddSingleton<IInstructionDatasetService, InstructionDatasetService>();
+        services.AddSingleton<ICreateInstructionDatasetChoreographyService, CreateInstructionDatasetChoreographyService>();
 
         return services;
     }

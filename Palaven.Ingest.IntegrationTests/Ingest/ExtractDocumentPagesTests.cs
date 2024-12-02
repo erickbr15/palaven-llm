@@ -9,17 +9,17 @@ using Palaven.Application.Abstractions.Ingest;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.Model.Messaging;
-using Palaven.Application.Ingest.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
-using Liara.Integrations.Extensions;
+using Palaven.Application.Ingest.Extensions;
+using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
-public class CurateArticleTests
+public class ExtractDocumentPagesTests
 {
     private readonly IHost _host;
 
-    public CurateArticleTests()
+    public ExtractDocumentPagesTests()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -42,7 +42,6 @@ public class CurateArticleTests
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddLiaraCommonServices();
-                services.AddLiaraOpenAIServices();
                 services.AddAzureAIServices(hostContext.Configuration);
                 services.AddAzureStorageServices(hostContext.Configuration);
 
@@ -50,21 +49,22 @@ public class CurateArticleTests
                 var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
+                services.AddNotificationService();
                 services.AddIngestServices();
             }).Build();
     }
 
     [Fact]
-    public async Task CurateArticle_Run_WithNoErrors()
+    public async Task CreateBronzeLayer_Run_WithNoErrors()
     {
         var queueMessageService = _host.Services.GetRequiredService<IMessageQueueService>();
-        var coreographyService = _host.Services.GetRequiredService<IArticlesCurationChoreographyService>();
+        var coreographyService = _host.Services.GetRequiredService<IDocumentPagesExtractionChoreographyService>();
 
-        var message = await queueMessageService.ReceiveMessageAsync<CurateArticlesMessage>(cancellationToken: CancellationToken.None);
+        var message = await queueMessageService.ReceiveMessageAsync<ExtractDocumentPagesMessage>(cancellationToken: CancellationToken.None);
 
-        var result = await coreographyService.CurateArticlesAsync(message, CancellationToken.None);
+        var result = await coreographyService.ExtractPagesAsync(message, CancellationToken.None);
 
         Assert.NotNull(result);
-        Assert.False(result.HasErrors);
+        Assert.True(result.IsSuccess);
     }
 }

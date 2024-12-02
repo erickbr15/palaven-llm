@@ -18,7 +18,7 @@ public class ExtractArticleParagraphsFunction
     }
 
     [Function(nameof(ExtractArticleParagraphsFunction))]
-    public async Task Run([QueueTrigger("extract-article-paragraphs-queue", Connection = "AzureStorageLawDocs")] QueueMessage message, FunctionContext context)
+    public async Task RunAsync([QueueTrigger("extract-article-paragraphs-queue")] QueueMessage message, FunctionContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"C# Queue trigger function [extract-article-paragraphs-queue] started: {message.MessageText}");
 
@@ -39,7 +39,7 @@ public class ExtractArticleParagraphsFunction
             PopReceipt = message.PopReceipt
         };
 
-        var result = await _choreographyService.ExtractArticleParagraphsAsync(palavenMessage, context.CancellationToken);
+        var result = await _choreographyService.ExtractArticleParagraphsAsync(palavenMessage, cancellationToken);
 
         if (result.HasErrors)
         {

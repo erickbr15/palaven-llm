@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Palaven.Ingest.FunctionApp": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7122",
+      "launchBrowser": false
+    }
+  }
+}

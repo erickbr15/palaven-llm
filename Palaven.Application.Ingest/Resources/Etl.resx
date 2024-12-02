@@ -126,4 +126,52 @@
   <data name="TaxLawInvalidArticleIds" xml:space="preserve">
     <value>Artículo adicionado</value>
   </data>
+  <data name="NotificationStartTaxLawIngest" xml:space="preserve">
+    <value>The ingest process started successfully. Etl task created in CosmosDB [Id: {0}]. PDF file stored in etl-inbox blob storage [File:{1}]. Message to start document analysis was enqueued.</value>
+  </data>
+  <data name="NotificationDocumentAnalysisInvoked" xml:space="preserve">
+    <value>The choreography service to start the document analysis has been invoked. OperationId: {0}</value>
+  </data>
+  <data name="NotificationDocumentAnalysisStartedInAzure" xml:space="preserve">
+    <value>The document analysis started successfully in Azure. Document analysis operation id: {0}</value>
+  </data>
+  <data name="NotificationDocumentAnalysisSuccess" xml:space="preserve">
+    <value>The choreography service finishes the process successfully. The extract document pages message was enqueueded. OperationId {0}</value>
+  </data>
+  <data name="NotificationDocumentAnalysisError" xml:space="preserve">
+    <value>An error occurred during the document analysis process. OperationId: {0}</value>
+  </data>
+  <data name="NotificationExtractPagesInvoked" xml:space="preserve">
+    <value>The extract document pages process was invoked. OperationId {0}.</value>
+  </data>
+  <data name="NotificationExtractPagesAzureAnalysisCompleted" xml:space="preserve">
+    <value>The document analysis process by Azure was completed. Analysis operation ID {0}</value>
+  </data>
+  <data name="NotificationExtractPagesAzureAnalysisIncomplete" xml:space="preserve">
+    <value>The document analysis process by Azure is still in progress. Analysis operation ID {0}.</value>
+  </data>
+  <data name="NotificationExtractPagesSuccess" xml:space="preserve">
+    <value>The process to extract the pages finishes successfully. The message to extract the articles from pages was enqueueded. Operation ID {0}</value>
+  </data>
+  <data name="NotificacionEtlError" xml:space="preserve">
+    <value>An error occurred during the process. Operation ID: {0}</value>
+  </data>
+  <data name="NotificationExtractArticlesInvoked" xml:space="preserve">
+    <value>The process to extract articles from pages was invoked successfully. Operation ID {0}</value>
+  </data>
+  <data name="NotificationExtractArticlesSuccess" xml:space="preserve">
+    <value>The process to extract articles from pages finishes successfully. The messages to request the article curation by AI is enqueued. Operation ID {0}</value>
+  </data>
+  <data name="NotificationArticleCurationInvoked" xml:space="preserve">
+    <value>The process to curate an articles batch was invoked successfully. Operation ID {0}. Message ID: {1}</value>
+  </data>
+  <data name="NotificationArticleCurationSuccess" xml:space="preserve">
+    <value>The process to curate an articles batch by AI model finishes successfully. Operation ID {0}. Message ID {1}</value>
+  </data>
+  <data name="NotificationGenerateInstructionsInvoked" xml:space="preserve">
+    <value>The process to generate the golden instructions was invoked successfully. Operation ID {0}. Message ID: {1}</value>
+  </data>
+  <data name="NotificationGenerateInstructionsSuccess" xml:space="preserve">
+    <value>The process to generate the golden instructions finishes successfully. Operation ID {0}. Message ID: {1}</value>
+  </data>
 </root>

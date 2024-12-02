@@ -6,22 +6,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Palaven.Application.Abstractions.Ingest;
+using Palaven.Application.Abstractions.DatasetManagement;
+using Palaven.Application.Extensions;
+using Palaven.Application.Notification.Extensions;
+using Palaven.Data.Sql.Extensions;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.Model.Messaging;
 using Palaven.Persistence.CosmosDB.Extensions;
-using Palaven.Application.Ingest.Extensions;
-using Palaven.Infrastructure.VectorIndexing.Extensions;
-using Palaven.VectorIndexing.Extensions;
 
-namespace Palaven.Ingest.Test.Ingest;
+namespace Palaven.Ingest.IntegrationTests.DatasetsManagement;
 
-public class GenerateInstructionsTests
+public class DatasetManagementTests
 {
     private readonly IHost _host;
 
-    public GenerateInstructionsTests()
+    public DatasetManagementTests()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -54,22 +54,23 @@ public class GenerateInstructionsTests
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
                 
-                services.AddIngestServices();
-
-                services.AddVectorIndexingServices();
-                services.AddPalavenVectorIndexingServices();
+                var palavenSqlDBConnectionString = hostContext.Configuration.GetConnectionString("SqlDB");
+                services.AddDataSqlServices(palavenSqlDBConnectionString!);
+                services.AddNotificationService();
+                services.AddDatasetManagementServices();
             }).Build();
     }
 
     [Fact]
-    public async Task GenerateInstructions_Run_WithNoErrors()
+    public async Task Can_CreateInstructionDataset_WithNoErrors()
     {
-        var queueMessageService = _host.Services.GetRequiredService<IMessageQueueService>();
-        var coreographyService = _host.Services.GetRequiredService<IInstructionGenerationChoreographyService>();
+        var messageQueueService = _host.Services.GetRequiredService<IMessageQueueService>();
+        var choreographyService = _host.Services.GetRequiredService<ICreateInstructionDatasetChoreographyService>();
 
-        var message = await queueMessageService.ReceiveMessageAsync<GenerateInstructionsMessage>(cancellationToken: CancellationToken.None);
-        var result = await coreographyService.GenerateInstructionsAsync(message, CancellationToken.None);
+        var message = await messageQueueService.ReceiveMessageAsync<CreateInstructionDatasetMessage>(cancellationToken: CancellationToken.None);
+        var result = await choreographyService.CreateInstructionDatasetAsync(message, CancellationToken.None);
 
         Assert.NotNull(result);
+        Assert.False(result.HasErrors);
     }
 }

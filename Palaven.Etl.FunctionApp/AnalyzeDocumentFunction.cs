@@ -18,7 +18,7 @@ public class AnalyzeDocumentFunction
     }
 
     [Function(nameof(AnalyzeDocumentFunction))]
-    public async Task Run([QueueTrigger("analyze-documents-queue", Connection = "AzureStorageLawDocs")] QueueMessage message, FunctionContext context)
+    public async Task RunAsync([QueueTrigger("analyze-documents-queue")] QueueMessage message, FunctionContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Queue trigger function [analyze-documents-queue] triggered. Message: {message.MessageText}");
 
@@ -39,7 +39,7 @@ public class AnalyzeDocumentFunction
             PopReceipt = message.PopReceipt
         };
 
-        await _choreographyService.StartDocumentAnalysisAsync(palavenMessage, context.CancellationToken);
+        await _choreographyService.StartDocumentAnalysisAsync(palavenMessage, cancellationToken);
 
         _logger.LogInformation($"Queue trigger function [analyze-documents-queue] processed: {message.MessageText}");
     }

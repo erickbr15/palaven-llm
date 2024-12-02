@@ -14,7 +14,7 @@ using Palaven.Persistence.CosmosDB.Extensions;
 using Palaven.VectorIndexing.Extensions;
 
 
-var host = new HostBuilder()    
+var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureAppConfiguration((hostingContext, configBuilder) =>
     {
@@ -47,12 +47,12 @@ var host = new HostBuilder()
         
         services.AddIngestServices();
         services.AddVectorIndexingServices();
-        services.AddPalavenVectorIndexingServices();
+        services.AddPalavenVectorIndexingServices();        
 
-
+        services.AddLogging();
         services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();                
-    })
+        services.ConfigureFunctionsApplicationInsights();
+    })    
     .Build();
 
 host.Run();

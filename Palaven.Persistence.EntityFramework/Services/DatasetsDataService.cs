@@ -46,6 +46,12 @@ public class DatasetsDataService : IDatasetsDataService
         return instruction;
     }
 
+    public async Task<FineTuningPromptEntity> CreateAsync(FineTuningPromptEntity prompt, CancellationToken cancellationToken)
+    {
+        await _fineTuningPromptRepository.AddAsync(prompt, cancellationToken);
+        return prompt;
+    }
+
     public async Task DeleteInstructionAsync(int id, CancellationToken cancellationToken)
     {
         var instruction = await _instructionRepository.GetByIdAsync(id, cancellationToken);
@@ -93,16 +99,22 @@ public class DatasetsDataService : IDatasetsDataService
         return entity;
     }
 
+    public async Task<FineTuningPromptEntity> UpdateAsync(int id, FineTuningPromptEntity prompt, CancellationToken cancellationToken)
+    {
+        var entity = await _fineTuningPromptRepository.GetByIdAsync(id, cancellationToken) ?? throw new InvalidOperationException($"Unable to find the entity with id {id}.");
+
+        entity.Instruction = prompt.Instruction;
+        entity.DatasetId = prompt.DatasetId;
+        entity.LargeLanguageModel = prompt.LargeLanguageModel;
+        entity.Prompt = prompt.Prompt;
+
+        return entity;
+    }
+
     public Task<FineTuningPromptEntity?> GetFineTuningPromptByIdAsync(int id, CancellationToken cancellationToken)
     {
         return _fineTuningPromptRepository.GetByIdAsync(id, cancellationToken);
-    }
-
-    public async Task<FineTuningPromptEntity> CreateAsync(FineTuningPromptEntity prompt, CancellationToken cancellationToken)
-    {
-        await _fineTuningPromptRepository.AddAsync(prompt, cancellationToken);
-        return prompt;
-    }
+    }    
 
     public async Task DeleteFineTuningPromptAsync(int id, CancellationToken cancellationToken)
     {
@@ -126,17 +138,5 @@ public class DatasetsDataService : IDatasetsDataService
     public IQueryable<FineTuningPromptEntity> GetFineTuningPromptQueryable()
     {
         return _fineTuningPromptRepository.GetAll();
-    }    
-
-    public async Task<FineTuningPromptEntity> UpdateAsync(int id, FineTuningPromptEntity prompt, CancellationToken cancellationToken)
-    {
-        var entity = await _fineTuningPromptRepository.GetByIdAsync(id, cancellationToken) ?? throw new InvalidOperationException($"Unable to find the entity with id {id}.");
-
-        entity.Instruction = prompt.Instruction;
-        entity.DatasetId = prompt.DatasetId;
-        entity.LargeLanguageModel = prompt.LargeLanguageModel;
-        entity.Prompt = prompt.Prompt;
-
-        return entity;
-    }
+    }        
 }

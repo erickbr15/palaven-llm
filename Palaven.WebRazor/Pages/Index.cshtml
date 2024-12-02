@@ -1,65 +1,77 @@
 @page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Palaven";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container my-5">
+    <div class="p-5 bg-body-tertiary rounded-3">
+        <h3 class="text-body-emphasis">Enhancing LLM performance in specialized Spanish domains using RAG and PEFT QLoRA</h3>
+    </div>
+</div>
+<div class="container">
+    <section>
+        <h4>Why was developed this project?</h4>
+        <p>
+            This work is conducted in response to the growing recognition that LLMs struggle to manage the specialized complexities inherent in Spanish-language domains. These models frequently fail to provide accurate and contextually appropriate responses when addressing domain-specific inquiries. This performance gap highlights the necessity of developing enhanced methods for improving language models in specialized fields.
+            The growing complexity and specificity of professional domains have led to a heightened demand for more accurate, reliable, and accessible language tools in specialized sectors. To meet these challenges, this work is dedicated to enhancing LLM performance in specialized Spanish-language domains.
+        </p>
+    </section>
+    <section>
+        <h4>Hypothesis</h4>
+        <p>
+            The hypothesis of this work is grounded in the premise that combining fine-tuning with the integration of relevant, domain-specific knowledge through RAG will enhance the model's predictive capabilities and contextual responsiveness. By leveraging QLoRA for efficient fine-tuning and RAG for incorporating specialized information, the model is expected to achieve significantly improved accuracy and contextual relevance in specialized domains.
+            To test this hypothesis, the following experiments will be executed using the same set of instructions and the same evaluation metrics:
+        </p>
+        <ul class="list-group">
+            <li class="list-group-item">1.	Vanilla LLM applied to the specialized Spanish domain (no RAG, no fine-tuning).</li>
+            <li class="list-group-item">2.	Vanilla LLM with RAG applied to the specialized Spanish domain (no fine-tuning).</li>
+            <li class="list-group-item">3.	LLM fine-tuned with QLoRA applied to the specialized Spanish domain (no RAG).</li>
+            <li class="list-group-item">4.	LLM fine-tuned with QLoRA and augmented with RAG applied to the specialized Spanish domain.</li>
+        </ul>
+    </section>
+    <section>
+        <h4>Tech stack</h4>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <p class="mb-0">Large Language Models. Chat-GPT 4 via HTTP API call</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Large Language Models. Google/gemma-7b-it. Fine-tuning using Parameter Efficient Fine-Tunning Quantized Low Rank Adaptation (PEFT QLoRA)</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Prompt engineering</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">PDF ETL process based on Medallion Architecture stages</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Tokens and Embeddings</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Retriever-Augmented Generation (Naive implementation for google/gemma-7b-it) using vector database and cosine distance</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Evaluation metrics for NLP models (ROUGE, BLEU, BERTScore)</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Clean architecture</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Command Query Responsability Segreggation Pattern (CQRS)</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">ASP.NET Web API</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Python | Pytorch | Hugging face transformers | Google Colab Notebooks</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-0">Azure Services (Azure Functions, Azure Blob Storage, Azure Queue Storage, CosmosDB, Azure SQL Server, Azure App Configuration, Azure KeyVault, Azure MFA B2C Authentication, Azure Document Intelligence)</p>
+            </li>
+        </ul>
+    </section>    
 </div>
 
-<div>Graph API result</div>
-<div>@ViewData["GraphApiResult"]</div>
 
-<h2>Upload PDF document related to Mexican tax law</h2>
 
-<form enctype="multipart/form-data" method="post">
-    <dl>
-        <dt>
-            <label asp-for="InputModel.UserId"></label>
-        </dt>
-        <dd>
-            <input asp-for="InputModel.UserId" type="text"/>
-        </dd>
-        <dt>
-            <label asp-for="InputModel.Law"></label>
-        </dt>
-        <dd>
-            <input asp-for="InputModel.Law" type="text" />
-            <span asp-validation-for="InputModel.Law"></span>
-        </dd>
-        <dt>
-            <label asp-for="InputModel.Acronym"></label>
-        </dt>
-        <dd>
-            <input asp-for="InputModel.Acronym" type="text" />
-            <span asp-validation-for="InputModel.Acronym"></span>
-        </dd>
-        <dt>
-            <label asp-for="InputModel.Year"></label>
-        </dt>
-        <dd>
-            <input asp-for="InputModel.Year" type="text" />
-            <span asp-validation-for="InputModel.Year"></span>
-        </dd>
-        <dt>
-            <label asp-for="InputModel.FormFile"></label>
-        </dt>
-        <dd>
-            <input asp-for="InputModel.FormFile" type="file" />
-            <span asp-validation-for="InputModel.FormFile"></span>
-        </dd>
-    </dl>
-    <input asp-page-handler="Upload" class="btn" type="submit" value="Upload" />
-</form>
 
-<p class="result">
-    @Model.Result
-</p>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

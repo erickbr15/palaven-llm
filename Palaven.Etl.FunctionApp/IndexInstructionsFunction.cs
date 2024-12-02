@@ -18,7 +18,7 @@ public class IndexInstructionsFunction
     }
 
     [Function(nameof(IndexInstructionsFunction))]
-    public async Task Run([QueueTrigger("index-instructions-queue", Connection = "AzureStorageLawDocs")] QueueMessage message, FunctionContext context)
+    public async Task RunAsync([QueueTrigger("index-instructions-queue")] QueueMessage message, FunctionContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"C# Queue trigger function [index-instructions-queue] started: {message.MessageText}");
 
@@ -39,7 +39,7 @@ public class IndexInstructionsFunction
             PopReceipt = message.PopReceipt
         };
 
-        var result = await _choreographyService.IndexInstructionsAsync(indexInstructionsMessage, context.CancellationToken);
+        var result = await _choreographyService.IndexInstructionsAsync(indexInstructionsMessage, cancellationToken);
 
         if (result.HasErrors)
         {

@@ -9,6 +9,7 @@ using Palaven.Application.Ingest.Extensions;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
 using Liara.Integrations.Extensions;
+using Palaven.Application.Notification.Extensions;
 
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
@@ -33,7 +34,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
         .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
             .AddMicrosoftGraph(builder.Configuration.GetSection("MicrosoftGraph"))
-            .AddInMemoryTokenCaches();
+            .AddDistributedTokenCaches();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -53,6 +54,8 @@ var palavenDBConfig = builder.Configuration.GetSection("CosmosDB:Containers");
 var palavenDBConnectionString = builder.Configuration.GetConnectionString("PalavenCosmosDB");
 
 builder.Services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
+builder.Services.AddNotificationService();
+
 builder.Services.AddIngestServices();
 
 var app = builder.Build();

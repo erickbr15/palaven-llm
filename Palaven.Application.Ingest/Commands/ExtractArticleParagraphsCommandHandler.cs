@@ -85,11 +85,11 @@ public class ExtractArticleParagraphsCommandHandler : ICommandHandler<ExtractArt
 
         var articles = new List<SilverDocument>();
 
-        List<TaxLawDocumentParagraph> articleParagraphs = null;
+        List<TaxLawDocumentParagraph> articleParagraphs = null!;
 
         while (queue.Count > 0)
         {
-            TaxLawDocumentParagraph paragraph = null;
+            TaxLawDocumentParagraph paragraph = null!;
             articleParagraphs = new List<TaxLawDocumentParagraph>();
 
             do

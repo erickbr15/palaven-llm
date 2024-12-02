@@ -1,26 +1,25 @@
-﻿using Azure.Identity;
-using Liara.Common.Extensions;
-using Liara.Integrations.Azure;
-using Liara.Integrations.Extensions;
+﻿using Liara.Common.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Palaven.Application.Abstractions.VectorIndexing;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Palaven.Infrastructure.Abstractions.Messaging;
-using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.Model.Messaging;
-using Palaven.Infrastructure.VectorIndexing.Extensions;
+using Palaven.Application.Abstractions.Ingest;
+using Liara.Integrations.Azure;
+using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
-using Palaven.VectorIndexing.Extensions;
+using Palaven.Application.Ingest.Extensions;
+using Palaven.Application.Notification.Extensions;
 
-namespace Palaven.Ingest.Test.VectorIndexing;
+namespace Palaven.Ingest.Test.Ingest;
 
-public class VectorIndexingTests
+public class StartDocumentAnalysisTests
 {
     private readonly IHost _host;
 
-    public VectorIndexingTests()
+    public StartDocumentAnalysisTests()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -43,8 +42,6 @@ public class VectorIndexingTests
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddLiaraCommonServices();
-                services.AddLiaraOpenAIServices();
-                services.AddLiaraPineconeServices();
                 services.AddAzureAIServices(hostContext.Configuration);
                 services.AddAzureStorageServices(hostContext.Configuration);
 
@@ -52,21 +49,22 @@ public class VectorIndexingTests
                 var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
-                services.AddVectorIndexingServices();
-                services.AddPalavenVectorIndexingServices();
+                services.AddNotificationService();
+                services.AddIngestServices();
             }).Build();
     }
 
     [Fact]
-    public async Task GenerateInstructionVectorIndex_Run_WithNoErrors()
+    public async Task StartDocumentAnalysis_Run_WithNoErrors()
     {
-        var messageQueueService = _host.Services.GetRequiredService<IMessageQueueService>();        
-        var vectorIndexingService = _host.Services.GetRequiredService<IInstructionsIndexingChoreographyService>();
+        var messageQueueService = _host.Services.GetRequiredService<IMessageQueueService>();
+        var coreographyService = _host.Services.GetRequiredService<IDocumentAnalysisChoreographyService>();
 
-        var message = await messageQueueService.ReceiveMessageAsync<IndexInstructionsMessage>(cancellationToken: CancellationToken.None);
-        var result = await vectorIndexingService.IndexInstructionsAsync(message, CancellationToken.None);
+        var message = await messageQueueService.ReceiveMessageAsync<DocumentAnalysisMessage>(cancellationToken: CancellationToken.None);
+        var result = await coreographyService.StartDocumentAnalysisAsync(message, CancellationToken.None);
 
         Assert.NotNull(result);
-        Assert.False(result.HasErrors);
+        Assert.True(result.IsSuccess);
+        Assert.True(!string.IsNullOrWhiteSpace(result.Value));
     }
 }

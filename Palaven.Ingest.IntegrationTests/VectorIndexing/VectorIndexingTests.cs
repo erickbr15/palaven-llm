@@ -1,24 +1,27 @@
 ﻿using Azure.Identity;
 using Liara.Common.Extensions;
 using Liara.Integrations.Azure;
+using Liara.Integrations.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Palaven.Application.Abstractions.Ingest;
+using Palaven.Application.Abstractions.VectorIndexing;
+using Palaven.Application.Notification.Extensions;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.Model.Messaging;
+using Palaven.Infrastructure.VectorIndexing.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
-using Palaven.Application.Ingest.Extensions;
+using Palaven.VectorIndexing.Extensions;
 
-namespace Palaven.Ingest.Test.Ingest;
+namespace Palaven.Ingest.Test.VectorIndexing;
 
-public class ExtractDocumentPagesTests
+public class VectorIndexingTests
 {
     private readonly IHost _host;
 
-    public ExtractDocumentPagesTests()
+    public VectorIndexingTests()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -41,6 +44,8 @@ public class ExtractDocumentPagesTests
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddLiaraCommonServices();
+                services.AddLiaraOpenAIServices();
+                services.AddLiaraPineconeServices();
                 services.AddAzureAIServices(hostContext.Configuration);
                 services.AddAzureStorageServices(hostContext.Configuration);
 
@@ -48,21 +53,22 @@ public class ExtractDocumentPagesTests
                 var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
-                services.AddIngestServices();
+                services.AddNotificationService();
+                services.AddVectorIndexingServices();
+                services.AddPalavenVectorIndexingServices();
             }).Build();
     }
 
     [Fact]
-    public async Task CreateBronzeLayer_Run_WithNoErrors()
+    public async Task GenerateInstructionVectorIndex_Run_WithNoErrors()
     {
-        var queueMessageService = _host.Services.GetRequiredService<IMessageQueueService>();
-        var coreographyService = _host.Services.GetRequiredService<IDocumentPagesExtractionChoreographyService>();
+        var messageQueueService = _host.Services.GetRequiredService<IMessageQueueService>();
+        var vectorIndexingService = _host.Services.GetRequiredService<IInstructionsIndexingChoreographyService>();
 
-        var message = await queueMessageService.ReceiveMessageAsync<ExtractDocumentPagesMessage>(cancellationToken: CancellationToken.None);
-
-        var result = await coreographyService.ExtractPagesAsync(message, CancellationToken.None);
+        var message = await messageQueueService.ReceiveMessageAsync<IndexInstructionsMessage>(cancellationToken: CancellationToken.None);
+        var result = await vectorIndexingService.IndexInstructionsAsync(message, CancellationToken.None);
 
         Assert.NotNull(result);
-        Assert.True(result.IsSuccess);
+        Assert.False(result.HasErrors);
     }
 }

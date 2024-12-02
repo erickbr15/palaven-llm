@@ -21,11 +21,11 @@ public class ExtractDocumentPagesFunction
     }
 
     [Function(nameof(ExtractDocumentPagesFunction))]
-    public async Task Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer, FunctionContext context)
+    public async Task RunAsync([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer, FunctionContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
-        var message = await _messageQueueService.ReceiveMessageAsync<ExtractDocumentPagesMessage>(cancellationToken: context.CancellationToken);
+        var message = await _messageQueueService.ReceiveMessageAsync<ExtractDocumentPagesMessage>(cancellationToken: cancellationToken);
 
         var result = await _choreographyService.ExtractPagesAsync(message, context.CancellationToken);
 

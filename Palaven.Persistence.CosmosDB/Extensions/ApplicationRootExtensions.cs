@@ -22,7 +22,7 @@ public static class ApplicationRootExtensions
 
         if(containerOptions != null)
         {
-            services.AddTransient<IDocumentRepository<EtlTaskDocument>>(provider =>
+            services.AddSingleton<IDocumentRepository<EtlTaskDocument>>(provider =>
             {
 
                 var containerId = typeof(EtlTaskDocument).Name;
@@ -32,7 +32,7 @@ public static class ApplicationRootExtensions
                 return new EtlTaskDocumentRepository(client, options!);
             });
 
-            services.AddTransient<IDocumentRepository<BronzeDocument>>(provider =>
+            services.AddSingleton<IDocumentRepository<BronzeDocument>>(provider =>
             {
 
                 var containerId = typeof(BronzeDocument).Name;
@@ -42,7 +42,7 @@ public static class ApplicationRootExtensions
                 return new BronzeDocumentRepository(client, options!);
             });
 
-            services.AddTransient<IDocumentRepository<SilverDocument>>(provider =>
+            services.AddSingleton<IDocumentRepository<SilverDocument>>(provider =>
             {
 
                 var containerId = typeof(SilverDocument).Name;
@@ -53,7 +53,7 @@ public static class ApplicationRootExtensions
 
             });
 
-            services.AddTransient<IDocumentRepository<GoldenDocument>>(provider =>
+            services.AddSingleton<IDocumentRepository<GoldenDocument>>(provider =>
             {
 
                 var containerId = typeof(GoldenDocument).Name;
@@ -63,7 +63,17 @@ public static class ApplicationRootExtensions
                 return new GoldenDocumentRepository(client, options!);
             });
 
-            services.AddTransient<IDocumentRepository<DatasetGenerationTaskDocument>>(provider =>
+            services.AddSingleton<IDocumentRepository<NotificationDocument>>(provider =>
+            {
+
+                var containerId = typeof(NotificationDocument).Name;
+                var options = containerOptions[containerId];
+                var client = provider.GetRequiredService<CosmosClient>();
+
+                return new NotificationDocumentRepository(client, options!);
+            });
+
+            services.AddSingleton<IDocumentRepository<DatasetGenerationTaskDocument>>(provider =>
             {
 
                 var containerId = typeof(DatasetGenerationTaskDocument).Name;

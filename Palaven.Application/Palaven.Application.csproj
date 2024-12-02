@@ -9,13 +9,28 @@
   <ItemGroup>
     <PackageReference Include="Liara.Common" Version="8.2.1" />
     <PackageReference Include="Liara.Persistence.Abstractions" Version="8.2.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Palaven.Application.Abstractions\Palaven.Application.Abstractions.csproj" />
     <ProjectReference Include="..\Palaven.Application.Model\Palaven.Application.Model.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.Abstractions\Palaven.Infrastructure.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\DatasetManagement.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DatasetManagement.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\DatasetManagement.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DatasetManagement.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

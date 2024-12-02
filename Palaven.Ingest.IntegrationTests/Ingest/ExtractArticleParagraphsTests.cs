@@ -1,24 +1,25 @@
-﻿using Liara.Common.Extensions;
+﻿using Azure.Identity;
+using Liara.Common.Extensions;
+using Liara.Integrations.Azure;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Azure.Identity;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.Extensions.Hosting;
+using Palaven.Infrastructure.MicrosoftAzure.Extensions;
+using Palaven.Application.Ingest.Extensions;
+using Palaven.Persistence.CosmosDB.Extensions;
 using Palaven.Infrastructure.Abstractions.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Palaven.Infrastructure.Model.Messaging;
 using Palaven.Application.Abstractions.Ingest;
-using Liara.Integrations.Azure;
-using Palaven.Infrastructure.MicrosoftAzure.Extensions;
-using Palaven.Persistence.CosmosDB.Extensions;
-using Palaven.Application.Ingest.Extensions;
+using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
-public class StartDocumentAnalysisTests
+public class ExtractArticleParagraphsTests
 {
     private readonly IHost _host;
 
-    public StartDocumentAnalysisTests()
+    public ExtractArticleParagraphsTests()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -49,20 +50,22 @@ public class StartDocumentAnalysisTests
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
                 services.AddIngestServices();
+                services.AddNotificationService();
             }).Build();
     }
 
     [Fact]
-    public async Task StartDocumentAnalysis_Run_WithNoErrors()
+    public async Task ExtractArticleParagraphs_Run_WithNoErrors()
     {
-        var messageQueueService = _host.Services.GetRequiredService<IMessageQueueService>();
-        var coreographyService = _host.Services.GetRequiredService<IDocumentAnalysisChoreographyService>();
+        var queueMessageService = _host.Services.GetRequiredService<IMessageQueueService>();
 
-        var message = await messageQueueService.ReceiveMessageAsync<DocumentAnalysisMessage>(cancellationToken: CancellationToken.None);
-        var result = await coreographyService.StartDocumentAnalysisAsync(message, CancellationToken.None);
+        var message = await queueMessageService.ReceiveMessageAsync<ExtractArticleParagraphsMessage>(cancellationToken: CancellationToken.None);
+
+        var choreographyService = _host.Services.GetRequiredService<IArticleParagraphsExtractionChoreographyService>();
+
+        var result = await choreographyService.ExtractArticleParagraphsAsync(message, CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);
-        Assert.True(!string.IsNullOrWhiteSpace(result.Value));
     }
 }

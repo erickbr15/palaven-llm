@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Liara.Common" Version="8.2.1" />
     <PackageReference Include="Liara.Persistence.Abstractions" Version="8.2.2" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +17,21 @@
     <ProjectReference Include="..\Palaven.Application.Model\Palaven.Application.Model.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.Abstractions\Palaven.Infrastructure.Abstractions.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.Model\Palaven.Infrastructure.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Indexing.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Indexing.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Indexing.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Indexing.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

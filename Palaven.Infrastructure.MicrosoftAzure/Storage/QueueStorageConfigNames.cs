@@ -10,6 +10,7 @@ public static class QueueStorageConfigNames
     public const string CurateArticlesQueue = "CurateArticles";
     public const string GenerateInstructionsQueue = "GenerateInstructions";
     public const string IndexInstructionsQueue = "IndexInstructions";
+    public const string CreateInstructionsDatasetQueue = "CreateInstructionsDataset";
 
     public static string GetQueueConfigNameByMessageType(Type messageType)
     {
@@ -21,6 +22,7 @@ public static class QueueStorageConfigNames
             Type t when t == typeof(CurateArticlesMessage) => CurateArticlesQueue,
             Type t when t == typeof(GenerateInstructionsMessage) => GenerateInstructionsQueue,
             Type t when t == typeof(IndexInstructionsMessage) => IndexInstructionsQueue,
+            Type t when t == typeof(CreateInstructionDatasetMessage) => CreateInstructionsDatasetQueue,
             _ => throw new InvalidOperationException($"Unknown message type: {messageType.Name}")
         };
     }

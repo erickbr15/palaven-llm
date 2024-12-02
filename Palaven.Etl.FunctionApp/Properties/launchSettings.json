@@ -3,7 +3,9 @@
     "Palaven.Etl.FunctionApp": {
       "commandName": "Project",
       "commandLineArgs": "--port 7001",
-      "launchBrowser": false
+      "environmentVariables": {
+        "AppConfigurationEndpoint": "https://palaven-config.azconfig.io"
+      }
     }
   }
 }

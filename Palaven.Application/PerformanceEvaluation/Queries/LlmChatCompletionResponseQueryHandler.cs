@@ -16,15 +16,15 @@ public class LlmChatCompletionResponseQueryHandler : IQueryHandler<LlmChatComple
         _evaluationSessionDataService = evaluationSessionDataService ?? throw new ArgumentNullException(nameof(evaluationSessionDataService));
     }
 
-    public async Task<IResult<IList<LlmResponseView>>> ExecuteAsync(LlmChatCompletionResponseQuery query, CancellationToken cancellationToken)
+    public Task<IResult<IList<LlmResponseView>>> ExecuteAsync(LlmChatCompletionResponseQuery query, CancellationToken cancellationToken)
     {
         if (query == null)
         {
-            return Result<IList<LlmResponseView>>.Fail(new ArgumentNullException(nameof(query)));
+            return Task.FromResult(Result<IList<LlmResponseView>>.Fail(new ArgumentNullException(nameof(query))));
         }
 
         var result = _evaluationSessionDataService.FetchChatCompletionLlmResponses(query.SelectionCriteria);
 
-        return Result<IList<LlmResponseView>>.Success(result);
+        return Task.FromResult(Result<IList<LlmResponseView>>.Success(result));
     }
 }

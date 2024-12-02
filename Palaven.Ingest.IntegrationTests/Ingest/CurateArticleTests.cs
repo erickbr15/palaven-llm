@@ -3,22 +3,24 @@ using Liara.Common.Extensions;
 using Liara.Integrations.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Palaven.Application.Abstractions.Ingest;
+using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
+using Palaven.Infrastructure.Model.Messaging;
 using Palaven.Application.Ingest.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
-using Palaven.Infrastructure.Abstractions.Messaging;
-using Microsoft.Extensions.DependencyInjection;
-using Palaven.Infrastructure.Model.Messaging;
-using Palaven.Application.Abstractions.Ingest;
+using Liara.Integrations.Extensions;
+using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
-public class ExtractArticleParagraphsTests
+public class CurateArticleTests
 {
     private readonly IHost _host;
 
-    public ExtractArticleParagraphsTests()
+    public CurateArticleTests()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration((hostingContext, configBuilder) =>
@@ -41,6 +43,7 @@ public class ExtractArticleParagraphsTests
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddLiaraCommonServices();
+                services.AddLiaraOpenAIServices();
                 services.AddAzureAIServices(hostContext.Configuration);
                 services.AddAzureStorageServices(hostContext.Configuration);
 
@@ -49,21 +52,21 @@ public class ExtractArticleParagraphsTests
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
                 services.AddIngestServices();
+                services.AddNotificationService();
             }).Build();
     }
 
     [Fact]
-    public async Task ExtractArticleParagraphs_Run_WithNoErrors()
+    public async Task CurateArticle_Run_WithNoErrors()
     {
         var queueMessageService = _host.Services.GetRequiredService<IMessageQueueService>();
+        var coreographyService = _host.Services.GetRequiredService<IArticlesCurationChoreographyService>();
 
-        var message = await queueMessageService.ReceiveMessageAsync<ExtractArticleParagraphsMessage>(cancellationToken: CancellationToken.None);
+        var message = await queueMessageService.ReceiveMessageAsync<CurateArticlesMessage>(cancellationToken: CancellationToken.None);
 
-        var choreographyService = _host.Services.GetRequiredService<IArticleParagraphsExtractionChoreographyService>();
-
-        var result = await choreographyService.ExtractArticleParagraphsAsync(message, CancellationToken.None);
+        var result = await coreographyService.CurateArticlesAsync(message, CancellationToken.None);
 
         Assert.NotNull(result);
-        Assert.True(result.IsSuccess);
+        Assert.False(result.HasErrors);
     }
 }

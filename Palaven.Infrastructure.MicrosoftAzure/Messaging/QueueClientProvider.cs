@@ -24,9 +24,11 @@ public class QueueClientProvider : IQueueClientProvider
     public QueueClient GetQueueClient(Type messageType)
     {
         var queueConfigName = QueueStorageConfigNames.GetQueueConfigNameByMessageType(messageType);
+
         if(!_queueClients.Value.ContainsKey(messageType))
         {
             var queueName = _storageAccountOptions.QueueNames[queueConfigName];
+
             _queueClients.Value.Add(messageType, _queueServiceClient.GetQueueClient(queueName));
         }
 

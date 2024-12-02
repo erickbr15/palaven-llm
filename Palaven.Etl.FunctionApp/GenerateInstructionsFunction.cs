@@ -18,7 +18,7 @@ public class GenerateInstructionsFunction
     }
 
     [Function(nameof(GenerateInstructionsFunction))]
-    public async Task Run([QueueTrigger("generate-instructions-queue", Connection = "AzureStorageLawDocs")] QueueMessage message, FunctionContext context)
+    public async Task RunAsync([QueueTrigger("generate-instructions-queue")] QueueMessage message, FunctionContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"C# Queue trigger function [generate-instructions-queue] started: {message.MessageText}");
 
@@ -39,7 +39,7 @@ public class GenerateInstructionsFunction
             PopReceipt = message.PopReceipt
         };
 
-        var result = await _choreographyService.GenerateInstructionsAsync(generateInstructionsMessage, context.CancellationToken);
+        var result = await _choreographyService.GenerateInstructionsAsync(generateInstructionsMessage, cancellationToken);
 
         if (result.HasErrors)
         {
