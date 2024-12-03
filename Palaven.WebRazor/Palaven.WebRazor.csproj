@@ -26,4 +26,10 @@
     <ProjectReference Include="..\Palaven.Persistence.CosmosDB\Palaven.Persistence.CosmosDB.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

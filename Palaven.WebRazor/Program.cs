@@ -27,6 +27,7 @@ builder.Configuration.AddAzureAppConfiguration(options =>
         kv.SetCredential(new DefaultAzureCredential());
     });
 });
+builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
 var initialScopes = builder.Configuration["DownstreamApi:Scopes"]?.Split(' ') ?? builder.Configuration["MicrosoftGraph:Scopes"]?.Split(' ');
 

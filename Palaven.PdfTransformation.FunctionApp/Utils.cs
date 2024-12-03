@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Palaven.Etl.FunctionApp;
+namespace Palaven.PdfTransformation.FunctionApp;
 
 public static class Utils
 {
@@ -16,7 +16,7 @@ public static class Utils
         }
         catch
         {
-            throw;
+            //Intentionally in blank
         }
 
         return success;

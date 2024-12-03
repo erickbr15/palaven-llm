@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Palaven.Application.VectorIndexing.Services;
 using Palaven.Infrastructure.Model.Messaging;
 
-namespace Palaven.Etl.FunctionApp;
+namespace Palaven.PdfTransformation.FunctionApp;
 
 public class IndexInstructionsFunction
 {

@@ -16,8 +16,8 @@ public class QueueClientProvider : IQueueClientProvider
     public QueueClientProvider(IOptions<StorageAccountOptions> optionsService, IAzureClientFactory<QueueServiceClient> azureClientFactory)
     {
         _storageAccountOptions = optionsService?.Value ?? throw new InvalidOperationException("Unable to get StorageAccountOptions");
-        _queueServiceClient = azureClientFactory.CreateClient("AzureStorageLawDocs") ?? throw new InvalidOperationException("Unable to create QueueServiceClient");
-        
+        _queueServiceClient = azureClientFactory.CreateClient("AzureStorageLawDocs") ?? throw new InvalidOperationException("Unable to create QueueServiceClient");        
+
         _queueClients = new Lazy<IDictionary<Type, QueueClient>>(() => new Dictionary<Type, QueueClient>());
     }
 
@@ -27,8 +27,7 @@ public class QueueClientProvider : IQueueClientProvider
 
         if(!_queueClients.Value.ContainsKey(messageType))
         {
-            var queueName = _storageAccountOptions.QueueNames[queueConfigName];
-
+            var queueName = _storageAccountOptions.QueueNames[queueConfigName];            
             _queueClients.Value.Add(messageType, _queueServiceClient.GetQueueClient(queueName));
         }
 

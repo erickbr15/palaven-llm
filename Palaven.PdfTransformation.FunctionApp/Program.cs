@@ -3,15 +3,16 @@ using Liara.Common.Extensions;
 using Liara.Integrations.Azure;
 using Liara.Integrations.Extensions;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Palaven.Application.Ingest.Extensions;
 using Palaven.Application.Notification.Extensions;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
+using Palaven.Infrastructure.VectorIndexing.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
-
+using Palaven.VectorIndexing.Extensions;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
@@ -28,8 +29,8 @@ var host = new HostBuilder()
             {
                 kv.SetCredential(new DefaultAzureCredential());
             });
-        });        
-    })    
+        });
+    })
     .ConfigureServices((hostContext, services) =>
     {
         services.AddLiaraCommonServices();
@@ -44,14 +45,13 @@ var host = new HostBuilder()
 
         services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
         services.AddNotificationService();
-        services.AddIngestServices();             
+        services.AddVectorIndexingServices();
+        services.AddPalavenVectorIndexingServices();
 
         services.AddLogging();
-
-        /*
         services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();*/
-    })    
+        services.ConfigureFunctionsApplicationInsights();
+    })
     .Build();
 
 host.Run();

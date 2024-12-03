@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Application.VectorI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Infrastructure.VectorIndexing", "Palaven.Infrastructure.VectorIndexing\Palaven.Infrastructure.VectorIndexing.csproj", "{9B625355-F871-4E1B-BD3F-DEADBFC88902}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Etl.FunctionApp", "Palaven.Etl.FunctionApp\Palaven.Etl.FunctionApp.csproj", "{7976B47D-6DB2-431D-9C54-2669B8D44B58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.PdfIngest.FunctionApp", "Palaven.Etl.FunctionApp\Palaven.PdfIngest.FunctionApp.csproj", "{7976B47D-6DB2-431D-9C54-2669B8D44B58}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Infrastructure.Llm", "Palaven.Infrastructure.Llm\Palaven.Infrastructure.Llm.csproj", "{D599C452-0098-4693-8CC3-6BCA9DD02D0C}"
 EndProject
@@ -49,7 +49,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Ingest.IntegrationT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Notifications.FunctionApp", "Palaven.Notifications.FunctionApp\Palaven.Notifications.FunctionApp.csproj", "{C7DB386C-BFA7-4887-9F15-031374708F7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.Application.Notification", "Palaven.Application.Notification\Palaven.Application.Notification.csproj", "{473923DC-8464-4883-95D0-49CD5C0D90CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Application.Notification", "Palaven.Application.Notification\Palaven.Application.Notification.csproj", "{473923DC-8464-4883-95D0-49CD5C0D90CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.PdfTransformation.FunctionApp", "Palaven.PdfTransformation.FunctionApp\Palaven.PdfTransformation.FunctionApp.csproj", "{942457F2-B3F8-4651-9378-1BBDEDB360D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{473923DC-8464-4883-95D0-49CD5C0D90CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{473923DC-8464-4883-95D0-49CD5C0D90CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{473923DC-8464-4883-95D0-49CD5C0D90CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{942457F2-B3F8-4651-9378-1BBDEDB360D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{942457F2-B3F8-4651-9378-1BBDEDB360D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{942457F2-B3F8-4651-9378-1BBDEDB360D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{942457F2-B3F8-4651-9378-1BBDEDB360D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +158,7 @@ Global
 		{C261727E-7E93-4189-9FD7-4F48F2BABB0E} = {4A512285-0E5A-4C67-BBED-9984A880A8BD}
 		{C7DB386C-BFA7-4887-9F15-031374708F7F} = {EE1E4C43-A409-403C-8752-55C2608F52CA}
 		{473923DC-8464-4883-95D0-49CD5C0D90CD} = {B1E3584C-275F-4E89-9D17-BF74882D5465}
+		{942457F2-B3F8-4651-9378-1BBDEDB360D6} = {EE1E4C43-A409-403C-8752-55C2608F52CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E278837F-4CA4-43C3-9874-FE884FA0982F}

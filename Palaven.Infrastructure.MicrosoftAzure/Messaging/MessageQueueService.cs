@@ -1,5 +1,6 @@
 ﻿using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.Model.Messaging;
+using System.Text;
 using System.Text.Json;
 
 namespace Palaven.Infrastructure.MicrosoftAzure.Messaging;
@@ -25,7 +26,8 @@ public class MessageQueueService : IMessageQueueService
 
         var azureResponse = await queueClient.PeekMessageAsync(cancellationToken);
 
-        var body = JsonSerializer.Deserialize<TBody>(azureResponse.Value.Body.ToString());
+        var decodedMessage = Encoding.UTF8.GetString(Convert.FromBase64String(azureResponse.Value.Body.ToString()));
+        var body = JsonSerializer.Deserialize<TBody>(decodedMessage);
 
         var message = new Message<TBody>
         {
@@ -47,7 +49,8 @@ public class MessageQueueService : IMessageQueueService
 
         var messages = azureResponse.Value.Select(azureMessage =>
         {
-            var body = JsonSerializer.Deserialize<TBody>(azureMessage.Body.ToString());
+            var decodedMessage = Encoding.UTF8.GetString(Convert.FromBase64String(azureMessage.Body.ToString()));
+            var body = JsonSerializer.Deserialize<TBody>(decodedMessage);
             return body!;
         });
 
@@ -60,7 +63,8 @@ public class MessageQueueService : IMessageQueueService
 
         var azureResponse = await queueClient.ReceiveMessageAsync(visibilityTimeout, cancellationToken);
 
-        var body = JsonSerializer.Deserialize<TBody>(azureResponse.Value.Body.ToString());
+        var decodedMessage = Encoding.UTF8.GetString(Convert.FromBase64String(azureResponse.Value.Body.ToString()));
+        var body = JsonSerializer.Deserialize<TBody>(decodedMessage);
 
         var message = new Message<TBody>
         {
@@ -84,7 +88,8 @@ public class MessageQueueService : IMessageQueueService
 
         var messages = azureResponse.Value.Select(azureMessage =>
         {
-            var body = JsonSerializer.Deserialize<TBody>(azureMessage.Body.ToString());
+            var decodedMessage = Encoding.UTF8.GetString(Convert.FromBase64String(azureMessage.Body.ToString()));
+            var body = JsonSerializer.Deserialize<TBody>(decodedMessage);
             return body!;
         });
 
@@ -98,9 +103,11 @@ public class MessageQueueService : IMessageQueueService
             return;
         }
 
-        var queueClient = _queueClientProvider.GetQueueClient(typeof(TBody));
-        var messageJson = JsonSerializer.Serialize(messageBody);
+        var queueClient = _queueClientProvider.GetQueueClient(typeof(TBody));        
 
-        await queueClient.SendMessageAsync(messageJson, cancellationToken);          
+        var messageJson = JsonSerializer.Serialize(messageBody);
+        var encodedMessage = Convert.ToBase64String(Encoding.UTF8.GetBytes(messageJson));
+
+        await queueClient.SendMessageAsync(encodedMessage, cancellationToken);
     }
 }
