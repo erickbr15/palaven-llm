@@ -28,7 +28,7 @@ public class ArticleParagraphsExtractionChoreographyService : IArticleParagraphs
     }
 
     public async Task<IResult<EtlTaskDocument>> ExtractArticleParagraphsAsync(Message<ExtractArticleParagraphsMessage> message, CancellationToken cancellationToken)
-    {
+    {                
         await _notificationService.SendAsync(new Guid(message.Body.TenantId),
             string.Format(Resources.Etl.NotificationExtractArticlesInvoked, message.Body.OperationId), cancellationToken);
 

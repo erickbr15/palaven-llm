@@ -2,12 +2,12 @@ using Azure.Identity;
 using Liara.Common.Extensions;
 using Liara.Integrations.Azure;
 using Liara.Integrations.Extensions;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Palaven.Application.Extensions;
 using Palaven.Application.Notification.Extensions;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.VectorIndexing.Extensions;
@@ -44,13 +44,13 @@ var host = new HostBuilder()
         var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
 
         services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
+
         services.AddNotificationService();
         services.AddVectorIndexingServices();
         services.AddPalavenVectorIndexingServices();
+        services.AddDatasetManagementServices();
 
-        services.AddLogging();
-        services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();
+        services.AddLogging();        
     })
     .Build();
 

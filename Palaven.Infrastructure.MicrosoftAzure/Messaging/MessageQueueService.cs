@@ -1,5 +1,6 @@
 ﻿using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.Model.Messaging;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -20,13 +21,21 @@ public class MessageQueueService : IMessageQueueService
         await queueClient.DeleteMessageAsync(message.MessageId, message.PopReceipt, cancellationToken);        
     }    
 
-    public async Task<Message<TBody>> PeekMessageAsync<TBody>(CancellationToken cancellationToken = default) where TBody : class
+    public async Task<Message<TBody>?> PeekMessageAsync<TBody>(CancellationToken cancellationToken = default) where TBody : class
     {
         var queueClient = _queueClientProvider.GetQueueClient(typeof(TBody));
 
-        var azureResponse = await queueClient.PeekMessageAsync(cancellationToken);
+        var azureResponse = await queueClient.PeekMessageAsync(cancellationToken); 
+        
+        if(azureResponse.GetRawResponse().IsError || 
+            azureResponse.GetRawResponse().Status == (int)HttpStatusCode.NoContent ||
+            azureResponse.Value is null)
+        {
+            return null;
+        }
 
         var decodedMessage = Encoding.UTF8.GetString(Convert.FromBase64String(azureResponse.Value.Body.ToString()));
+        
         var body = JsonSerializer.Deserialize<TBody>(decodedMessage);
 
         var message = new Message<TBody>
@@ -43,8 +52,8 @@ public class MessageQueueService : IMessageQueueService
 
     public async Task<IEnumerable<TBody>> PeekMessagesAsync<TBody>(int? maxMessages, CancellationToken cancellationToken = default) where TBody : class
     {
-        var queueClient = _queueClientProvider.GetQueueClient(typeof(TBody));
-
+        var queueClient = _queueClientProvider.GetQueueClient(typeof(TBody));        
+        
         var azureResponse = await queueClient.PeekMessagesAsync(maxMessages, cancellationToken);
 
         var messages = azureResponse.Value.Select(azureMessage =>
@@ -57,13 +66,21 @@ public class MessageQueueService : IMessageQueueService
         return messages;
     }
 
-    public async Task<Message<TBody>> ReceiveMessageAsync<TBody>(TimeSpan? visibilityTimeout = null,CancellationToken cancellationToken = default) where TBody : class
+    public async Task<Message<TBody>?> ReceiveMessageAsync<TBody>(TimeSpan? visibilityTimeout = null,CancellationToken cancellationToken = default) where TBody : class
     {
         var queueClient = _queueClientProvider.GetQueueClient(typeof(TBody));
 
         var azureResponse = await queueClient.ReceiveMessageAsync(visibilityTimeout, cancellationToken);
 
+        if (azureResponse.GetRawResponse().IsError || 
+            azureResponse.GetRawResponse().Status == (int)HttpStatusCode.NoContent ||
+            azureResponse.Value is null)
+        {
+            return null;
+        }
+
         var decodedMessage = Encoding.UTF8.GetString(Convert.FromBase64String(azureResponse.Value.Body.ToString()));
+
         var body = JsonSerializer.Deserialize<TBody>(decodedMessage);
 
         var message = new Message<TBody>

@@ -44,13 +44,8 @@ var host = new HostBuilder()
 
         services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
         services.AddNotificationService();
-        services.AddIngestServices();             
-
+        services.AddIngestServices();
         services.AddLogging();
-
-        /*
-        services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();*/
     })    
     .Build();
 

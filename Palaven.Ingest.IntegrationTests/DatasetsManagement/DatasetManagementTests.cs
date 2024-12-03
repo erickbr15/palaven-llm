@@ -68,7 +68,7 @@ public class DatasetManagementTests
         var choreographyService = _host.Services.GetRequiredService<ICreateInstructionDatasetChoreographyService>();
 
         var message = await messageQueueService.ReceiveMessageAsync<CreateInstructionDatasetMessage>(cancellationToken: CancellationToken.None);
-        var result = await choreographyService.CreateInstructionDatasetAsync(message, CancellationToken.None);
+        var result = await choreographyService.CreateInstructionDatasetAsync(message!, CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.False(result.HasErrors);
