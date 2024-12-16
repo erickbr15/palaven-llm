@@ -45,13 +45,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Application", "Pala
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Api", "Palaven.Api\Palaven.Api.csproj", "{99CE05FE-84CD-4CF1-8B00-E4E422154E43}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Ingest.IntegrationTests", "Palaven.Ingest.IntegrationTests\Palaven.Ingest.IntegrationTests.csproj", "{C261727E-7E93-4189-9FD7-4F48F2BABB0E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Notifications.FunctionApp", "Palaven.Notifications.FunctionApp\Palaven.Notifications.FunctionApp.csproj", "{C7DB386C-BFA7-4887-9F15-031374708F7F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Palaven.Application.Notification", "Palaven.Application.Notification\Palaven.Application.Notification.csproj", "{473923DC-8464-4883-95D0-49CD5C0D90CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.PdfTransformation.FunctionApp", "Palaven.PdfTransformation.FunctionApp\Palaven.PdfTransformation.FunctionApp.csproj", "{942457F2-B3F8-4651-9378-1BBDEDB360D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.IntegrationTests", "Palaven.IntegrationTests\Palaven.IntegrationTests.csproj", "{9AE5F660-7A7A-407E-AE84-9CA6C7198059}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,10 +119,6 @@ Global
 		{99CE05FE-84CD-4CF1-8B00-E4E422154E43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99CE05FE-84CD-4CF1-8B00-E4E422154E43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99CE05FE-84CD-4CF1-8B00-E4E422154E43}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C261727E-7E93-4189-9FD7-4F48F2BABB0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C261727E-7E93-4189-9FD7-4F48F2BABB0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C261727E-7E93-4189-9FD7-4F48F2BABB0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C261727E-7E93-4189-9FD7-4F48F2BABB0E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7DB386C-BFA7-4887-9F15-031374708F7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7DB386C-BFA7-4887-9F15-031374708F7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7DB386C-BFA7-4887-9F15-031374708F7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -135,6 +131,10 @@ Global
 		{942457F2-B3F8-4651-9378-1BBDEDB360D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{942457F2-B3F8-4651-9378-1BBDEDB360D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{942457F2-B3F8-4651-9378-1BBDEDB360D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AE5F660-7A7A-407E-AE84-9CA6C7198059}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AE5F660-7A7A-407E-AE84-9CA6C7198059}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AE5F660-7A7A-407E-AE84-9CA6C7198059}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AE5F660-7A7A-407E-AE84-9CA6C7198059}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,10 +155,10 @@ Global
 		{D599C452-0098-4693-8CC3-6BCA9DD02D0C} = {17A8060F-4D72-4F76-A50E-1A12A15907BE}
 		{AC031113-F525-4263-A608-C24FEBD5D005} = {B1E3584C-275F-4E89-9D17-BF74882D5465}
 		{99CE05FE-84CD-4CF1-8B00-E4E422154E43} = {DA527458-A1A3-4D2D-A383-A705EA181EF4}
-		{C261727E-7E93-4189-9FD7-4F48F2BABB0E} = {4A512285-0E5A-4C67-BBED-9984A880A8BD}
 		{C7DB386C-BFA7-4887-9F15-031374708F7F} = {EE1E4C43-A409-403C-8752-55C2608F52CA}
 		{473923DC-8464-4883-95D0-49CD5C0D90CD} = {B1E3584C-275F-4E89-9D17-BF74882D5465}
 		{942457F2-B3F8-4651-9378-1BBDEDB360D6} = {EE1E4C43-A409-403C-8752-55C2608F52CA}
+		{9AE5F660-7A7A-407E-AE84-9CA6C7198059} = {4A512285-0E5A-4C67-BBED-9984A880A8BD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E278837F-4CA4-43C3-9874-FE884FA0982F}

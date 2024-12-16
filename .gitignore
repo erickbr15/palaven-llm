@@ -440,3 +440,11 @@ $RECYCLE.BIN/
 **/finetuning-gemma
 **/finetuning-gemma/*
 **/*crt
+/presentation/PalavenLLm.pptx
+/presentation/Professional-Growth.pptx
+/Palaven.PdfTransformation.FunctionApp/Properties/ServiceDependencies/palaven-pdf-transformation - Zip Deploy/appInsights1.arm.json
+/Palaven.PdfTransformation.FunctionApp/Properties/ServiceDependencies/palaven-pdf-transformation - Zip Deploy/profile.arm.json
+/Palaven.PdfTransformation.FunctionApp/Properties/ServiceDependencies/palaven-pdf-transformation - Zip Deploy/storage1.arm.json
+/Palaven.PdfTransformation.FunctionApp/Properties/serviceDependencies.json
+/Palaven.PdfTransformation.FunctionApp/Properties/serviceDependencies.palaven-pdf-transformation - Zip Deploy.json
+/Palaven.Ingest.IntegrationTests/Resources/LISR-2024.pdf

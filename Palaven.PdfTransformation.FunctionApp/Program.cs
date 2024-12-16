@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Palaven.Application.Extensions;
 using Palaven.Application.Notification.Extensions;
+using Palaven.Data.Sql.Extensions;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.VectorIndexing.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
@@ -42,10 +43,13 @@ var host = new HostBuilder()
 
         var palavenDBConfig = hostContext.Configuration.GetSection("CosmosDB:Containers");
         var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
-
         services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
 
+        var palavenSqlDBConnectionString = hostContext.Configuration.GetConnectionString("SqlDB");
+        services.AddDataSqlServices(palavenSqlDBConnectionString!);
+
         services.AddNotificationService();
+        
         services.AddVectorIndexingServices();
         services.AddPalavenVectorIndexingServices();
         services.AddDatasetManagementServices();

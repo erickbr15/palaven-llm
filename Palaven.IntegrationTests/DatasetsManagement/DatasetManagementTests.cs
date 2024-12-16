@@ -7,7 +7,10 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Palaven.Application.Abstractions.DatasetManagement;
+using Palaven.Application.Abstractions.Ingest;
 using Palaven.Application.Extensions;
+using Palaven.Application.Ingest.Extensions;
+using Palaven.Application.Model.Ingest;
 using Palaven.Application.Notification.Extensions;
 using Palaven.Data.Sql.Extensions;
 using Palaven.Infrastructure.Abstractions.Messaging;
@@ -57,8 +60,27 @@ public class DatasetManagementTests
                 var palavenSqlDBConnectionString = hostContext.Configuration.GetConnectionString("SqlDB");
                 services.AddDataSqlServices(palavenSqlDBConnectionString!);
                 services.AddNotificationService();
+                services.AddIngestServices();
                 services.AddDatasetManagementServices();
             }).Build();
+    }
+
+    [Fact]
+    public async Task Can_EnqueueInstructionTransformationTasks()
+    {
+        var choreographyService = _host.Services.GetRequiredService<IInstructionGenerationChoreographyService>();
+
+        var command = new EnqueueInstructionTransformationTasksCommand
+        {
+            OperationId = new Guid("8db17b31-7db6-462d-8abd-0a7366ac62d2"),
+            TenantId = new Guid("f3ca0317-e937-423e-97aa-4da231a218a1"),
+            BatchSize = 10
+        };
+
+        var result = await choreographyService.EnqueueInstructionTransformationTasksAsync(command, CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.False(result.HasErrors);
     }
 
     [Fact]

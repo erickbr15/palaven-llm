@@ -22,7 +22,7 @@ public class CreateInstructionsDatasetFunction
     {
         _logger.LogInformation($"C# Queue trigger function processed: {message.MessageText}");
 
-        if (Utils.TryToDeserializeMessage<CreateInstructionDatasetMessage>(message.MessageText, out var createInstructionsDatasetMessageBody))
+        if (!Utils.TryToDeserializeMessage<CreateInstructionDatasetMessage>(message.MessageText, out var createInstructionsDatasetMessageBody))
         {
             _logger.LogError($"Failed to deserialize message. Message: {message.MessageText}");
             return;

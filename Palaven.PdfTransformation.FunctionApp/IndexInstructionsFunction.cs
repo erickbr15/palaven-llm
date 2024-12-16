@@ -22,7 +22,7 @@ public class IndexInstructionsFunction
     {
         _logger.LogInformation($"C# Queue trigger function [index-instructions-queue] started: {message.MessageText}");
 
-        if(Utils.TryToDeserializeMessage<IndexInstructionsMessage>(message.MessageText, out var indexInstructionsMessageBody))
+        if(!Utils.TryToDeserializeMessage<IndexInstructionsMessage>(message.MessageText, out var indexInstructionsMessageBody))
         {
             _logger.LogError($"Failed to deserialize message. Message: {message.MessageText}");
             return;

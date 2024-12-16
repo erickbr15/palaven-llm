@@ -7,4 +7,5 @@ namespace Palaven.Application.Abstractions.Ingest;
 public interface IInstructionGenerationChoreographyService
 {
     Task<IResult<InstructionGenerationResult>> GenerateInstructionsAsync(Message<GenerateInstructionsMessage> message, CancellationToken cancellationToken);
+    Task<IResult> EnqueueInstructionTransformationTasksAsync(EnqueueInstructionTransformationTasksCommand command, CancellationToken cancellationToken);
 }

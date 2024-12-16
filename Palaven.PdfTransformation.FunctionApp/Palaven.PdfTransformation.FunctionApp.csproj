@@ -33,6 +33,7 @@
     <ProjectReference Include="..\Palaven.Infrastructure.MicrosoftAzure\Palaven.Infrastructure.MicrosoftAzure.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.VectorIndexing\Palaven.Infrastructure.VectorIndexing.csproj" />
     <ProjectReference Include="..\Palaven.Persistence.CosmosDB\Palaven.Persistence.CosmosDB.csproj" />
+    <ProjectReference Include="..\Palaven.Persistence.EntityFramework\Palaven.Persistence.EntityFramework.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
