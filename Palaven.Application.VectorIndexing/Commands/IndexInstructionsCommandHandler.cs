@@ -24,7 +24,8 @@ public class IndexInstructionsCommandHandler : ICommandHandler<IndexInstructions
     public async Task<IResult<InstructionsIndexingResult>> ExecuteAsync(IndexInstructionsCommand command, CancellationToken cancellationToken)
     {        
         var goldenDocuments = await FetchGoldenDocumentsAsync(command, cancellationToken);
-        var result = new InstructionsIndexingResult { OperationId = command.OperationId };
+        var indexingResult = new InstructionsIndexingResult { OperationId = command.OperationId };
+        var exceptions = new List<Exception>();
 
         foreach (var goldenDocument in goldenDocuments)
         {
@@ -34,15 +35,23 @@ public class IndexInstructionsCommandHandler : ICommandHandler<IndexInstructions
 
                 await _vectorIndexingService.UpsertAsync(vectorUpsertModels, cancellationToken);
 
-                result.SucessfulDocumentIds.Add(goldenDocument.Id);
+                indexingResult.SucessfulDocumentIds.Add(goldenDocument.Id);
             }
-            catch
+            catch(Exception ex)
             {
-                result.FailedDocumentIds.Add(goldenDocument.Id);
+                exceptions.Add(ex);
+                indexingResult.FailedDocumentIds.Add(goldenDocument.Id);
             }
         }
 
-        return Result<InstructionsIndexingResult>.Success(result);
+        if (exceptions.Any())
+        {
+            var result = Result<InstructionsIndexingResult>.Fail(exceptions);
+            result.Value = indexingResult;
+            return result;
+        }
+
+        return Result<InstructionsIndexingResult>.Success(indexingResult);
     }
 
     private Task<IEnumerable<GoldenDocument>> FetchGoldenDocumentsAsync(IndexInstructionsCommand command, CancellationToken cancellationToken)

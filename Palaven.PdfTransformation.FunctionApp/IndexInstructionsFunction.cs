@@ -1,6 +1,7 @@
 using Azure.Storage.Queues.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Palaven.Application.Abstractions.VectorIndexing;
 using Palaven.Application.VectorIndexing.Services;
 using Palaven.Infrastructure.Model.Messaging;
 
@@ -9,9 +10,9 @@ namespace Palaven.PdfTransformation.FunctionApp;
 public class IndexInstructionsFunction
 {
     private readonly ILogger<IndexInstructionsFunction> _logger;
-    private readonly InstructionsIndexingChoreographyService _choreographyService;
+    private readonly IInstructionsIndexingChoreographyService _choreographyService;
 
-    public IndexInstructionsFunction(ILogger<IndexInstructionsFunction> logger, InstructionsIndexingChoreographyService choreographyService)
+    public IndexInstructionsFunction(ILogger<IndexInstructionsFunction> logger, IInstructionsIndexingChoreographyService choreographyService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _choreographyService = choreographyService ?? throw new ArgumentNullException(nameof(choreographyService));
@@ -49,7 +50,7 @@ public class IndexInstructionsFunction
             }
             foreach (var error in result.Exceptions)
             {
-                _logger.LogError(error.Message);
+                _logger.LogError(error, error.Message);
             }
 
             return;
