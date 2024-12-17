@@ -2,9 +2,8 @@
 
 public class EvaluationSessionInstruction
 {
-    public long Id { get; set; }
-    public int InstructionId { get; set; }
     public Guid EvaluationSessionId { get; set; }
+    public Guid InstructionId { get; set; }    
     public string InstructionPurpose { get; set; } = default!;
 
     public InstructionEntity Instruction { get; set; } = default!;

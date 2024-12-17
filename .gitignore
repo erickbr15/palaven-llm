@@ -448,3 +448,4 @@ $RECYCLE.BIN/
 /Palaven.PdfTransformation.FunctionApp/Properties/serviceDependencies.json
 /Palaven.PdfTransformation.FunctionApp/Properties/serviceDependencies.palaven-pdf-transformation - Zip Deploy.json
 /Palaven.Ingest.IntegrationTests/Resources/LISR-2024.pdf
+*.pdf

@@ -66,7 +66,7 @@ public class VectorIndexingTests
         var vectorIndexingService = _host.Services.GetRequiredService<IInstructionsIndexingChoreographyService>();
 
         var message = await messageQueueService.ReceiveMessageAsync<IndexInstructionsMessage>(cancellationToken: CancellationToken.None);
-        var result = await vectorIndexingService.IndexInstructionsAsync(message, CancellationToken.None);
+        var result = await vectorIndexingService.IndexInstructionsAsync(message!, CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.False(result.HasErrors);

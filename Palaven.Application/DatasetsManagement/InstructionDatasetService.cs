@@ -32,7 +32,7 @@ public class InstructionDatasetService : IInstructionDatasetService
         var instructionDataset = testInstructions
             .Select(i => new InstructionData
             {
-                InstructionId = i.Id,
+                InstructionId = i.InstructionId,
                 DatasetId = i.DatasetId,
                 ChunckNumber = model.BatchNumber,
                 Instruction = i.Instruction,

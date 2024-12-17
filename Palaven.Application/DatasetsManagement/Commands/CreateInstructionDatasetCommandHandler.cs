@@ -29,6 +29,7 @@ public class CreateInstructionDatasetCommandHandler : ICommandHandler<CreateInst
         }
 
         var documents = await FetchDocumentsAsync(command.DocumentIds, cancellationToken);
+
         if(documents == null || !documents.Any())
         {
             return Result.Fail(new InvalidOperationException("No documents found"));
@@ -63,7 +64,7 @@ public class CreateInstructionDatasetCommandHandler : ICommandHandler<CreateInst
     {
         var documentInstructionIds = _datasetsDataService.GetInstructionQueryable()
             .Where(i => i.GoldenArticleId == documentId)
-            .Select(i => i.Id)
+            .Select(i => i.InstructionId)
             .ToList();
 
         foreach (var instructionId in documentInstructionIds)

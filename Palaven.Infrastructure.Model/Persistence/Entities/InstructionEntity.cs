@@ -1,9 +1,8 @@
 ﻿namespace Palaven.Infrastructure.Model.Persistence.Entities;
 
 public class InstructionEntity
-{
-    public int Id { get; set; }
-    public Guid? InstructionId { get; set; }
+{    
+    public Guid InstructionId { get; set; }
     public Guid DatasetId { get; set; }
     public string Instruction { get; set; } = default!;
     public string Response { get; set; } = default!;

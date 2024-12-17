@@ -48,7 +48,7 @@ public class PerformanceMetricsDataService : IPerformanceMetricDataService
 
         var existingEvaluation = _bertScoreMetricRepository
             .GetAll()
-            .SingleOrDefault(x => x.SessionId == bertScoreMetrics.SessionId &&
+            .SingleOrDefault(x => x.EvaluationSessionId == bertScoreMetrics.EvaluationSessionId &&
                                 x.BatchNumber == bertScoreMetrics.BatchNumber &&
                                 x.EvaluationExerciseId == bertScoreMetrics.EvaluationExerciseId);
 
@@ -59,9 +59,9 @@ public class PerformanceMetricsDataService : IPerformanceMetricDataService
         }
         else
         {
-            existingEvaluation.BertScorePrecision = bertScoreMetrics.BertScorePrecision;
-            existingEvaluation.BertScoreRecall = bertScoreMetrics.BertScoreRecall;
-            existingEvaluation.BertScoreF1 = bertScoreMetrics.BertScoreF1;
+            existingEvaluation.Precision = bertScoreMetrics.Precision;
+            existingEvaluation.Recall = bertScoreMetrics.Recall;
+            existingEvaluation.F1 = bertScoreMetrics.F1;
             existingEvaluation.ModifiedDate = DateTime.Now;
 
             _bertScoreMetricRepository.Update(existingEvaluation);
@@ -72,7 +72,7 @@ public class PerformanceMetricsDataService : IPerformanceMetricDataService
     {
         var existingEvaluation = _bleuMetricRepository
             .GetAll()
-            .SingleOrDefault(x => x.SessionId == bleuMetrics.SessionId &&
+            .SingleOrDefault(x => x.EvaluationSessionId == bleuMetrics.EvaluationSessionId &&
                                 x.BatchNumber == bleuMetrics.BatchNumber &&
                                 x.EvaluationExerciseId == bleuMetrics.EvaluationExerciseId);
 
@@ -83,7 +83,7 @@ public class PerformanceMetricsDataService : IPerformanceMetricDataService
         }
         else
         {
-            existingEvaluation.BleuScore = bleuMetrics.BleuScore;
+            existingEvaluation.Score = bleuMetrics.Score;
             existingEvaluation.ModifiedDate = DateTime.Now;
 
             _bleuMetricRepository.Update(existingEvaluation);
@@ -102,7 +102,7 @@ public class PerformanceMetricsDataService : IPerformanceMetricDataService
     {
         var existingEvaluation = _rougeScoreMetricRepository
             .GetAll()
-            .SingleOrDefault(x => x.SessionId == rougeScoreMetric.SessionId && 
+            .SingleOrDefault(x => x.EvaluationSessionId == rougeScoreMetric.EvaluationSessionId && 
                     x.BatchNumber == rougeScoreMetric.BatchNumber && 
                     x.EvaluationExerciseId == rougeScoreMetric.EvaluationExerciseId &&
                     x.RougeType == rougeScoreMetric.RougeType);
@@ -114,9 +114,9 @@ public class PerformanceMetricsDataService : IPerformanceMetricDataService
         }
         else
         {
-            existingEvaluation.RougePrecision = rougeScoreMetric.RougePrecision;
-            existingEvaluation.RougeRecall = rougeScoreMetric.RougeRecall;
-            existingEvaluation.RougeF1 = rougeScoreMetric.RougeF1;
+            existingEvaluation.Precision = rougeScoreMetric.Precision;
+            existingEvaluation.Recall = rougeScoreMetric.Recall;
+            existingEvaluation.F1 = rougeScoreMetric.F1;
             existingEvaluation.ModifiedDate = DateTime.Now;
 
             _rougeScoreMetricRepository.Update(existingEvaluation);

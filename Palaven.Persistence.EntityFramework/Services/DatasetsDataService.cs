@@ -22,7 +22,7 @@ public class DatasetsDataService : IDatasetsDataService
         _evaluationSessionInstructionRepository = evaluationSessionInstructionRepository ?? throw new ArgumentNullException(nameof(evaluationSessionInstructionRepository));
     }
 
-    public Task<InstructionEntity?> GetInstructionByIdAsync(int id, CancellationToken cancellationToken)
+    public Task<InstructionEntity?> GetInstructionByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return _instructionRepository.GetByIdAsync(id, cancellationToken);
     }
@@ -30,9 +30,8 @@ public class DatasetsDataService : IDatasetsDataService
     public IEnumerable<InstructionEntity> GetInstructionForTestingByEvaluationSession(Guid sessionId, int sessionBatchSize, int? batchNumber)
     {
         var instructions = from testInstruction in _evaluationSessionInstructionRepository.GetAll()
-                           join instruction in _instructionRepository.GetAll() on testInstruction.InstructionId equals instruction.Id
+                           join instruction in _instructionRepository.GetAll() on testInstruction.InstructionId equals instruction.InstructionId
                            where testInstruction.EvaluationSessionId == sessionId && testInstruction.InstructionPurpose == "test"
-                           orderby instruction.Id
                            select instruction;
 
         var offset = ((batchNumber ?? 1) - 1) * sessionBatchSize;
@@ -52,7 +51,7 @@ public class DatasetsDataService : IDatasetsDataService
         return prompt;
     }
 
-    public async Task DeleteInstructionAsync(int id, CancellationToken cancellationToken)
+    public async Task DeleteInstructionAsync(Guid id, CancellationToken cancellationToken)
     {
         var instruction = await _instructionRepository.GetByIdAsync(id, cancellationToken);
         
@@ -62,7 +61,7 @@ public class DatasetsDataService : IDatasetsDataService
         }        
     }
 
-    public Task<bool> ExistsInstructionAsync(int id, CancellationToken cancellationToken)
+    public Task<bool> ExistsInstructionAsync(Guid id, CancellationToken cancellationToken)
     {
         return _instructionRepository.ExistsAsync(id, cancellationToken);
     }
@@ -87,7 +86,7 @@ public class DatasetsDataService : IDatasetsDataService
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<InstructionEntity> UpdateAsync(int id, InstructionEntity instruction, CancellationToken cancellationToken)
+    public async Task<InstructionEntity> UpdateAsync(Guid id, InstructionEntity instruction, CancellationToken cancellationToken)
     {
         var entity = await _instructionRepository.GetByIdAsync(id, cancellationToken) ?? throw new InvalidOperationException($"Unable to find the entity with id {id}.");        
 
@@ -99,7 +98,7 @@ public class DatasetsDataService : IDatasetsDataService
         return entity;
     }
 
-    public async Task<FineTuningPromptEntity> UpdateAsync(int id, FineTuningPromptEntity prompt, CancellationToken cancellationToken)
+    public async Task<FineTuningPromptEntity> UpdateAsync(Guid id, FineTuningPromptEntity prompt, CancellationToken cancellationToken)
     {
         var entity = await _fineTuningPromptRepository.GetByIdAsync(id, cancellationToken) ?? throw new InvalidOperationException($"Unable to find the entity with id {id}.");
 
@@ -111,12 +110,12 @@ public class DatasetsDataService : IDatasetsDataService
         return entity;
     }
 
-    public Task<FineTuningPromptEntity?> GetFineTuningPromptByIdAsync(int id, CancellationToken cancellationToken)
+    public Task<FineTuningPromptEntity?> GetFineTuningPromptByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return _fineTuningPromptRepository.GetByIdAsync(id, cancellationToken);
     }    
 
-    public async Task DeleteFineTuningPromptAsync(int id, CancellationToken cancellationToken)
+    public async Task DeleteFineTuningPromptAsync(Guid id, CancellationToken cancellationToken)
     {
         var prompt = await _fineTuningPromptRepository.GetByIdAsync(id, cancellationToken);
         if (prompt != null)
@@ -125,7 +124,7 @@ public class DatasetsDataService : IDatasetsDataService
         }
     }    
 
-    public Task<bool> ExistsFineTuningPromptAsync(int id, CancellationToken cancellationToken)
+    public Task<bool> ExistsFineTuningPromptAsync(Guid id, CancellationToken cancellationToken)
     {
         return _fineTuningPromptRepository.ExistsAsync(id, cancellationToken);
     }

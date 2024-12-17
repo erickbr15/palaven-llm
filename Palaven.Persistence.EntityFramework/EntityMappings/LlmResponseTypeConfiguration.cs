@@ -10,18 +10,18 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
     {
         builder.ToTable("LlmResponses", PalavenDbSchemas.LlmPerformanceEvaluation);
 
-        builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseIdentityColumn();
-
-        builder.Property(x => x.SessionId).IsRequired();
-        builder.Property(x => x.EvaluationExerciseId).IsRequired();
-        builder.Property(x => x.BatchNumber).IsRequired();
+        builder.HasKey(x => new { x.EvaluationSessionId, x.InstructionId, x.EvaluationExerciseId });
+        
+        builder.Property(x => x.EvaluationSessionId).IsRequired();
         builder.Property(x => x.InstructionId).IsRequired();
-        builder.Property(x => x.ResponseCompletion)
-            .HasColumnName("LlmResponseCompletion")
+        builder.Property(x => x.EvaluationExerciseId).IsRequired();
+
+        builder.Property(x => x.BatchNumber).IsRequired();
+        
+        builder.Property(x => x.Response).HasColumnName("LlmResponse")
             .HasColumnType("text");
 
-        builder.Property(x => x.LlmResponseToEvaluate)
+        builder.Property(x => x.CleanResponse).HasColumnName("LlmCleanResponse")
             .HasColumnType("text");
 
         builder.Property(x => x.ElapsedTime).HasColumnType("float").IsRequired();
@@ -29,9 +29,9 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
         builder.Property(x=> x.CreationDate).IsRequired();
         builder.Property(x=> x.ModifiedDate);
 
-        builder.HasOne(x => x.EvaluationExercise)
+        builder.HasOne(x => x.EvaluationSession)
             .WithMany()
-            .HasForeignKey(x => x.EvaluationExerciseId)
+            .HasForeignKey(x => x.EvaluationSessionId)
             .IsRequired(true);
 
         builder.HasOne(x => x.Instruction)
@@ -39,13 +39,13 @@ public class LlmResponseTypeConfiguration : IEntityTypeConfiguration<LlmResponse
             .HasForeignKey(x => x.InstructionId)
             .IsRequired(true);
 
-        builder.HasOne(x => x.EvaluationSession)
+        builder.HasOne(x => x.EvaluationExercise)
             .WithMany()
-            .HasForeignKey(x => x.SessionId)
+            .HasForeignKey(x => x.EvaluationExerciseId)
             .IsRequired(true);
 
-        builder.Navigation(x => x.Instruction).AutoInclude();
         builder.Navigation(x => x.EvaluationSession).AutoInclude();
+        builder.Navigation(x => x.Instruction).AutoInclude();
         builder.Navigation(x => x.EvaluationExercise).AutoInclude();
     }
 }

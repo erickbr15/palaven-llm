@@ -51,7 +51,7 @@ public class CleanChatCompletionResponseCommandHandler : ICommandHandler<CleanCh
         var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.ChatCompletionExcerciseType);
 
         var selectionCriteria = new Func<LlmResponse, bool>(x =>
-            x.SessionId == command.SessionId &&
+            x.EvaluationSessionId == command.SessionId &&
             x.BatchNumber == command.BatchNumber &&
             x.EvaluationExerciseId == evaluationExerciseId);
 

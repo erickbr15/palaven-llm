@@ -113,7 +113,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
 
         var instructions = result.Select(i => new InstructionData
         {
-            InstructionId = i.Id,
+            InstructionId = i.InstructionId,
             DatasetId = i.DatasetId,
             ChunckNumber = batchNumber,
             Instruction = i.Instruction,

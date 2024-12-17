@@ -12,16 +12,17 @@ public class BleuMetricTypeConfiguration : IEntityTypeConfiguration<BleuMetric>
 
         builder.HasKey(e => e.Id);
         builder.Property(e=> e.Id).IsRequired().UseIdentityColumn();
-        builder.Property(e => e.SessionId).IsRequired();
+
+        builder.Property(e => e.EvaluationSessionId).IsRequired();
         builder.Property(e => e.EvaluationExerciseId).IsRequired();
         builder.Property(e => e.BatchNumber).IsRequired();
-        builder.Property(e => e.BleuScore).HasColumnType("float");
+        builder.Property(e => e.Score).HasColumnType("float");
         builder.Property(e => e.CreationDate).IsRequired();
         builder.Property(e => e.ModifiedDate);
 
         builder.HasOne(e => e.EvaluationSession)
             .WithMany()
-            .HasForeignKey(e => e.SessionId)
+            .HasForeignKey(e => e.EvaluationSessionId)
             .IsRequired(true);
 
         builder.HasOne(e => e.EvaluationExercise)

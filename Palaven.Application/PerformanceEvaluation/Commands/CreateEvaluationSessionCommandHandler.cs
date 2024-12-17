@@ -49,26 +49,26 @@ public class CreateEvaluationSessionCommandHandler : ICommandHandler<CreateEvalu
 
     private List<EvaluationSessionInstruction> BuildEvaluationSessionInstructions(EvaluationSession evaluationSession, decimal trainingAndValidationSplit)
     {
-        var instructionsToTrainAndValidateIds = new List<int>();
-        var instructionsToTestIds = new List<int>();
+        var instructionsToTrainAndValidateIds = new List<Guid>();
+        var instructionsToTestIds = new List<Guid>();
 
         SplitInstructionsIntoTrainAndTestSets(instructionsToTrainAndValidateIds, instructionsToTestIds, evaluationSession.DatasetId, trainingAndValidationSplit);
 
         var trainingAndValidationInstructions = _datasetDataService.GetInstructionQueryable()
-            .Where(x => instructionsToTrainAndValidateIds.Contains(x.Id))
+            .Where(x => instructionsToTrainAndValidateIds.Contains(x.InstructionId))
             .Select(x => new EvaluationSessionInstruction
             {
                 EvaluationSessionId = evaluationSession.SessionId,
-                InstructionId = x.Id,
+                InstructionId = x.InstructionId,
                 InstructionPurpose = "train-validation"
             });
 
         var testInstructions = _datasetDataService.GetInstructionQueryable()
-            .Where(x => instructionsToTestIds.Contains(x.Id))
+            .Where(x => instructionsToTestIds.Contains(x.InstructionId))
             .Select(x => new EvaluationSessionInstruction
             {
                 EvaluationSessionId = evaluationSession.SessionId,
-                InstructionId = x.Id,
+                InstructionId = x.InstructionId,
                 InstructionPurpose = "test"
             });
 
@@ -79,13 +79,13 @@ public class CreateEvaluationSessionCommandHandler : ICommandHandler<CreateEvalu
         return evaluationSessionInstructions;
     }
 
-    private void SplitInstructionsIntoTrainAndTestSets(List<int> instructionsToTrainAndValidateIds, List<int> instructionsToTestIds, Guid datasetId, decimal trainingAndValidationSplit)
+    private void SplitInstructionsIntoTrainAndTestSets(List<Guid> instructionsToTrainAndValidateIds, List<Guid> instructionsToTestIds, Guid datasetId, decimal trainingAndValidationSplit)
     {
         var instructions = _datasetDataService.GetInstructionQueryable().Where(x => x.DatasetId == datasetId).ToList();
 
         foreach (var articleInstructions in instructions.GroupBy(i => i.GoldenArticleId))
         {
-            var qaInstructionIds = new Queue<int>(articleInstructions.Where(ai => ai.Category != "summarization").Select(ai => ai.Id).ToList());
+            var qaInstructionIds = new Queue<Guid>(articleInstructions.Where(ai => ai.Category != "summarization").Select(ai => ai.InstructionId).ToList());
 
             var instructionsToTrainAndValidateCount = (int)Math.Round(qaInstructionIds.Count * trainingAndValidationSplit, 2, MidpointRounding.AwayFromZero);
 
@@ -116,7 +116,7 @@ public class CreateEvaluationSessionCommandHandler : ICommandHandler<CreateEvalu
                 }
             }
 
-            var summarizationInstructionIds = articleInstructions.Where(ai => ai.Category == "summarization").Select(ai => ai.Id).ToList();
+            var summarizationInstructionIds = articleInstructions.Where(ai => ai.Category == "summarization").Select(ai => ai.InstructionId).ToList();
 
             instructionsToTrainAndValidateIds.AddRange(summarizationInstructionIds);
             instructionsToTestIds.AddRange(summarizationInstructionIds);

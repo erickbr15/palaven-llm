@@ -8,7 +8,7 @@ public class LlmResponseView
     public int BatchSize { get; set; }
     public string LargeLanguageModel { get; set; } = default!;
     public string DeviceInfo { get; set; } = default!;
-    public int InstructionId { get; set; }
+    public Guid InstructionId { get; set; }
     public int BatchNumber { get; set; }
     public string Instruction { get; set; } = default!;
     public string Response { get; set; } = default!;

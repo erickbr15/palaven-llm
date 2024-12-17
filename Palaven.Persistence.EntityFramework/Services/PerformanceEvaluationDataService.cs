@@ -79,7 +79,7 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
     private Task UpsertChatCompletionResponseAsync(LlmResponse chatCompletionResponse, CancellationToken cancellationToken)
     {
         var existingResponse = _llmResponseRepository.GetAll().SingleOrDefault(x => 
-            x.SessionId == chatCompletionResponse.SessionId && 
+            x.EvaluationSessionId == chatCompletionResponse.EvaluationSessionId && 
             x.InstructionId == chatCompletionResponse.InstructionId &&
             x.BatchNumber == chatCompletionResponse.BatchNumber &&
             x.EvaluationExerciseId == chatCompletionResponse.EvaluationExerciseId);
@@ -91,7 +91,7 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
         }
         else
         {
-            existingResponse.ResponseCompletion = chatCompletionResponse.ResponseCompletion;
+            existingResponse.Response = chatCompletionResponse.Response;
             existingResponse.ModifiedDate = DateTime.Now;
 
             _llmResponseRepository.Update(existingResponse);
@@ -106,9 +106,9 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
         
         foreach (var item in chatCompletionResponses)
         {
-            var llmResponse = _llmResponseRepository.GetById(item.Id);
+            var llmResponse = _llmResponseRepository.GetById(new { item.EvaluationSessionId, item.InstructionId, item.EvaluationExerciseId });
 
-            llmResponse!.LlmResponseToEvaluate = cleaningStrategy(llmResponse.ResponseCompletion);
+            llmResponse!.CleanResponse = cleaningStrategy(llmResponse.Response);
             llmResponse.ModifiedDate = DateTime.Now;
 
             _llmResponseRepository.Update(llmResponse);
@@ -118,8 +118,8 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
     public IList<LlmResponseView> FetchChatCompletionLlmResponses(Func<LlmResponseView, bool> selectionCriteria)
     {
         var responses = (from response in _dbContext.LlmResponses
-                         join evaluationSession in _dbContext.EvaluationSessions on response.SessionId equals evaluationSession.SessionId
-                         join instruction in _dbContext.Instructions on response.InstructionId equals instruction.Id                         
+                         join evaluationSession in _dbContext.EvaluationSessions on response.EvaluationSessionId equals evaluationSession.SessionId
+                         join instruction in _dbContext.Instructions on response.InstructionId equals instruction.InstructionId
                          select new LlmResponseView
                          {
                              EvaluationSessionId = evaluationSession.SessionId,
@@ -128,14 +128,16 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
                              LargeLanguageModel = evaluationSession.LargeLanguageModel,
                              DeviceInfo = evaluationSession.DeviceInfo,
                              EvaluationExercise = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeDescription(response.EvaluationExerciseId),
-                             InstructionId = instruction.Id,
+                             InstructionId = instruction.InstructionId,
                              BatchNumber = response.BatchNumber,
                              Instruction = instruction.Instruction,
                              Response = instruction.Response,
                              Category = instruction.Category,
-                             LlmResponseToEvaluate = response.LlmResponseToEvaluate,
+                             LlmResponseToEvaluate = response.CleanResponse,
                              ElapsedTime = response.ElapsedTime
-                         }).Where(selectionCriteria).ToList();
+                         })
+                         .Where(selectionCriteria)
+                         .ToList();
 
         return responses;
     }
@@ -151,20 +153,19 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
 
         var batchInstructionIds = (from es in _dbContext.EvaluationSessions
                                    join esi in _dbContext.EvaluationSessionInstructions on es.SessionId equals esi.EvaluationSessionId
-                                   join i in _dbContext.Instructions on esi.InstructionId equals i.Id
+                                   join i in _dbContext.Instructions on esi.InstructionId equals i.InstructionId
                                    where es.SessionId == evaluationSessionId &&
                                          esi.InstructionPurpose == "test"
-                                   orderby i.Id
-                                   select i.Id)
+                                   select i.InstructionId)
                            .Skip(offset)
                            .Take(batchSize);
 
         var instructions = (from es in _dbContext.EvaluationSessions
                             join esi in _dbContext.EvaluationSessionInstructions on es.SessionId equals esi.EvaluationSessionId
-                            join i in _dbContext.Instructions on esi.InstructionId equals i.Id
+                            join i in _dbContext.Instructions on esi.InstructionId equals i.InstructionId
                             join llmr in _dbContext.LlmResponses on new
                             {
-                                InstructionId = i.Id,
+                                i.InstructionId,
                                 EvaluationExerciseId = evaluationExerciseId,
                                 BatchNumber = batchNumber
                             }
@@ -179,9 +180,8 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
                             where es.SessionId == evaluationSessionId &&
                                   es.DatasetId == datasetId &&
                                   esi.InstructionPurpose == "test" &&
-                                  batchInstructionIds.Contains(i.Id) &&
-                                  llmrLeft.Instruction == null
-                            orderby i.Id
+                                  batchInstructionIds.Contains(i.InstructionId) &&
+                                  llmrLeft.Instruction == null                            
                             select i).ToList();
         
         return instructions;

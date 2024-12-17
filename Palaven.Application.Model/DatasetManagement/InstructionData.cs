@@ -2,7 +2,7 @@
 
 public class InstructionData
 {
-    public int InstructionId { get; set; }
+    public Guid InstructionId { get; set; }
     public int ChunckNumber { get; set; }
     public Guid DatasetId { get; set; }
     public string Instruction { get; set; } = default!;

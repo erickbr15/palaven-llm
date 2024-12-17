@@ -22,12 +22,7 @@ public class IndexInstructionsCommandHandler : ICommandHandler<IndexInstructions
     }
     
     public async Task<IResult<InstructionsIndexingResult>> ExecuteAsync(IndexInstructionsCommand command, CancellationToken cancellationToken)
-    {
-        if(command == null)
-        {
-            return Result<InstructionsIndexingResult>.Fail(new ArgumentNullException(nameof(command)));
-        }
-
+    {        
         var goldenDocuments = await FetchGoldenDocumentsAsync(command, cancellationToken);
         var result = new InstructionsIndexingResult { OperationId = command.OperationId };
 

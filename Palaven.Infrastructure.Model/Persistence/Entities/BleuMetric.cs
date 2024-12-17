@@ -3,10 +3,10 @@
 public class BleuMetric
 {
     public int Id { get; set; }
-    public Guid SessionId { get; set; }
+    public Guid EvaluationSessionId { get; set; }
     public int EvaluationExerciseId { get; set; }
     public int BatchNumber { get; set; }
-    public float? BleuScore { get; set; }
+    public float? Score { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime? ModifiedDate { get; set; }
 

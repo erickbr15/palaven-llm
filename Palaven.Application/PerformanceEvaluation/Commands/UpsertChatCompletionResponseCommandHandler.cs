@@ -31,8 +31,8 @@ public class UpsertChatCompletionResponseCommandHandler : ICommandHandler<Upsert
                 BatchNumber = r.BatchNumber,
                 InstructionId = r.InstructionId,
                 EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(r.EvaluationExercise),
-                ResponseCompletion = r.ResponseCompletion,
-                SessionId = r.SessionId!.Value,
+                Response = r.ResponseCompletion,
+                EvaluationSessionId = r.SessionId!.Value,
                 ElapsedTime = r.ElapsedTime!.Value
             }).ToList();
 

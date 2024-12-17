@@ -31,7 +31,7 @@ public class FineTuningDatasetService : IFineTuningDatasetService
             .ToList();
 
         var instructions = _datasetDataService.GetInstructionQueryable()
-            .Where(i => !processedInstructions.Contains(i.Id))
+            .Where(i => !processedInstructions.Contains(i.InstructionId))
             .ToList();
         
 
@@ -41,7 +41,7 @@ public class FineTuningDatasetService : IFineTuningDatasetService
 
             var prompt = new FineTuningPromptEntity
             {
-                InstructionId = instruction.Id,
+                InstructionId = instruction.InstructionId,
                 DatasetId = instruction.DatasetId,
                 LargeLanguageModel = request.LargeLanguageModel,
                 Prompt = fineTuningPrompt
@@ -70,6 +70,7 @@ public class FineTuningDatasetService : IFineTuningDatasetService
             .Take(evaluationSession.BatchSize)
             .Select(i => new FineTuningPromptData
             {
+                PromptId = i.PromptId,
                 InstructionId = i.InstructionId,
                 DatasetId = i.DatasetId,
                 ChunckNumber = request.BatchNumber ?? 0,

@@ -11,7 +11,7 @@ public class FineTuningPromptTypeConfiguration : IEntityTypeConfiguration<FineTu
         builder.ToTable("FineTuningPrompts", PalavenDbSchemas.Datasets);
 
         builder.HasKey(b => b.PromptId);
-        builder.Property(b => b.PromptId).HasColumnName("Id").IsRequired().UseIdentityColumn();
+        builder.Property(b => b.PromptId).IsRequired();
 
         builder.Property(b => b.InstructionId).IsRequired();
         builder.Property(b => b.DatasetId).IsRequired();

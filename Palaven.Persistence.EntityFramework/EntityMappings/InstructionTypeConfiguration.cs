@@ -10,8 +10,7 @@ public class InstructionTypeConfiguration : IEntityTypeConfiguration<Instruction
     {
         builder.ToTable("Instructions", PalavenDbSchemas.Datasets);
 
-        builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseIdentityColumn();
+        builder.HasKey(x => x.InstructionId);        
 
         builder.Property(x => x.InstructionId).IsRequired();
         builder.Property(x=> x.DatasetId).IsRequired();

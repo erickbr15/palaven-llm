@@ -21,16 +21,16 @@ public class PerformanceMetricsService : IPerformanceMetricsService
     {
         var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(evaluationExercise);
 
-        var result = _performanceMetricsDataService.FetchBertScoreMetrics(b => b.SessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId);
+        var result = _performanceMetricsDataService.FetchBertScoreMetrics(b => b.EvaluationSessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId);
 
         var metrics = result.Select(m => new BertScoreMetrics
         {
-            EvaluationSessionId = m.SessionId,
+            EvaluationSessionId = m.EvaluationSessionId,
             EvaluationExercise = evaluationExercise.ToLower(),
             BatchNumber = m.BatchNumber,
-            Precision = m.BertScorePrecision ?? 0,
-            Recall = m.BertScoreRecall ?? 0,
-            F1 = m.BertScoreF1 ?? 0
+            Precision = m.Precision ?? 0,
+            Recall = m.Recall ?? 0,
+            F1 = m.F1 ?? 0
         }).ToList();
 
         return metrics;
@@ -40,14 +40,14 @@ public class PerformanceMetricsService : IPerformanceMetricsService
     {
         var evaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(evaluationExercise);
 
-        var result = _performanceMetricsDataService.FetchBleuMetrics(b => b.SessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId);
+        var result = _performanceMetricsDataService.FetchBleuMetrics(b => b.EvaluationSessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId);
 
         var metrics = result.Select(m => new BleuMetrics
         {
-            EvaluationSessionId = m.SessionId,
+            EvaluationSessionId = m.EvaluationSessionId,
             EvaluationExercise = evaluationExercise.ToLower(),
             BatchNumber = m.BatchNumber,
-            BleuScore = m.BleuScore ?? 0
+            BleuScore = m.Score ?? 0
         }).ToList();
 
         return metrics;
@@ -59,17 +59,17 @@ public class PerformanceMetricsService : IPerformanceMetricsService
         
         rougeType = string.IsNullOrWhiteSpace(rougeType) ? "rouge1" : rougeType.ToLower();
 
-        var result = _performanceMetricsDataService.FetchRougeScoreMetrics(b => b.SessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId && b.RougeType == rougeType);
+        var result = _performanceMetricsDataService.FetchRougeScoreMetrics(b => b.EvaluationSessionId == evaluationSessionId && b.EvaluationExerciseId == evaluationExerciseId && b.RougeType == rougeType);
 
         var metrics = result.Select(m => new RougeScoreMetrics
         {
-            EvaluationSessionId = m.SessionId,
+            EvaluationSessionId = m.EvaluationSessionId,
             EvaluationExercise = evaluationExercise.ToLower(),
             BatchNumber = m.BatchNumber,
             RougeType = m.RougeType,
-            Precision = m.RougePrecision ?? 0,
-            Recall = m.RougeRecall ?? 0,
-            F1 = m.RougeF1 ?? 0
+            Precision = m.Precision ?? 0,
+            Recall = m.Recall ?? 0,
+            F1 = m.F1 ?? 0
         }).ToList();
 
         return metrics;
@@ -79,12 +79,12 @@ public class PerformanceMetricsService : IPerformanceMetricsService
     {
         var bertScoreMetrics = new BertScoreMetric
         {
-            SessionId = request.SessionId,
+            EvaluationSessionId = request.SessionId,
             EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(request.EvaluationExercise),
             BatchNumber = request.BatchNumber,
-            BertScorePrecision = request.Precision,
-            BertScoreRecall = request.Recall,
-            BertScoreF1 = request.F1
+            Precision = request.Precision,
+            Recall = request.Recall,
+            F1 = request.F1
         };
 
         await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(bertScoreMetrics, cancellationToken);
@@ -98,10 +98,10 @@ public class PerformanceMetricsService : IPerformanceMetricsService
     {
         var bleuMetric = new BleuMetric
         {
-            SessionId = request.SessionId,
+            EvaluationSessionId = request.SessionId,
             EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(request.EvaluationExercise),
             BatchNumber = request.BatchNumber,
-            BleuScore = request.BleuScore ?? 0,
+            Score = request.BleuScore ?? 0,
         };
 
         await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(bleuMetric, cancellationToken);
@@ -115,13 +115,13 @@ public class PerformanceMetricsService : IPerformanceMetricsService
     {
         var rougeScoreMetrics = requests.Select(command => new RougeScoreMetric
         {
-            SessionId = command.SessionId,
+            EvaluationSessionId = command.SessionId,
             EvaluationExerciseId = ChatCompletionExcerciseType.GetChatCompletionExcerciseTypeId(command.EvaluationExercise),
             BatchNumber = command.BatchNumber,
             RougeType = command.RougeType.ToLower(),
-            RougePrecision = command.Precision,
-            RougeRecall = command.Recall,
-            RougeF1 = command.F1
+            Precision = command.Precision,
+            Recall = command.Recall,
+            F1 = command.F1
         });
 
         await _performanceMetricsDataService.UpsertChatCompletionPerformanceEvaluationAsync(rougeScoreMetrics, cancellationToken);
