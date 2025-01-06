@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Palaven.Etl.FunctionApp;
+namespace Palaven.PdfIngest.FunctionApp;
 
 public static class Utils
 {

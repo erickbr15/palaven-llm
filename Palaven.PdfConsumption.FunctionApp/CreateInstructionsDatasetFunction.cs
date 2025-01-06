@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Palaven.Application.Abstractions.DatasetManagement;
 using Palaven.Infrastructure.Model.Messaging;
 
-namespace Palaven.PdfTransformation.FunctionApp;
+namespace Palaven.PdfConsumption.FunctionApp;
 
 public class CreateInstructionsDatasetFunction
 {

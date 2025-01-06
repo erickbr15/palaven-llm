@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Palaven.PdfTransformation.FunctionApp;
+namespace Palaven.PdfConsumption.FunctionApp;
 
 public static class Utils
 {

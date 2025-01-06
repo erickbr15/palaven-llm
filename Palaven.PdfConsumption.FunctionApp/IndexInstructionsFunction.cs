@@ -1,11 +1,9 @@
-using Azure.Storage.Queues.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Palaven.Application.Abstractions.VectorIndexing;
-using Palaven.Application.VectorIndexing.Services;
 using Palaven.Infrastructure.Model.Messaging;
 
-namespace Palaven.PdfTransformation.FunctionApp;
+namespace Palaven.PdfConsumption.FunctionApp;
 
 public class IndexInstructionsFunction
 {
@@ -19,7 +17,7 @@ public class IndexInstructionsFunction
     }
 
     [Function(nameof(IndexInstructionsFunction))]
-    public async Task RunAsync([QueueTrigger("index-instructions-queue")] QueueMessage message, FunctionContext context, CancellationToken cancellationToken)
+    public async Task RunAsync([QueueTrigger("index-instructions-queue")] Azure.Storage.Queues.Models.QueueMessage message, FunctionContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"C# Queue trigger function [index-instructions-queue] started: {message.MessageText}");
 

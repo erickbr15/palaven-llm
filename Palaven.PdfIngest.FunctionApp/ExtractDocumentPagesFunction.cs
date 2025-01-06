@@ -4,7 +4,7 @@ using Palaven.Application.Abstractions.Ingest;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.Model.Messaging;
 
-namespace Palaven.Etl.FunctionApp;
+namespace Palaven.PdfIngest.FunctionApp;
 
 public class ExtractDocumentPagesFunction
 {
