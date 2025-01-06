@@ -21,7 +21,6 @@
     <ProjectReference Include="..\Palaven.Application.Abstractions\Palaven.Application.Abstractions.csproj" />
     <ProjectReference Include="..\Palaven.Application.Ingest\Palaven.Application.Ingest.csproj" />
     <ProjectReference Include="..\Palaven.Application.Model\Palaven.Application.Model.csproj" />
-    <ProjectReference Include="..\Palaven.Application.Notification\Palaven.Application.Notification.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.MicrosoftAzure\Palaven.Infrastructure.MicrosoftAzure.csproj" />
     <ProjectReference Include="..\Palaven.Persistence.CosmosDB\Palaven.Persistence.CosmosDB.csproj" />
   </ItemGroup>

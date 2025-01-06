@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Palaven.Application.Extensions;
-using Palaven.Application.Notification.Extensions;
 using Palaven.Data.Sql.Extensions;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.VectorIndexing.Extensions;
@@ -47,8 +46,6 @@ var host = new HostBuilder()
 
         var palavenSqlDBConnectionString = hostContext.Configuration.GetConnectionString("SqlDB");
         services.AddDataSqlServices(palavenSqlDBConnectionString!);
-
-        services.AddNotificationService();
         
         services.AddVectorIndexingServices();
         services.AddPalavenVectorIndexingServices();

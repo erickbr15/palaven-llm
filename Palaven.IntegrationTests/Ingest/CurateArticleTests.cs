@@ -12,7 +12,6 @@ using Palaven.Infrastructure.Model.Messaging;
 using Palaven.Application.Ingest.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
 using Liara.Integrations.Extensions;
-using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
@@ -52,7 +51,6 @@ public class CurateArticleTests
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
                 services.AddIngestServices();
-                services.AddNotificationService();
             }).Build();
     }
 
@@ -64,7 +62,7 @@ public class CurateArticleTests
 
         var message = await queueMessageService.ReceiveMessageAsync<CurateArticlesMessage>(cancellationToken: CancellationToken.None);
 
-        var result = await coreographyService.CurateArticlesAsync(message, CancellationToken.None);
+        var result = await coreographyService.CurateArticlesAsync(message!, CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.False(result.HasErrors);

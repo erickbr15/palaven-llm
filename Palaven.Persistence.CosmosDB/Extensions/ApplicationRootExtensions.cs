@@ -61,17 +61,7 @@ public static class ApplicationRootExtensions
                 var client = provider.GetRequiredService<CosmosClient>();
 
                 return new GoldenDocumentRepository(client, options!);
-            });
-
-            services.AddSingleton<IDocumentRepository<NotificationDocument>>(provider =>
-            {
-
-                var containerId = typeof(NotificationDocument).Name;
-                var options = containerOptions[containerId];
-                var client = provider.GetRequiredService<CosmosClient>();
-
-                return new NotificationDocumentRepository(client, options!);
-            });
+            });            
 
             services.AddSingleton<IDocumentRepository<DatasetGenerationTaskDocument>>(provider =>
             {

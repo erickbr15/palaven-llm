@@ -11,7 +11,6 @@ using Liara.Integrations.Azure;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Persistence.CosmosDB.Extensions;
 using Palaven.Application.Ingest.Extensions;
-using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
@@ -49,7 +48,6 @@ public class StartDocumentAnalysisTests
                 var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
-                services.AddNotificationService();
                 services.AddIngestServices();
             }).Build();
     }
@@ -61,7 +59,7 @@ public class StartDocumentAnalysisTests
         var coreographyService = _host.Services.GetRequiredService<IDocumentAnalysisChoreographyService>();
 
         var message = await messageQueueService.ReceiveMessageAsync<DocumentAnalysisMessage>(cancellationToken: CancellationToken.None);
-        var result = await coreographyService.StartDocumentAnalysisAsync(message, CancellationToken.None);
+        var result = await coreographyService.StartDocumentAnalysisAsync(message!, CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);

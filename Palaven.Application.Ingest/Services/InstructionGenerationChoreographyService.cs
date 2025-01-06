@@ -3,7 +3,6 @@ using Liara.Common.Abstractions;
 using Liara.Common.Abstractions.Cqrs;
 using Liara.Persistence.Abstractions;
 using Palaven.Application.Abstractions.Ingest;
-using Palaven.Application.Abstractions.Notifications;
 using Palaven.Application.Model.Ingest;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.Model.Messaging;
@@ -16,15 +15,12 @@ public class InstructionGenerationChoreographyService : IInstructionGenerationCh
     private readonly IMessageQueueService _messageQueueService;
     private readonly ICommandHandler<GenerateInstructionsCommand, InstructionGenerationResult> _generateInstructionsCommandHandler;
     private readonly IDocumentRepository<GoldenDocument> _goldenDocumentRepository;
-    private readonly INotificationService _notificationService;
 
     public InstructionGenerationChoreographyService(IMessageQueueService messageQueueService, ICommandHandler<GenerateInstructionsCommand, InstructionGenerationResult> commandHandler,
-        INotificationService notificationService,
         IDocumentRepository<GoldenDocument> goldenDocumentRepository)
     {
         _messageQueueService = messageQueueService ?? throw new ArgumentNullException(nameof(messageQueueService));
         _generateInstructionsCommandHandler = commandHandler ?? throw new ArgumentNullException(nameof(commandHandler));
-        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _goldenDocumentRepository = goldenDocumentRepository ?? throw new ArgumentNullException(nameof(goldenDocumentRepository));
     }
 
@@ -57,8 +53,8 @@ public class InstructionGenerationChoreographyService : IInstructionGenerationCh
                 };
 
                 await _messageQueueService.SendMessageAsync(createInstructionDatasetMessage, cancellationToken);
-                
-                
+
+
                 var indexInstructionMessage = new IndexInstructionsMessage
                 {
                     OperationId = command.OperationId.ToString(),
@@ -100,9 +96,6 @@ public class InstructionGenerationChoreographyService : IInstructionGenerationCh
 
     public async Task<IResult<InstructionGenerationResult>> GenerateInstructionsAsync(Message<GenerateInstructionsMessage> message, CancellationToken cancellationToken)
     {
-        await _notificationService.SendAsync(new Guid(message.Body.TenantId), 
-            string.Format(Resources.Etl.NotificationGenerateInstructionsInvoked, message.Body.OperationId, message.MessageId), cancellationToken);
-
         var command = new GenerateInstructionsCommand
         {
             OperationId = new Guid(message.Body.OperationId),
@@ -112,9 +105,6 @@ public class InstructionGenerationChoreographyService : IInstructionGenerationCh
         var result = await _generateInstructionsCommandHandler.ExecuteAsync(command, cancellationToken);
         if (result.HasErrors)
         {
-            await _notificationService.SendAsync(new Guid(message.Body.TenantId),
-                string.Format(Resources.Etl.NotificacionEtlError, message.Body.OperationId), cancellationToken);
-
             return result;
         }
 
@@ -136,9 +126,6 @@ public class InstructionGenerationChoreographyService : IInstructionGenerationCh
         await _messageQueueService.SendMessageAsync(instructionDatasetMessage, cancellationToken);
 
         await _messageQueueService.DeleteMessageAsync(message, cancellationToken);
-
-        await _notificationService.SendAsync(new Guid(message.Body.TenantId),
-            string.Format(Resources.Etl.NotificationGenerateInstructionsSuccess, message.Body.OperationId, message.MessageId), cancellationToken);
 
         return result;
     }

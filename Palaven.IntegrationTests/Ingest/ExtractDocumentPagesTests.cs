@@ -11,7 +11,6 @@ using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.Model.Messaging;
 using Palaven.Persistence.CosmosDB.Extensions;
 using Palaven.Application.Ingest.Extensions;
-using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
@@ -49,7 +48,6 @@ public class ExtractDocumentPagesTests
                 var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
-                services.AddNotificationService();
                 services.AddIngestServices();
             }).Build();
     }
@@ -62,7 +60,7 @@ public class ExtractDocumentPagesTests
 
         var message = await queueMessageService.ReceiveMessageAsync<ExtractDocumentPagesMessage>(cancellationToken: CancellationToken.None);
 
-        var result = await coreographyService.ExtractPagesAsync(message, CancellationToken.None);
+        var result = await coreographyService.ExtractPagesAsync(message!, CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);

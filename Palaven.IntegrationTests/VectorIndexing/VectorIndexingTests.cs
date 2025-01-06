@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Palaven.Application.Abstractions.VectorIndexing;
-using Palaven.Application.Notification.Extensions;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
 using Palaven.Infrastructure.Model.Messaging;
@@ -53,7 +52,6 @@ public class VectorIndexingTests
                 var palavenDBConnectionString = hostContext.Configuration.GetConnectionString("PalavenCosmosDB");
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
-                services.AddNotificationService();
                 services.AddVectorIndexingServices();
                 services.AddPalavenVectorIndexingServices();
             }).Build();

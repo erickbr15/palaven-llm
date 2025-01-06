@@ -2,7 +2,6 @@
 using Liara.Common.Abstractions.Cqrs;
 using Liara.Persistence.Abstractions;
 using Palaven.Application.Abstractions.Ingest;
-using Palaven.Application.Abstractions.Notifications;
 using Palaven.Application.Model.Ingest;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.Model.Messaging;
@@ -15,23 +14,17 @@ public class ArticleParagraphsExtractionChoreographyService : IArticleParagraphs
     private readonly ICommandHandler<ExtractArticleParagraphsCommand, EtlTaskDocument> _commandHandler;
     private readonly IDocumentRepository<SilverDocument> _silverStageRepository;
     private readonly IMessageQueueService _messageQueueService;
-    private readonly INotificationService _notificationService;
 
     public ArticleParagraphsExtractionChoreographyService(ICommandHandler<ExtractArticleParagraphsCommand, EtlTaskDocument> commandHandler, IDocumentRepository<SilverDocument> silverStageRepository,
-        IMessageQueueService messageQueueService,
-        INotificationService notificationService)
+        IMessageQueueService messageQueueService)
     {
         _commandHandler = commandHandler ?? throw new ArgumentNullException(nameof(commandHandler));
         _silverStageRepository = silverStageRepository ?? throw new ArgumentNullException(nameof(silverStageRepository));
         _messageQueueService = messageQueueService ?? throw new ArgumentNullException(nameof(messageQueueService));
-        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
     }
 
     public async Task<IResult<EtlTaskDocument>> ExtractArticleParagraphsAsync(Message<ExtractArticleParagraphsMessage> message, CancellationToken cancellationToken)
-    {                
-        await _notificationService.SendAsync(new Guid(message.Body.TenantId),
-            string.Format(Resources.Etl.NotificationExtractArticlesInvoked, message.Body.OperationId), cancellationToken);
-
+    {                        
         var command = new ExtractArticleParagraphsCommand
         {
             OperationId = new Guid(message.Body.OperationId)
@@ -40,9 +33,6 @@ public class ArticleParagraphsExtractionChoreographyService : IArticleParagraphs
         var result = await _commandHandler.ExecuteAsync(command, cancellationToken);
         if(result.HasErrors)
         {
-            await _notificationService.SendAsync(new Guid(message.Body.TenantId),
-                string.Format(Resources.Etl.NotificacionEtlError, message.Body.OperationId), cancellationToken);
-
             return result;
         }
 
@@ -50,9 +40,6 @@ public class ArticleParagraphsExtractionChoreographyService : IArticleParagraphs
         
         await EnqueueCurateArticleMessagesAsync(curateArticleMessages, cancellationToken);
         await _messageQueueService.DeleteMessageAsync(message, cancellationToken);
-
-        await _notificationService.SendAsync(new Guid(message.Body.TenantId),
-            string.Format(Resources.Etl.NotificationExtractArticlesSuccess, message.Body.OperationId), cancellationToken);
 
         return result;
     }

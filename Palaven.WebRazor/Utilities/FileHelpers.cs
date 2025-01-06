@@ -60,7 +60,7 @@ namespace Palaven.WebRazor2.Utilities
             // property associated with this IFormFile. If a display
             // name isn't found, error messages simply won't show
             // a display name.
-            MemberInfo property = typeof(T).GetProperty(formFile.Name.Substring(formFile.Name.IndexOf(".",StringComparison.Ordinal) + 1));
+            MemberInfo property = typeof(T).GetProperty(formFile.Name.Substring(formFile.Name.IndexOf(".", StringComparison.Ordinal) + 1))!;
 
             if (property != null && property.GetCustomAttribute(typeof(DisplayAttribute)) is DisplayAttribute displayAttribute)
             {
@@ -147,9 +147,7 @@ namespace Palaven.WebRazor2.Utilities
                         modelState.AddModelError("File",
                         $"The file exceeds {megabyteSizeLimit:N1} MB.");
                     }
-                    else if (!IsValidFileExtensionAndSignature(
-                        contentDisposition.FileName.Value, memoryStream,
-                        permittedExtensions))
+                    else if (!IsValidFileExtensionAndSignature(contentDisposition.FileName.Value!, memoryStream,permittedExtensions))
                     {
                         modelState.AddModelError("File",
                             "The file type isn't permitted or the file's " +
@@ -242,7 +240,7 @@ namespace Palaven.WebRazor2.Utilities
                 var signatures = _fileSignature[ext];
                 var headerBytes = reader.ReadBytes(signatures.Max(m => m.Length));
 
-                return signatures.Any(signature =>
+                return signatures.Exists(signature =>
                     headerBytes.Take(signature.Length).SequenceEqual(signature));
             }
         }

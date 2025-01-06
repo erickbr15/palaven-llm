@@ -23,8 +23,8 @@ public class IngestModel : PageModel
     }
 
     [BindProperty]
-    public BufferedSingleFile InputModel { get; set; }
-    public string Result { get; private set; }
+    public BufferedSingleFile InputModel { get; set; } = new BufferedSingleFile();
+    public string Result { get; private set; } = default!;
 
     public async Task<IActionResult> OnPostUploadAsync()
     {

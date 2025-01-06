@@ -11,7 +11,6 @@ using Palaven.Application.Abstractions.Ingest;
 using Palaven.Application.Extensions;
 using Palaven.Application.Ingest.Extensions;
 using Palaven.Application.Model.Ingest;
-using Palaven.Application.Notification.Extensions;
 using Palaven.Data.Sql.Extensions;
 using Palaven.Infrastructure.Abstractions.Messaging;
 using Palaven.Infrastructure.MicrosoftAzure.Extensions;
@@ -59,7 +58,6 @@ public class DatasetManagementTests
                 
                 var palavenSqlDBConnectionString = hostContext.Configuration.GetConnectionString("SqlDB");
                 services.AddDataSqlServices(palavenSqlDBConnectionString!);
-                services.AddNotificationService();
                 services.AddIngestServices();
                 services.AddDatasetManagementServices();
             }).Build();
@@ -88,7 +86,7 @@ public class DatasetManagementTests
     {
         var messageQueueService = _host.Services.GetRequiredService<IMessageQueueService>();
         var choreographyService = _host.Services.GetRequiredService<ICreateInstructionDatasetChoreographyService>();
-
+        
         var message = await messageQueueService.ReceiveMessageAsync<CreateInstructionDatasetMessage>(cancellationToken: CancellationToken.None);
         var result = await choreographyService.CreateInstructionDatasetAsync(message!, CancellationToken.None);
 

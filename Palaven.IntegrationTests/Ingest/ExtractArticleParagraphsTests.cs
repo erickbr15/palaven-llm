@@ -11,7 +11,6 @@ using Palaven.Infrastructure.Abstractions.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Palaven.Infrastructure.Model.Messaging;
 using Palaven.Application.Abstractions.Ingest;
-using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
@@ -50,7 +49,6 @@ public class ExtractArticleParagraphsTests
 
                 services.AddNoSqlDataServices(palavenDBConnectionString!, null, palavenDBConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
                 services.AddIngestServices();
-                services.AddNotificationService();
             }).Build();
     }
 
@@ -63,7 +61,7 @@ public class ExtractArticleParagraphsTests
 
         var choreographyService = _host.Services.GetRequiredService<IArticleParagraphsExtractionChoreographyService>();
 
-        var result = await choreographyService.ExtractArticleParagraphsAsync(message, CancellationToken.None);
+        var result = await choreographyService.ExtractArticleParagraphsAsync(message!, CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);

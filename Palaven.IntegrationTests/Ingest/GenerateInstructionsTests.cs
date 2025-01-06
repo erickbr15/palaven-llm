@@ -14,7 +14,6 @@ using Palaven.Persistence.CosmosDB.Extensions;
 using Palaven.Application.Ingest.Extensions;
 using Palaven.Infrastructure.VectorIndexing.Extensions;
 using Palaven.VectorIndexing.Extensions;
-using Palaven.Application.Notification.Extensions;
 
 namespace Palaven.Ingest.Test.Ingest;
 
@@ -59,7 +58,6 @@ public class GenerateInstructionsTests
 
                 services.AddVectorIndexingServices();
                 services.AddPalavenVectorIndexingServices();
-                services.AddNotificationService();
             }).Build();
     }
 
@@ -70,7 +68,7 @@ public class GenerateInstructionsTests
         var coreographyService = _host.Services.GetRequiredService<IInstructionGenerationChoreographyService>();
 
         var message = await queueMessageService.ReceiveMessageAsync<GenerateInstructionsMessage>(cancellationToken: CancellationToken.None);
-        var result = await coreographyService.GenerateInstructionsAsync(message, CancellationToken.None);
+        var result = await coreographyService.GenerateInstructionsAsync(message!, CancellationToken.None);
 
         Assert.NotNull(result);
     }

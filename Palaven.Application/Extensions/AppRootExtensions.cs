@@ -19,28 +19,28 @@ public static class AppRootExtensions
 {
     public static IServiceCollection AddDatasetManagementServices(this IServiceCollection services)
     {
-        services.AddSingleton<ICommandHandler<CreateInstructionDatasetCommand>, CreateInstructionDatasetCommandHandler>();
-        services.AddSingleton<IFineTuningDatasetService,FineTuningDatasetService>();
-        services.AddSingleton<IInstructionDatasetService, InstructionDatasetService>();
-        services.AddSingleton<ICreateInstructionDatasetChoreographyService, CreateInstructionDatasetChoreographyService>();
+        services.AddTransient<ICommandHandler<CreateInstructionDatasetCommand>, CreateInstructionDatasetCommandHandler>();
+        services.AddTransient<IFineTuningDatasetService,FineTuningDatasetService>();
+        services.AddTransient<IInstructionDatasetService, InstructionDatasetService>();
+        services.AddTransient<ICreateInstructionDatasetChoreographyService, CreateInstructionDatasetChoreographyService>();
 
         return services;
     }
 
     public static IServiceCollection AddPerformanceEvaluationServices(this IServiceCollection services)
     {
-        services.AddSingleton<ICommandHandler<CreateEvaluationSessionCommand, EvaluationSessionInfo>, CreateEvaluationSessionCommandHandler>(); 
-        services.AddSingleton<ICommandHandler<CleanChatCompletionResponseCommand>, CleanChatCompletionResponseCommandHandler>();        
-        services.AddSingleton<ICommandHandler<UpsertChatCompletionResponseCommand>, UpsertChatCompletionResponseCommandHandler>();                
-        services.AddSingleton<IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>>, LlmChatCompletionResponseQueryHandler>();
-        services.AddSingleton<IPerformanceEvaluationService, PerformanceEvaluationService>();
+        services.AddTransient<ICommandHandler<CreateEvaluationSessionCommand, EvaluationSessionInfo>, CreateEvaluationSessionCommandHandler>(); 
+        services.AddTransient<ICommandHandler<CleanChatCompletionResponseCommand>, CleanChatCompletionResponseCommandHandler>();        
+        services.AddTransient<ICommandHandler<UpsertChatCompletionResponseCommand>, UpsertChatCompletionResponseCommandHandler>();                
+        services.AddTransient<IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>>, LlmChatCompletionResponseQueryHandler>();
+        services.AddTransient<IPerformanceEvaluationService, PerformanceEvaluationService>();
 
         return services;
     }
 
     public static IServiceCollection AddPerformanceMetricsService(this IServiceCollection services)
     {
-        services.AddSingleton<IPerformanceMetricsService, PerformanceMetricsService>();
+        services.AddTransient<IPerformanceMetricsService, PerformanceMetricsService>();
 
         return services;
     }
