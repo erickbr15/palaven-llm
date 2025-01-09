@@ -14,7 +14,6 @@ public class FineTuningPromptTypeConfiguration : IEntityTypeConfiguration<FineTu
         builder.Property(b => b.PromptId).IsRequired();
 
         builder.Property(b => b.InstructionId).IsRequired();
-        builder.Property(b => b.DatasetId).IsRequired();
         builder.Property(b => b.LargeLanguageModel).HasMaxLength(2000).IsRequired();
         builder.Property(b => b.Prompt).IsRequired();
 

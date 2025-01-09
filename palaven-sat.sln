@@ -49,6 +49,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.PdfIngest.FunctionA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.PdfConsumption.FunctionApp", "Palaven.PdfConsumption.FunctionApp\Palaven.PdfConsumption.FunctionApp.csproj", "{A1895675-C08F-440F-80DA-B2275CED7E7D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Common", "0 - Common", "{94DCFDB9-D975-4586-8C3C-CDF945F81EF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palaven.Common", "Palaven.Common\Palaven.Common.csproj", "{80B71A42-B8FD-4DCB-BAE9-5666D8003B08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +127,10 @@ Global
 		{A1895675-C08F-440F-80DA-B2275CED7E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1895675-C08F-440F-80DA-B2275CED7E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1895675-C08F-440F-80DA-B2275CED7E7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80B71A42-B8FD-4DCB-BAE9-5666D8003B08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80B71A42-B8FD-4DCB-BAE9-5666D8003B08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80B71A42-B8FD-4DCB-BAE9-5666D8003B08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80B71A42-B8FD-4DCB-BAE9-5666D8003B08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -145,6 +153,7 @@ Global
 		{9AE5F660-7A7A-407E-AE84-9CA6C7198059} = {4A512285-0E5A-4C67-BBED-9984A880A8BD}
 		{896D1268-0489-474A-A23E-822AD480977D} = {EE1E4C43-A409-403C-8752-55C2608F52CA}
 		{A1895675-C08F-440F-80DA-B2275CED7E7D} = {EE1E4C43-A409-403C-8752-55C2608F52CA}
+		{80B71A42-B8FD-4DCB-BAE9-5666D8003B08} = {94DCFDB9-D975-4586-8C3C-CDF945F81EF6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E278837F-4CA4-43C3-9874-FE884FA0982F}

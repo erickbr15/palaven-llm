@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.13.1" />
+    <PackageReference Include="Liara.Common" Version="8.3.0" />
+    <PackageReference Include="Liara.Integrations" Version="8.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.9.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
@@ -16,9 +19,12 @@
     <ProjectReference Include="..\Palaven.Application.Abstractions\Palaven.Application.Abstractions.csproj" />
     <ProjectReference Include="..\Palaven.Application.Model\Palaven.Application.Model.csproj" />
     <ProjectReference Include="..\Palaven.Application\Palaven.Application.csproj" />
+    <ProjectReference Include="..\Palaven.Common\Palaven.Common.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.Abstractions\Palaven.Infrastructure.Abstractions.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.Llm\Palaven.Infrastructure.Llm.csproj" />
+    <ProjectReference Include="..\Palaven.Infrastructure.MicrosoftAzure\Palaven.Infrastructure.MicrosoftAzure.csproj" />
     <ProjectReference Include="..\Palaven.Infrastructure.Model\Palaven.Infrastructure.Model.csproj" />
+    <ProjectReference Include="..\Palaven.Persistence.EntityFramework\Palaven.Persistence.EntityFramework.csproj" />
   </ItemGroup>
 
 </Project>

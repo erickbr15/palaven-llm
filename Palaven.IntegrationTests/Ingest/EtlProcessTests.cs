@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Azure.Identity;
-using Liara.Persistence.Abstractions;
+using Liara.Common.Abstractions.Persistence;
 using Palaven.Infrastructure.Model.Persistence.Documents;
 using Palaven.Persistence.CosmosDB.Extensions;
 using Liara.Integrations.Azure;

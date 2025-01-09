@@ -2,6 +2,7 @@
 
 public class EvaluationSessionInstruction
 {
+    public int Id { get; set; }
     public Guid EvaluationSessionId { get; set; }
     public Guid InstructionId { get; set; }    
     public string InstructionPurpose { get; set; } = default!;

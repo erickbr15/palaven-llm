@@ -18,9 +18,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
     
     private readonly IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> _queryChatCompletionResponsesCommand;
 
-    public PerformanceEvaluationService(
-        IEvaluationSessionDataService evaluationSessionDataService,        
-        ICommandHandler<UpsertChatCompletionResponseCommand> upsertChatCompletionResponseCommand,
+    public PerformanceEvaluationService(IEvaluationSessionDataService evaluationSessionDataService, ICommandHandler<UpsertChatCompletionResponseCommand> upsertChatCompletionResponseCommand,
         ICommandHandler<CleanChatCompletionResponseCommand> cleanChatCompletionResponsesCommand,
         ICommandHandler<CreateEvaluationSessionCommand, EvaluationSessionInfo> createEvaluationSessionCommand,
         IQueryHandler<LlmChatCompletionResponseQuery, IList<LlmResponseView>> queryChatCompletionResponsesCommand)
@@ -52,6 +50,7 @@ public class PerformanceEvaluationService : IPerformanceEvaluationService
             DatasetId = evaluationSession.DatasetId,
             BatchSize = evaluationSession.BatchSize,
             LargeLanguageModel = evaluationSession.LargeLanguageModel,
+            DeviceInfo = evaluationSession.DeviceInfo,
             IsActive = evaluationSession.IsActive,
             StartDate = evaluationSession.StartDate
         };

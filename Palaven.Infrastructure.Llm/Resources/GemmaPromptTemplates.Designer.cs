@@ -61,6 +61,15 @@ namespace Palaven.Infrastructure.Llm.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;bos&gt;&lt;start_of_turn&gt;user {instruction}&lt;end_of_turn&gt;&lt;start_of_turn&gt;model {response}&lt;end_of_turn&gt;&lt;eos&gt;.
+        /// </summary>
+        internal static string FineTuningPrompt {
+            get {
+                return ResourceManager.GetString("FineTuningPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;start_of_turn&gt;user
         ///Answer the following question in a concise and informative manner following the next directions:
         ///1. The question is in spanish, then answer in spanish.

@@ -1,4 +1,4 @@
-﻿using Liara.Persistence.Abstractions;
+﻿using Liara.Common.Abstractions.Persistence;
 using Palaven.Infrastructure.Abstractions.Persistence;
 using Palaven.Infrastructure.Model.Persistence.Entities;
 

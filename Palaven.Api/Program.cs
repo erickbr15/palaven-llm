@@ -1,6 +1,12 @@
 using Azure.Identity;
+using Liara.Common.Extensions;
+using Liara.Integrations.Azure;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Palaven.Application.Extensions;
+using Palaven.Data.Sql.Extensions;
 using Palaven.Infrastructure.Llm.Extensions;
+using Palaven.Infrastructure.MicrosoftAzure.Extensions;
+using Palaven.Persistence.CosmosDB.Extensions;
 
 namespace Palaven.Api
 {
@@ -24,7 +30,19 @@ namespace Palaven.Api
                 });
             });
 
+            var sqlConnectionString = builder.Configuration.GetConnectionString("SqlDB");            
+            builder.Services.AddDataSqlServices(sqlConnectionString!);
+
+            var cosmosContainerConfig = builder.Configuration.GetSection("CosmosDB:Containers");
+            var cosmosConnectionString = builder.Configuration.GetConnectionString("PalavenCosmosDB");
+            builder.Services.AddNoSqlDataServices(cosmosConnectionString!, null, cosmosContainerConfig.Get<Dictionary<string, CosmosDBContainerOptions>>());
+
             builder.Services.AddLlmServices();
+            builder.Services.AddAzureStorageServices(builder.Configuration);
+
+            builder.Services.AddDatasetManagementServices();
+            builder.Services.AddPerformanceEvaluationServices();
+            builder.Services.AddPerformanceMetricsService();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

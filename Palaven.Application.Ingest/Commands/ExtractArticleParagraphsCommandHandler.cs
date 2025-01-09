@@ -5,7 +5,7 @@ using Palaven.Infrastructure.Model.Persistence.Documents;
 using Palaven.Application.Model.Ingest;
 using Liara.Common.Abstractions;
 using Liara.Common;
-using Liara.Persistence.Abstractions;
+using Liara.Common.Abstractions.Persistence;
 
 namespace Palaven.Application.Ingest.Commands;
 

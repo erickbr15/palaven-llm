@@ -1,5 +1,4 @@
-﻿using Liara.Persistence.Abstractions;
-using Microsoft.Extensions.Options;
+﻿using Liara.Common.Abstractions.Persistence;
 using Palaven.Infrastructure.Abstractions.AI.Llm;
 using Palaven.Infrastructure.Abstractions.VectorIndexing;
 using Palaven.Infrastructure.Model.AI.Llm;

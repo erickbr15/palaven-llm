@@ -1,7 +1,7 @@
 ﻿using Liara.Common;
 using Liara.Common.Abstractions;
 using Liara.Common.Abstractions.Cqrs;
-using Liara.Persistence.Abstractions;
+using Liara.Common.Abstractions.Persistence;
 using Palaven.Application.Model.VectorIndexing;
 using Palaven.Infrastructure.Abstractions.VectorIndexing;
 using Palaven.Infrastructure.Model.AI;

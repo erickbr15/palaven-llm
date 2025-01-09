@@ -6,7 +6,7 @@ using Palaven.Application.Model.Ingest;
 using Palaven.Infrastructure.Model.Persistence.Documents.Metadata;
 using Palaven.Infrastructure.Model.Persistence.Documents;
 using Liara.Common;
-using Liara.Persistence.Abstractions;
+using Liara.Common.Abstractions.Persistence;
 using Liara.Integrations.OpenAI;
 using Palaven.Infrastructure.Model.AI;
 

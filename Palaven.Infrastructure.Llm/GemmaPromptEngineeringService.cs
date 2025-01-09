@@ -22,7 +22,21 @@ public class GemmaPromptEngineeringService : IPromptEngineeringService<string>
 
     public string CreateFineTuningPrompt(string instruction, string response)
     {
-        throw new NotImplementedException();
+        if(string.IsNullOrWhiteSpace(instruction))
+        {
+            return string.Empty;
+        }
+
+        if (string.IsNullOrWhiteSpace(response))
+        {
+            return string.Empty;
+        }
+
+        var prompt = Resources.GemmaPromptTemplates.FineTuningPrompt
+            .Replace("{instruction}", instruction)
+            .Replace("{response}", response);
+
+        return prompt;
     }
 
     public string CreateSimpleQueryPrompt(string instruction)

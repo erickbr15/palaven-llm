@@ -1,4 +1,4 @@
-﻿using Liara.Persistence.Abstractions;
+﻿using Liara.Common.Abstractions.Persistence;
 using Palaven.Infrastructure.Abstractions.Persistence;
 using Palaven.Infrastructure.Model.Persistence.Entities;
 
@@ -103,7 +103,6 @@ public class DatasetsDataService : IDatasetsDataService
         var entity = await _fineTuningPromptRepository.GetByIdAsync(id, cancellationToken) ?? throw new InvalidOperationException($"Unable to find the entity with id {id}.");
 
         entity.Instruction = prompt.Instruction;
-        entity.DatasetId = prompt.DatasetId;
         entity.LargeLanguageModel = prompt.LargeLanguageModel;
         entity.Prompt = prompt.Prompt;
 

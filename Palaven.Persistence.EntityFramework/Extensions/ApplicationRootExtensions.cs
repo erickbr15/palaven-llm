@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Palaven.Persistence.EntityFramework;
-using Liara.Persistence.Abstractions;
+using Liara.Common.Abstractions.Persistence;
 using Palaven.Persistence.EntityFramework.Repositories;
 using Palaven.Infrastructure.Model.Persistence.Entities;
 using Palaven.Infrastructure.Abstractions.Persistence;

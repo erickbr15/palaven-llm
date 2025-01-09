@@ -1,4 +1,4 @@
-﻿using Liara.Persistence.Abstractions;
+﻿using Liara.Common.Abstractions.Persistence;
 using Microsoft.Azure.Cosmos;
 
 namespace Palaven.Persistence.CosmosDB;

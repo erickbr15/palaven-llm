@@ -2,6 +2,6 @@
 
 public class QueryFineTuningDatasetRequest
 {
-    public Guid SessionId { get; set; }
-    public int? BatchNumber { get; set; }
+    public Guid DatasetId { get; set; }
+    public string LargeLanguageModel { get; set; } = default!;
 }

@@ -1,4 +1,4 @@
-﻿using Liara.Persistence.Abstractions;
+﻿using Liara.Common.Abstractions.Persistence;
 using Palaven.Infrastructure.Abstractions.Persistence;
 using Palaven.Infrastructure.Model.PerformanceEvaluation;
 using Palaven.Infrastructure.Model.Persistence.Entities;
@@ -156,6 +156,7 @@ public class PerformanceEvaluationDataService : IEvaluationSessionDataService
                                    join i in _dbContext.Instructions on esi.InstructionId equals i.InstructionId
                                    where es.SessionId == evaluationSessionId &&
                                          esi.InstructionPurpose == "test"
+                                   orderby esi.Id
                                    select i.InstructionId)
                            .Skip(offset)
                            .Take(batchSize);

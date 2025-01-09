@@ -11,22 +11,19 @@ namespace Palaven.Application.DatasetManagement;
 
 public class FineTuningDatasetService : IFineTuningDatasetService
 {
-    private readonly IDatasetsDataService _datasetDataService;
-    private readonly IEvaluationSessionDataService _evaluationSessionDataService;
+    private readonly IDatasetsDataService _datasetDataService;    
     private readonly IPromptEngineeringService<string> _promptEngineeringService;
 
     public FineTuningDatasetService(IDatasetsDataService instructionDataService, IEvaluationSessionDataService evaluationSessionDataService,
         IPromptEngineeringService<string> promptEngineeringService)
     {
         _datasetDataService = instructionDataService ?? throw new ArgumentNullException(nameof(instructionDataService));
-        _evaluationSessionDataService = evaluationSessionDataService ?? throw new ArgumentNullException(nameof(evaluationSessionDataService));
         _promptEngineeringService = promptEngineeringService ?? throw new ArgumentNullException(nameof(promptEngineeringService));
     }
 
     public async Task CreateFineTuningPromptDatasetAsync(CreateFineTuningDatasetRequest request, CancellationToken cancellationToken)
     {
         var processedInstructions = _datasetDataService.GetFineTuningPromptQueryable()
-            .Where(i => i.DatasetId == request.DatasetId)
             .Select(i => i.InstructionId)
             .ToList();
 
@@ -39,43 +36,34 @@ public class FineTuningDatasetService : IFineTuningDatasetService
         {
             var fineTuningPrompt = _promptEngineeringService.CreateFineTuningPrompt(instruction.Instruction, instruction.Response);
 
-            var prompt = new FineTuningPromptEntity
+            if (!string.IsNullOrWhiteSpace(fineTuningPrompt))
             {
-                InstructionId = instruction.InstructionId,
-                DatasetId = instruction.DatasetId,
-                LargeLanguageModel = request.LargeLanguageModel,
-                Prompt = fineTuningPrompt
-            };
+                var prompt = new FineTuningPromptEntity
+                {
+                    InstructionId = instruction.InstructionId,
+                    LargeLanguageModel = request.LargeLanguageModel,
+                    Prompt = fineTuningPrompt
+                };
 
-            await _datasetDataService.CreateAsync(prompt, cancellationToken);
-
+                await _datasetDataService.CreateAsync(prompt, cancellationToken);
+            }            
         }
         await _datasetDataService.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IResult<List<FineTuningPromptData>>> FetchFineTuningPromptDatasetAsync(QueryFineTuningDatasetRequest request, CancellationToken cancellationToken)
-    {
-        var evaluationSession = await _evaluationSessionDataService.GetEvaluationSessionAsync(request.SessionId, cancellationToken);
-        if (evaluationSession == null)
-        {
-            return Result<List<FineTuningPromptData>>.Success(new List<FineTuningPromptData>());
-        }
-
-        var offset = request.BatchNumber.HasValue ? (request.BatchNumber.Value - 1) * evaluationSession.BatchSize : 0;
-
+    public IResult<List<FineTuningPromptData>> FetchFineTuningPromptDataset(QueryFineTuningDatasetRequest request)
+    {                
         var instructionDataset = _datasetDataService.GetFineTuningPromptQueryable()
-            .Where(x => x.DatasetId == evaluationSession.DatasetId)
-            .OrderBy(x => x.PromptId)
-            .Skip(offset)
-            .Take(evaluationSession.BatchSize)
+            .Where(p=>
+                p.Instruction.DatasetId == request.DatasetId &&
+                p.LargeLanguageModel.ToLower() == request.LargeLanguageModel.ToLower())
             .Select(i => new FineTuningPromptData
             {
                 PromptId = i.PromptId,
                 InstructionId = i.InstructionId,
-                DatasetId = i.DatasetId,
-                ChunckNumber = request.BatchNumber ?? 0,
+                DatasetId = request.DatasetId,
                 Prompt = i.Prompt,
-                GoldenArticleId = i.Instruction.GoldenArticleId                
+                GoldenArticleId = i.Instruction.GoldenArticleId
             }).ToList();
 
         return Result<List<FineTuningPromptData>>.Success(instructionDataset);

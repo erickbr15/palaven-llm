@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Liara.Integrations" Version="8.2.4" />
-    <PackageReference Include="Liara.Persistence.Abstractions" Version="8.2.2" />
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.45.2" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.8.0" />
+    <PackageReference Include="Liara.Common" Version="8.3.0" />
+    <PackageReference Include="Liara.Integrations" Version="8.3.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.46.1" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.9.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
   </ItemGroup>
 

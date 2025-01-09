@@ -23,8 +23,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Liara.Common" Version="8.2.1" />
-    <PackageReference Include="Liara.Integrations" Version="8.2.4" />
+    <PackageReference Include="Liara.Common" Version="8.3.0" />
+    <PackageReference Include="Liara.Integrations" Version="8.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.9.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />

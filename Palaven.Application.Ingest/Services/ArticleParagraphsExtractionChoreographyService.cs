@@ -1,6 +1,6 @@
 ﻿using Liara.Common.Abstractions;
 using Liara.Common.Abstractions.Cqrs;
-using Liara.Persistence.Abstractions;
+using Liara.Common.Abstractions.Persistence;
 using Palaven.Application.Abstractions.Ingest;
 using Palaven.Application.Model.Ingest;
 using Palaven.Infrastructure.Abstractions.Messaging;

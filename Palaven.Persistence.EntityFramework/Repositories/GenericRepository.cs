@@ -1,4 +1,4 @@
-﻿using Liara.Persistence.Abstractions;
+﻿using Liara.Common.Abstractions.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

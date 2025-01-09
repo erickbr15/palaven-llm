@@ -3,7 +3,7 @@ using Liara.Common.Abstractions;
 using Liara.Common.Abstractions.Cqrs;
 using Liara.Integrations.OpenAI;
 using Liara.Integrations.OpenAI.Chat;
-using Liara.Persistence.Abstractions;
+using Liara.Common.Abstractions.Persistence;
 using Newtonsoft.Json;
 using Palaven.Application.Ingest.Resources;
 using Palaven.Application.Model.Ingest;

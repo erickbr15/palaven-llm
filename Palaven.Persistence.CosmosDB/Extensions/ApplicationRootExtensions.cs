@@ -1,5 +1,5 @@
-﻿using Liara.Integrations.Azure;
-using Liara.Persistence.Abstractions;
+﻿using Liara.Common.Abstractions.Persistence;
+using Liara.Integrations.Azure;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;

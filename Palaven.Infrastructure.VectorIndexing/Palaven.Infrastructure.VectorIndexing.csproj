@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Liara.Integrations" Version="8.2.4" />
+    <PackageReference Include="Liara.Common" Version="8.3.0" />
+    <PackageReference Include="Liara.Integrations" Version="8.3.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
   </ItemGroup>
 
